@@ -11,11 +11,11 @@ Rails.application.configure do
   # Show full stack traces so you can debug why a test failed.
   config.consider_all_requests_local = true
 
-  # Disables CSRF protection in tests so you don't have to deal with 
+  # Disables CSRF protection in tests so you don't have to deal with
   # authenticity tokens when simulating form posts.
   config.action_controller.allow_forgery_protection = false
 
-  # Raise an error if you try to use a callback (like 'before_action') 
+  # Raise an error if you try to use a callback (like 'before_action')
   # on a controller method that doesn't exist.
   config.action_controller.raise_on_missing_callback_actions = true
 
@@ -28,7 +28,7 @@ Rails.application.configure do
   # Performance boost for serving images/assets during integration tests.
   config.public_file_server.headers = { "cache-control" => "public, max-age=3600" }
 
-  # Emails aren't actually sent. Instead, they are saved to an array 
+  # Emails aren't actually sent. Instead, they are saved to an array
   # (ActionMailer::Base.deliveries) so you can test if an email *would* have been sent.
   config.action_mailer.delivery_method = :test
   config.action_mailer.default_url_options = { host: "example.com" }

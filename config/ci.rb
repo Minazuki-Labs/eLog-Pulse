@@ -9,11 +9,11 @@ CI.run do
   step "Security: Gem audit", "bin/bundler-audit"
   step "Security: Importmap vulnerability audit", "bin/importmap audit"
   step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
-  
+
   # Testing
   step "Tests: Rails", "bin/rails test"
   step "Tests: Seeds", "env RAILS_ENV=test bin/rails db:seed:replant"
 
-# System tests: Uncomment when you start testing in a real browser.
+  # System tests: Uncomment when you start testing in a real browser.
   # step "Tests: System", "bin/rails test:system"
 end

@@ -4,7 +4,7 @@ Rails.application.configure do
   # Allows you to see code changes immediately without restarting the server.
   config.enable_reloading = true
 
-  # Set to false so Rails doesn't load the whole app on startup. 
+  # Set to false so Rails doesn't load the whole app on startup.
   # This makes the server start faster in development.
   config.eager_load = false
 
@@ -35,7 +35,7 @@ Rails.application.configure do
   # Prevents your app from crashing if an email fails to send.
   config.action_mailer.raise_delivery_errors = false
   config.action_mailer.perform_caching = false
-  
+
   # Required for generating links in emails (e.g., password resets).
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
@@ -45,7 +45,7 @@ Rails.application.configure do
   # Tells you exactly which line of code triggered a Database query or Background job.
   config.active_record.verbose_query_logs = true
   config.active_job.verbose_enqueue_logs = true
-  
+
   # Adds SQL comments to your logs to help track where queries come from.
   config.active_record.query_log_tags_enabled = true
 
