@@ -1,13 +1,9 @@
 class User < ApplicationRecord
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+  devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
 
-  enum :role, { admin: 0, employee: 1, school: 2 }
+  enum :role, { admin: 0, employee: 1, school: 2 }, validate: true
 
   has_many :locations, foreign_key: :school_id
-  has_many :equipment_categories, foreign_key: :school_id
   has_many :reported_tickets, class_name: "Ticket", foreign_key: :school_id
 
   has_many :assigned_tickets, class_name: "Ticket", foreign_key: :employee_id
@@ -17,5 +13,6 @@ class User < ApplicationRecord
 
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :role, presence: true
+
+  scope :staff, -> { where(role: [ :admin, :employee ]) }
 end

@@ -36,9 +36,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_091015) do
   create_table "equipment_categories", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
-    t.bigint "school_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["school_id"], name: "index_equipment_categories_on_school_id"
   end
 
   create_table "issue_types", force: :cascade do |t|
@@ -47,6 +45,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_091015) do
     t.string "name"
     t.datetime "updated_at", null: false
     t.index ["equipment_category_id"], name: "index_issue_types_on_equipment_category_id"
+  end
+
+  create_table "location_template_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "equipment_category_id", null: false
+    t.bigint "location_template_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["equipment_category_id"], name: "index_location_template_items_on_equipment_category_id"
+    t.index ["location_template_id"], name: "index_location_template_items_on_location_template_id"
   end
 
   create_table "location_templates", force: :cascade do |t|
@@ -64,15 +71,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_091015) do
     t.bigint "school_id", null: false
     t.datetime "updated_at", null: false
     t.index ["school_id"], name: "index_locations_on_school_id"
-  end
-
-  create_table "template_items", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.bigint "equipment_category_id", null: false
-    t.bigint "location_template_id", null: false
-    t.datetime "updated_at", null: false
-    t.index ["equipment_category_id"], name: "index_template_items_on_equipment_category_id"
-    t.index ["location_template_id"], name: "index_template_items_on_location_template_id"
   end
 
   create_table "tickets", force: :cascade do |t|
@@ -114,12 +112,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_091015) do
   add_foreign_key "comments", "users"
   add_foreign_key "equipment", "equipment_categories"
   add_foreign_key "equipment", "locations"
-  add_foreign_key "equipment_categories", "users", column: "school_id"
   add_foreign_key "issue_types", "equipment_categories"
+  add_foreign_key "location_template_items", "equipment_categories"
+  add_foreign_key "location_template_items", "location_templates"
   add_foreign_key "location_templates", "users", column: "created_by_id"
   add_foreign_key "locations", "users", column: "school_id"
-  add_foreign_key "template_items", "equipment_categories"
-  add_foreign_key "template_items", "location_templates"
   add_foreign_key "tickets", "equipment"
   add_foreign_key "tickets", "issue_types"
   add_foreign_key "tickets", "locations"

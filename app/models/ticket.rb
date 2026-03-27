@@ -11,11 +11,14 @@ class Ticket < ApplicationRecord
   has_many :comments, dependent: :destroy
 
   validates :school_id, :location_id, :equipment_id, :issue_type_id, presence: true
-  validates :description, presence: true, length: { minimum: 10 }
+  validates :description, presence: true
   validates :status, :priority, presence: true
 
   validates :custom_issue_text, presence: true, if: :needs_custom_text?
   validate :equipment_must_belong_to_location
+
+  scope :open, -> { where(status: [ :pending, :in_progress ]) }
+  scope :high_priority, -> { where(priority: :high) }
 
   private
 
@@ -24,10 +27,10 @@ class Ticket < ApplicationRecord
   end
 
   def equipment_must_belong_to_location
-    return if equipment.nil? || location.nil?
+    return unless equipment && location
 
     if equipment.location_id != location_id
-      errors.add(:equipment, "must be located in the selected room")
+      errors.add(:equipment, "must be located in the selected room (#{location.name})")
     end
   end
 end

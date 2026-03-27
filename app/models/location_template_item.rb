@@ -1,4 +1,4 @@
-class TemplateItem < ApplicationRecord
+class LocationTemplateItem < ApplicationRecord
   belongs_to :location_template
   belongs_to :equipment_category
 
