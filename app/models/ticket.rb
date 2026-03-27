@@ -11,7 +11,6 @@ class Ticket < ApplicationRecord
   has_many :comments, dependent: :destroy
 
   validates :school_id, :location_id, :equipment_id, :issue_type_id, presence: true
-  validates :description, presence: true
   validates :status, :priority, presence: true
 
   validates :custom_issue_text, presence: true, if: :needs_custom_text?
