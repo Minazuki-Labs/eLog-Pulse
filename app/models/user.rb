@@ -14,4 +14,8 @@ class User < ApplicationRecord
   has_many :location_templates, foreign_key: :created_by_id
 
   has_many :comments
+
+  validates :name, presence: true
+  validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :role, presence: true
 end

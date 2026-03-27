@@ -3,4 +3,6 @@ class Location < ApplicationRecord
 
   has_many :equipment, dependent: :destroy
   has_many :tickets
+
+  validates :name, presence: true, uniqueness: { scope: :school_id }
 end

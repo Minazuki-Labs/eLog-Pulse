@@ -3,4 +3,14 @@ class LocationTemplate < ApplicationRecord
 
   has_many :template_items, dependent: :destroy
   has_many :equipment_categories, through: :template_items
+
+  validates :name, presence: true, uniqueness: { case_sensitive: false }
+  validates :description, length: { maximum: 500 }
+  before_validation :normalize_name
+
+  private
+
+  def normalize_name
+    self.name = name.squish if name.present?
+  end
 end

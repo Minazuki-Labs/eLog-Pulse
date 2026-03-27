@@ -9,4 +9,25 @@ class Ticket < ApplicationRecord
   belongs_to :issue_type
 
   has_many :comments, dependent: :destroy
+
+  validates :school_id, :location_id, :equipment_id, :issue_type_id, presence: true
+  validates :description, presence: true, length: { minimum: 10 }
+  validates :status, :priority, presence: true
+
+  validates :custom_issue_text, presence: true, if: :needs_custom_text?
+  validate :equipment_must_belong_to_location
+
+  private
+
+  def needs_custom_text?
+    issue_type&.other?
+  end
+
+  def equipment_must_belong_to_location
+    return if equipment.nil? || location.nil?
+
+    if equipment.location_id != location_id
+      errors.add(:equipment, "must be located in the selected room")
+    end
+  end
 end
