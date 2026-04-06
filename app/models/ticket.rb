@@ -16,8 +16,11 @@ class Ticket < ApplicationRecord
   validates :custom_issue_text, presence: true, if: :needs_custom_text?
   validate :equipment_must_belong_to_location
 
-  scope :open, -> { where(status: [ :pending, :in_progress ]) }
+  scope :open, -> { where(status: [ :pending ]) }
   scope :high_priority, -> { where(priority: :high) }
+
+  scope :assigned_to, ->(user) { where(employee: user) }
+  scope :recent, -> { order(created_at: :desc) }
 
   private
 
@@ -26,9 +29,7 @@ class Ticket < ApplicationRecord
   end
 
   def equipment_must_belong_to_location
-    return unless equipment && location
-
-    if equipment.location_id != location_id
+    if equipment && location && equipment.location_id != location_id
       errors.add(:equipment, "must be located in the selected room (#{location.name})")
     end
   end

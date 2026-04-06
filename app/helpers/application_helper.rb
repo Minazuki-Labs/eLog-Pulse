@@ -11,4 +11,16 @@ module ApplicationHelper
       "bg-gray-100 text-gray-600 border border-gray-200"
     end
   end
+
+  def sidebar_link(label, path, icon)
+    active = current_page?(path)
+
+    link_class = active ?
+      "flex items-center px-4 py-3 text-sm font-bold text-blue-600 bg-blue-50 rounded-xl mb-2 transition-all" :
+      "flex items-center px-4 py-3 text-sm font-semibold text-gray-400 hover:bg-gray-50 rounded-xl transition-all mb-2"
+
+    link_to path, class: link_class do
+      content_tag(:span, label)
+    end
+  end
 end
