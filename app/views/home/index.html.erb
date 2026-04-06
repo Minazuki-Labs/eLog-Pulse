@@ -1,34 +1,30 @@
 <div class="flex min-h-screen bg-white">
   <aside class="w-64 flex-shrink-0 px-6 pt-10 border-r border-gray-50">
     <nav class="space-y-1">
-      <p class="px-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4">
-        <%= current_user.role.titleize %> Menu
+      <p class="px-5 text-[13px] font-black text-slate-900 uppercase tracking-[0.2em] mb-6">
+        Helpdesk
       </p>
 
       <% if current_user.school? %>
-        <%= sidebar_link "Dashboard", root_path, "grid" %>
+        <%= sidebar_link "Dashboard", root_path, "squares-2x2" %>
         <%= sidebar_link "My Tickets", tickets_path, "ticket" %>
         <%= sidebar_link "Create New Ticket", new_ticket_path, "plus-circle" %>
-        <%= sidebar_link "Our Equipment", locations_path, "cube" %>
-        <%= sidebar_link "Settings", edit_user_registration_path, "cog" %>
+        <%= sidebar_link "Our Equipment", "#", "cube" %>
+        <%= sidebar_link "Settings", edit_user_registration_path, "cog-6-tooth" %>
 
-      <% elsif current_user.employee? %>
+      <% elsif current_user.employee? || current_user.admin? %>
         <%= sidebar_link "Assigned to Me", tickets_path(scope: 'assigned'), "user-circle" %>
         <%= sidebar_link "Open Tickets", tickets_path(scope: 'open'), "inbox" %>
-        <%= sidebar_link "Equipment Directory", "#", "clipboard-list" %>
-        <%= sidebar_link "School Directory", "#", "office-building" %>
+        <%= sidebar_link "Equipment Directory", "#", "clipboard-document-list" %>
+        <%= sidebar_link "School Directory", "#", "building-office" %>
 
-      <% elsif current_user.admin? %>
-        <%= sidebar_link "Assigned to Me", tickets_path(scope: 'assigned'), "user-circle" %>
-        <%= sidebar_link "Open Tickets", tickets_path(scope: 'open'), "inbox" %>
-        <%= sidebar_link "Equipment Directory", "#", "clipboard-list" %>
-        <%= sidebar_link "School Directory", "#", "office-building" %>
-        
-        <div class="pt-4 mt-4 border-t border-gray-100">
-          <p class="px-4 text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Admin Tools</p>
-          <%= sidebar_link "Staff Management", "#", "users" %>
-          <%= sidebar_link "Location Templates", "#", "template" %>
-        </div>
+        <% if current_user.admin? %>
+          <div class="pt-4 mt-4 border-t border-gray-100">
+            <p class="px-5 text-[13px] font-black text-slate-900 uppercase tracking-[0.2em] mb-6">Admin Tools</p>
+            <%= sidebar_link "Staff Management", "#", "users" %>
+            <%= sidebar_link "Location Templates", "#", "rectangle-group" %>
+          </div>
+        <% end %>
       <% end %>
     </nav>
   </aside>
