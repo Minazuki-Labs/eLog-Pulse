@@ -1,0 +1,43 @@
+<div class="max-w-4xl mx-auto py-10 px-4">
+  <%= link_to root_path, class: "flex items-center gap-2 text-slate-500 hover:text-blue-600 mb-8 transition-colors" do %>
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+    <span class="font-medium">Back to Tickets</span>
+  <% end %>
+
+  <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+    <div class="flex justify-between items-start mb-8">
+      <div>
+        <span class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest <%= status_color(@ticket.status) %>">
+          <%= @ticket.status %>
+        </span>
+        <h1 class="text-3xl font-extrabold text-slate-900 mt-4">
+          <%= @ticket.equipment&.equipment_category&.name %>
+        </h1>
+        <p class="text-lg text-slate-500"><%= @ticket.issue_type&.name %></p>
+      </div>
+      
+      <div class="text-right">
+        <p class="text-sm text-slate-400">Submitted on</p>
+        <p class="font-mono font-bold text-slate-700"><%= @ticket.created_at.strftime("%d %b %Y") %></p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      <div class="space-y-1">
+        <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Location</label>
+        <p class="text-slate-700 font-semibold"><%= @ticket.location&.name %></p>
+      </div>
+      <div class="space-y-1">
+        <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Priority Level</label>
+        <p class="text-slate-700 font-semibold"><%= @ticket.priority.capitalize rescue "Normal" %></p>
+      </div>
+    </div>
+
+    <div class="border-t border-slate-100 pt-8">
+      <h4 class="text-sm font-bold text-slate-800 uppercase mb-4">Description</h4>
+      <div class="prose prose-slate max-w-none">
+        <%= simple_format @ticket.description %>
+      </div>
+    </div>
+  </div>
+</div>
