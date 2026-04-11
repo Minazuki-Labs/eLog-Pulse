@@ -15,4 +15,8 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
 
   scope :staff, -> { where(role: [ :admin, :employee ]) }
+
+  def staff?
+    admin? || employee?
+  end
 end

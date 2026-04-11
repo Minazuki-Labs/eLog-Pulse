@@ -2,7 +2,7 @@ class HomeController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @tickets = Ticket.includes(:location, :issue_type, :employee).recent
+    @tickets = Ticket.includes(:school, :location, :issue_type, equipment: :equipment_category).recent
 
     case params[:scope]
     when "assigned"

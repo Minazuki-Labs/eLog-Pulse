@@ -12,6 +12,7 @@
       <%= sidebar_link "Settings", edit_user_registration_path, "cog-6-tooth" %>
 
     <% elsif current_user.employee? || current_user.admin? %>
+      <%= sidebar_link "Dashboard", root_path, "squares-2x2" %>
       <%= sidebar_link "Assigned to Me", tickets_path(scope: 'assigned'), "user-circle" %>
       <%= sidebar_link "Open Tickets", tickets_path(scope: 'open'), "inbox" %>
       <%= sidebar_link "Equipment Directory", "#", "clipboard-document-list" %>
