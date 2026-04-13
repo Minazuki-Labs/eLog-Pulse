@@ -1,0 +1,39 @@
+<div class="relative flex gap-6">
+  <div class="relative z-10 flex-shrink-0">
+    <div class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white ring-4 ring-white">
+      <span class="text-xs font-bold">
+        <% 
+          words = (comment.user.name.presence || comment.user.email).split
+          initials = if words.length > 1
+                      words.map(&:first).join.upcase[0..1]
+                    else
+                      display_name[0..1].upcase
+                    end
+        %>
+        <%= initials %>
+      </span>
+    </div>
+  </div>
+  
+  <div class="flex-1">
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-900"><%= comment.user.name %></span>
+        <span class="text-slate-300">•</span>
+        <span class="text-xs font-medium text-slate-500">
+          <%= time_ago_in_words(comment.created_at) %> ago
+        </span>
+      </div>
+      
+      <time class="text-[10px] font-mono font-medium text-slate-400 bg-slate-100/50 px-2 py-0.5 rounded">
+        <%= comment.created_at.strftime("%b %d, %Y • %H:%M") %>
+      </time>
+    </div>
+
+    <div class="bg-slate-50 border border-slate-200/60 p-5 rounded-2xl rounded-tl-none shadow-sm">
+      <div class="prose prose-sm text-slate-700 leading-relaxed max-w-none">
+        <%= simple_format comment.body %>
+      </div>
+    </div>
+  </div>
+</div>
