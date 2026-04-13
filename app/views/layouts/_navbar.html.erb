@@ -10,15 +10,7 @@
     <div class="flex items-center space-x-6">
       <div class="flex items-center space-x-4">
         <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-black shadow-inner">
-          <% 
-            words = (current_user.name.presence || current_user.email).split
-            initials = if words.length > 1
-                        words.map(&:first).join.upcase[0..1]
-                      else
-                        display_name[0..1].upcase
-                      end
-          %>
-          <%= initials %>
+          <%= current_user.initials %>
         </div>
 
         <p class="text-sm font-bold text-slate-800 leading-tight">

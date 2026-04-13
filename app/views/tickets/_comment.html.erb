@@ -2,15 +2,7 @@
   <div class="relative z-10 flex-shrink-0">
     <div class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white ring-4 ring-white">
       <span class="text-xs font-bold">
-        <% 
-          words = (comment.user.name.presence || comment.user.email).split
-          initials = if words.length > 1
-                      words.map(&:first).join.upcase[0..1]
-                    else
-                      display_name[0..1].upcase
-                    end
-        %>
-        <%= initials %>
+        <%= comment.user.initials %>
       </span>
     </div>
   </div>

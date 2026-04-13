@@ -19,4 +19,15 @@ class User < ApplicationRecord
   def staff?
     admin? || employee?
   end
+
+  def initials
+    display_name = (name.presence || email).to_s.strip
+    parts = display_name.split
+
+    if parts.length >= 2
+      (parts[0][0] + parts[1][0]).upcase
+    else
+      display_name[0..1].upcase
+    end
+  end
 end
