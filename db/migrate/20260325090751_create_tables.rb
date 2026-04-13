@@ -48,7 +48,6 @@ class CreateTables < ActiveRecord::Migration[8.1]
       t.references :location, null: false, foreign_key: true
       t.references :equipment, null: false, foreign_key: true
       t.references :issue_type, null: false, foreign_key: true
-      t.string :custom_issue_text
       t.text :description
       t.integer :status, default: 0
       t.integer :priority, default: 0

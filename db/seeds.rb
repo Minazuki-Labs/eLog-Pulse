@@ -216,7 +216,6 @@ ticket2 = Ticket.create!(
     description: "Monitor stolen",
     priority: :medium,
     status: :completed,
-    custom_issue_text: "Monitor missing",
     employee: employee1,
     assigned_at: Time.current
   )

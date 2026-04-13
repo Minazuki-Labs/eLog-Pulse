@@ -76,7 +76,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_091015) do
   create_table "tickets", force: :cascade do |t|
     t.datetime "assigned_at"
     t.datetime "created_at", null: false
-    t.string "custom_issue_text"
     t.text "description"
     t.bigint "employee_id"
     t.bigint "equipment_id", null: false
