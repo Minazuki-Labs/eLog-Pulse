@@ -9,5 +9,9 @@ Rails.application.routes.draw do
     put "users" => "devise/registrations#update", as: "user_registration"
   end
 
+  resources :tickets do
+    resources :comments, only: [ :create ]
+  end
+
   root to: "home#index"
 end

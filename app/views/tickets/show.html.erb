@@ -1,43 +1,134 @@
-<div class="max-w-4xl mx-auto py-10 px-4">
-  <%= link_to root_path, class: "flex items-center gap-2 text-slate-500 hover:text-blue-600 mb-8 transition-colors" do %>
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-    <span class="font-medium">Back to Tickets</span>
-  <% end %>
+<div class="max-w-5xl mx-auto py-10 px-4">
+  <div class="flex items-center justify-between mb-6">
+    <%= link_to root_path, class: "group flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors" do %>
+      <svg class="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+      <span class="font-semibold">Back to Tickets</span>
+    <% end %>
+    
+    <div class="flex gap-2">
+      <span class="text-xs font-mono text-slate-400 bg-slate-100 px-2 py-1 rounded">ID: #<%= @ticket.id %></span>
+    </div>
+  </div>
 
-  <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
-    <div class="flex justify-between items-start mb-8">
-      <div>
-        <span class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest <%= status_color(@ticket.status) %>">
-          <%= @ticket.status %>
-        </span>
-        <h1 class="text-3xl font-extrabold text-slate-900 mt-4">
-          <%= @ticket.equipment&.equipment_category&.name %>
-        </h1>
-        <p class="text-lg text-slate-500"><%= @ticket.issue_type&.name %></p>
-      </div>
+  <div class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+    <div class="flex flex-col md:flex-row">
       
-      <div class="text-right">
-        <p class="text-sm text-slate-400">Submitted on</p>
-        <p class="font-mono font-bold text-slate-700"><%= @ticket.created_at.strftime("%d %b %Y") %></p>
+      <div class="flex-1 p-8 md:p-12">
+        <div class="mb-10">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest <%= status_color(@ticket.status) %> ring-1 ring-inset ring-black/5">
+            <%= @ticket.status %>
+          </span>
+          <h1 class="text-4xl font-black text-slate-900 mt-4 tracking-tight leading-tight">
+            <%= @ticket.equipment&.equipment_category&.name %>
+          </h1>
+          <p class="text-xl text-slate-500 font-medium mt-1"><%= @ticket.issue_type&.name %></p>
+        </div>
+
+        <div class="space-y-4">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+            Description
+          </h4>
+          <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
+            <%= simple_format @ticket.description %>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-full md:w-80 bg-slate-50 border-l border-slate-100 p-8 md:p-10">
+        <div class="space-y-8">
+          
+          <% if current_user.staff? %>
+            <div>
+              <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">School</label>
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0z"></path></svg>
+                </div>
+                <p class="text-slate-900 font-bold leading-tight"><%= @ticket.school&.name %></p>
+              </div>
+            </div>
+          <% end %>
+
+          <div>
+            <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Location</label>
+            <p class="text-slate-700 font-semibold flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <%= @ticket.location&.name %>
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Priority Level</label>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white border border-slate-200 shadow-sm">
+              <span class="w-2 h-2 rounded-full <%= @ticket.priority == 'high' ? 'bg-red-500 animate-pulse' : 'bg-green-500' %>"></span>
+              <span class="text-sm font-bold text-slate-700 uppercase italic"><%= @ticket.priority || "Normal" %></span>
+            </div>
+          </div>
+
+          <div class="pt-6 border-t border-slate-200">
+            <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Timeline</label>
+            <div class="space-y-1">
+              <p class="text-xs text-slate-500">Created <span class="text-slate-900 font-bold"><%= time_ago_in_words(@ticket.created_at) %> ago</span></p>
+              <p class="text-[10px] font-mono text-slate-400"><%= @ticket.created_at.strftime("%d %b %Y, %H:%M") %></p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 pb-20">
+  <div class="mt-12 space-y-8">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <h3 class="text-2xl font-black text-slate-900 tracking-tight">Activity Log</h3>
+        <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-black ring-1 ring-inset ring-blue-200/50">
+          <%= @ticket.comments.count %>
+        </span>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-      <div class="space-y-1">
-        <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Location</label>
-        <p class="text-slate-700 font-semibold"><%= @ticket.location&.name %></p>
-      </div>
-      <div class="space-y-1">
-        <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Priority Level</label>
-        <p class="text-slate-700 font-semibold"><%= @ticket.priority.capitalize rescue "Normal" %></p>
-      </div>
+    <div class="bg-white rounded-[2rem] p-2 shadow-xl shadow-slate-200/40 border border-slate-100">
+      <%= form_with(model: [ @ticket, Comment.new ], class: "relative") do |f| %>
+        <%= f.text_area :body, 
+            placeholder: "Type a technical note or status update...", 
+            class: "w-full rounded-[1.6rem] border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-6 pb-16 text-slate-700 placeholder:text-slate-400 min-h-[120px] resize-none" 
+        %>
+        <div class="absolute bottom-4 right-4">
+          <%= f.submit "Post Update", 
+              class: "bg-slate-900 hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all transform active:scale-95 flex items-center gap-2 shadow-lg shadow-blue-500/20" 
+          %>
+        </div>
+      <% end %>
     </div>
 
-    <div class="border-t border-slate-100 pt-8">
-      <h4 class="text-sm font-bold text-slate-800 uppercase mb-4">Description</h4>
-      <div class="prose prose-slate max-w-none">
-        <%= simple_format @ticket.description %>
-      </div>
+    <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-slate-200 before:via-slate-100 before:to-transparent">
+      <% @ticket.comments.order(created_at: :desc).each do |comment| %>
+        <div class="relative flex gap-6 group">
+          <div class="relative z-10 flex-shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-white border-2 border-slate-100 flex items-center justify-center text-slate-400 group-hover:border-blue-400 transition-colors shadow-sm">
+              <span class="text-[10px] font-black uppercase"><%= comment.user.name.to_s[0..1] %></span>
+            </div>
+          </div>
+          
+          <div class="flex-1 pb-4">
+            <div class="bg-white p-6 rounded-[1.5rem] rounded-tl-none shadow-sm border border-slate-100 group-hover:border-slate-200 transition-all">
+              <div class="flex items-center justify-between mb-3">
+                <span class="font-bold text-slate-900"><%= comment.user.name %></span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  <%= time_ago_in_words(comment.created_at) %> ago
+                </span>
+              </div>
+              <div class="prose prose-sm text-slate-600 leading-relaxed">
+                <%= simple_format comment.body %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>
