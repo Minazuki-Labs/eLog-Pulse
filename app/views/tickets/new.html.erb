@@ -1,0 +1,51 @@
+<%= form_with(model: @ticket, data: { 
+    controller: "ticket-form",
+    ticket_form_locations_url_value: locations_tickets_path,
+    ticket_form_equipment_url_value: equipment_tickets_path,
+    ticket_form_issue_types_url_value: issue_types_tickets_path
+  }) do |f| %>
+
+  <div class="field">
+    <% if !current_user.school? %>
+      <%= f.label :school_id %>
+      <%= f.collection_select :school_id, @schools, :id, :name, 
+          { prompt: "Select School" }, 
+          { data: { action: "change->ticket-form#updateLocations", ticket_form_target: "school" } } %>
+    <% end %>
+  </div>
+
+  <div class="field">
+    <%= f.label :location_id, "Room/Location" %>
+    <%= f.collection_select :location_id, @locations, :id, :name, 
+        { prompt: "Select Location" }, 
+        { data: { action: "change->ticket-form#updateEquipment", ticket_form_target: "location" } } %>
+  </div>
+
+  <div class="field">
+    <%= f.label :equipment_id %>
+    <%= f.collection_select :equipment_id, @equipment, :id, :id, 
+        { prompt: "Select Equipment" }, 
+        { data: { action: "change->ticket-form#updateIssueTypes", ticket_form_target: "equipment" } } %>
+  </div>
+
+  <div class="field">
+    <%= f.label :issue_type_id %>
+    <%= f.collection_select :issue_type_id, @issue_types, :id, :name, 
+        { prompt: "Select Issue Type" }, 
+        { data: { ticket_form_target: "issueType" } } %>
+  </div>
+
+  <div class="field">
+    <%= f.label :priority %>
+    <%= f.select :priority, 
+        Ticket.priorities.keys.map { |p| [p.humanize, p] }, 
+        { prompt: "Select Priority" } %>
+  </div>
+
+  <div class="field">
+    <%= f.label :description %>
+    <%= f.text_area :description %>
+  </div>
+
+  <%= f.submit "Create Ticket" %>
+<% end %>
