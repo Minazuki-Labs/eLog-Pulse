@@ -1,51 +1,77 @@
-<%= form_with(model: @ticket, data: { 
-    controller: "ticket-form",
-    ticket_form_locations_url_value: locations_tickets_path,
-    ticket_form_equipment_url_value: equipment_tickets_path,
-    ticket_form_issue_types_url_value: issue_types_tickets_path
-  }) do |f| %>
+<div class="max-w-5xl mx-auto py-10 px-4">
+  <div class="flex items-center justify-between mb-8">
+    <%= link_to root_path, class: "group flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors" do %>
+      <svg class="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      <span class="font-semibold">Back to Tickets</span>
+    <% end %>
+    <h1 class="text-3xl font-black text-slate-900 tracking-tight">Create New Ticket</h1>
+  </div>
 
-  <div class="field">
-    <% if !current_user.school? %>
-      <%= f.label :school_id %>
-      <%= f.collection_select :school_id, @schools, :id, :name, 
-          { prompt: "Select School" }, 
-          { data: { action: "change->ticket-form#updateLocations", ticket_form_target: "school" } } %>
+  <div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200/40 border border-slate-100">
+    <%= form_with(model: @ticket, data: { 
+        controller: "ticket-form",
+        ticket_form_locations_url_value: locations_tickets_path,
+        ticket_form_equipment_url_value: equipment_tickets_path,
+        ticket_form_issue_types_url_value: issue_types_tickets_path
+      }, class: "space-y-8") do |f| %>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <% if !current_user.school? %>
+          <div class="flex flex-col gap-2">
+            <%= f.label :school_id, class: "text-sm font-black text-slate-700 ml-1" %>
+            <%= f.collection_select :school_id, @schools, :id, :name, 
+                { prompt: "Select School" }, 
+                { class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700",
+                  data: { action: "change->ticket-form#updateLocations", ticket_form_target: "school" } } %>
+          </div>
+        <% end %>
+
+        <div class="flex flex-col gap-2">
+          <%= f.label :location_id, "Room / Location", class: "text-sm font-black text-slate-700 ml-1" %>
+          <%= f.collection_select :location_id, @locations, :id, :name, 
+              { prompt: "Select Location" }, 
+              { class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700",
+                data: { action: "change->ticket-form#updateEquipment", ticket_form_target: "location" } } %>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <%= f.label :equipment_id, class: "text-sm font-black text-slate-700 ml-1" %>
+          <%= f.collection_select :equipment_id, @equipment, :id, :id, 
+              { prompt: "Select Equipment" }, 
+              { class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700",
+                data: { action: "change->ticket-form#updateIssueTypes", ticket_form_target: "equipment" } } %>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <%= f.label :issue_type_id, class: "text-sm font-black text-slate-700 ml-1" %>
+          <%= f.collection_select :issue_type_id, @issue_types, :id, :name, 
+              { prompt: "Select Issue Type" }, 
+              { class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700",
+                data: { ticket_form_target: "issueType" } } %>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <%= f.label :priority, class: "text-sm font-black text-slate-700 ml-1" %>
+          <%= f.select :priority, 
+              Ticket.priorities.keys.map { |p| [p.humanize, p] }, 
+              { prompt: "Select Priority" },
+              { class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700" } %>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <%= f.label :description, class: "text-sm font-black text-slate-700 ml-1" %>
+        <%= f.text_area :description, 
+            placeholder: "Describe the technical issue in detail...",
+            class: "w-full rounded-[1.6rem] border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-6 text-slate-700 placeholder:text-slate-400 min-h-[150px] resize-none" %>
+      </div>
+
+      <div class="flex justify-end pt-4">
+        <%= f.submit "Create Ticket", 
+            class: "bg-slate-900 hover:bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-base transition-all transform active:scale-95 shadow-xl shadow-blue-500/20 cursor-pointer" %>
+      </div>
     <% end %>
   </div>
-
-  <div class="field">
-    <%= f.label :location_id, "Room/Location" %>
-    <%= f.collection_select :location_id, @locations, :id, :name, 
-        { prompt: "Select Location" }, 
-        { data: { action: "change->ticket-form#updateEquipment", ticket_form_target: "location" } } %>
-  </div>
-
-  <div class="field">
-    <%= f.label :equipment_id %>
-    <%= f.collection_select :equipment_id, @equipment, :id, :id, 
-        { prompt: "Select Equipment" }, 
-        { data: { action: "change->ticket-form#updateIssueTypes", ticket_form_target: "equipment" } } %>
-  </div>
-
-  <div class="field">
-    <%= f.label :issue_type_id %>
-    <%= f.collection_select :issue_type_id, @issue_types, :id, :name, 
-        { prompt: "Select Issue Type" }, 
-        { data: { ticket_form_target: "issueType" } } %>
-  </div>
-
-  <div class="field">
-    <%= f.label :priority %>
-    <%= f.select :priority, 
-        Ticket.priorities.keys.map { |p| [p.humanize, p] }, 
-        { prompt: "Select Priority" } %>
-  </div>
-
-  <div class="field">
-    <%= f.label :description %>
-    <%= f.text_area :description %>
-  </div>
-
-  <%= f.submit "Create Ticket" %>
-<% end %>
+</div>

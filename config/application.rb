@@ -10,7 +10,7 @@ module ELogPulse
 
     config.autoload_lib(ignore: %w[assets tasks])
 
-    # Only keep config you are actually using:
-    # config.time_zone = "UTC"
+    config.time_zone = "Kuala Lumpur"
+    config.active_record.default_timezone = :utc
   end
 end
