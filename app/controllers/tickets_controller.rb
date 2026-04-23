@@ -21,12 +21,18 @@ class TicketsController < ApplicationController
     end
   end
 
+  def edit
+    @ticket = Ticket.find(params[:id])
+    setup_form_variables
+  end
+
   def update
     @ticket = Ticket.find(params[:id])
     if @ticket.update(ticket_params)
       redirect_to @ticket, notice: "Status updated to #{@ticket.status.humanize}"
     else
-      redirect_to @ticket, alert: "Update failed."
+      setup_form_variables
+      render :edit, status: :unprocessable_entity
     end
   end
 
