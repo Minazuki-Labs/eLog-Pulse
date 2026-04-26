@@ -67,21 +67,70 @@
         <div>
           <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Technician</label>
           <div class="flex items-center gap-3">
-            <% if @ticket.employee.present? %>
-              <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white text-[10px] font-black">
-                <%= @ticket.employee.initials %>
+            
+            <% if current_user.admin? %> <%# Admin View %>
+              <%= form_with model: @ticket, class: "w-full" do |f| %>
+                <div class="relative group">
+                  <%= f.collection_select :employee_id, 
+                      User.where(role: :employee), :id, :name, 
+                      { include_blank: "Unassigned" }, 
+                      { 
+                        class: "block w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none appearance-none",
+                        onchange: "this.form.requestSubmit()" 
+                      } 
+                  %>
+                  <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                  </div>
+                </div>
+              <% end %>
+
+            <% elsif current_user.employee? %> <%# Employee View %>
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-3">
+                  <% if @ticket.employee.present? %> <%# If assigned %>
+                    <div class="w-8 h-8 rounded-lg <%= @ticket.employee_id == current_user.id ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500' %> flex items-center justify-center text-[10px] font-black">
+                      <%= @ticket.employee.initials %>
+                    </div>
+                    <div>
+                      <p class="text-slate-900 font-bold text-sm leading-tight"><%= @ticket.employee.name %></p>
+
+                      <% if @ticket.employee_id == current_user.id %> <%# If assigned to me %>
+                        <%= button_to "Unassign Me", ticket_path(@ticket, ticket: { employee_id: nil }), 
+                            method: :patch, 
+                            class: "text-[10px] font-bold text-red-500 hover:text-red-700 transition-colors block mt-0.5" %>
+                      <% end %>
+                    </div>
+
+                  <% else %> <%# If unassigned %>
+                    <div class="w-8 h-8 rounded-lg border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-300">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    </div>
+                    <%= button_to "Claim Ticket", ticket_path(@ticket, ticket: { employee_id: current_user.id }), 
+                        method: :patch, 
+                        class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-black transition-all shadow-md shadow-blue-200" %>
+                  <% end %>
+                </div>
               </div>
-              <div>
+
+            <% else %> <%# School View %>
+              <% if @ticket.employee.present? %>
+                <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white text-[10px] font-black">
+                  <%= @ticket.employee.initials %>
+                </div>
                 <p class="text-slate-900 font-bold leading-tight"><%= @ticket.employee.name %></p>
-              </div>
-            <% else %>
-              <div class="w-8 h-8 rounded-lg border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-300">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                </svg>
-              </div>
-              <p class="text-slate-400 text-sm font-medium italic">Unassigned</p>
+              <% else %>
+                <div class="w-8 h-8 rounded-lg border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                </div>
+                <p class="text-slate-400 text-sm font-medium italic">Unassigned</p>
+              <% end %>
             <% end %>
+
           </div>
         </div>
 

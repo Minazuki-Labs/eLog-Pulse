@@ -28,11 +28,22 @@ class TicketsController < ApplicationController
 
   def update
     @ticket = Ticket.find(params[:id])
-    if @ticket.update(ticket_params)
-      redirect_to @ticket, notice: "Status updated to #{@ticket.status.humanize}"
+
+    if params[:ticket] && params[:ticket][:employee_id]
+      new_employee_id = params[:ticket][:employee_id].presence
+      if @ticket.update(employee_id: new_employee_id)
+        notice = new_employee_id ? "Ticket assigned successfully." : "Ticket unassigned."
+        redirect_to @ticket, notice: notice
+      else
+        redirect_to @ticket, alert: "Failed to update assignment."
+      end
     else
-      setup_form_variables
-      render :edit, status: :unprocessable_entity
+      if @ticket.update(ticket_params)
+        redirect_to @ticket, notice: "Status updated to #{@ticket.status.humanize}"
+      else
+        setup_form_variables
+        render :edit, status: :unprocessable_entity
+      end
     end
   end
 
@@ -63,7 +74,7 @@ class TicketsController < ApplicationController
   private
 
   def ticket_params
-    params.require(:ticket).permit(:school_id, :location_id, :equipment_id, :issue_type_id, :description, :priority, :status)
+    params.require(:ticket).permit(:school_id, :location_id, :equipment_id, :issue_type_id, :description, :priority, :status, :employee_id)
   end
 
   def setup_form_variables
