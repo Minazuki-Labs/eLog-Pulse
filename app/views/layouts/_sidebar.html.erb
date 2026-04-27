@@ -13,6 +13,7 @@
 
     <% elsif current_user.employee? || current_user.admin? %>
       <%= sidebar_link "Dashboard", root_path, "squares-2x2" %>
+      <%= sidebar_link "Create New Ticket", new_ticket_path, "plus-circle" %>
       <%= sidebar_link "Assigned to Me", tickets_path(scope: 'assigned'), "user-circle" %>
       <%= sidebar_link "Open Tickets", tickets_path(scope: 'open'), "inbox" %>
       <%= sidebar_link "All Tickets", tickets_path, "ticket" %>
