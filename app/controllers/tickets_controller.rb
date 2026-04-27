@@ -84,10 +84,11 @@ class TicketsController < ApplicationController
       @locations = @school.locations
     else
       @schools = User.where(role: :school)
-      @locations = @ticket.school ? @ticket.school.locations : []
+      school_id = params.dig(:ticket, :school_id) || @ticket.school_id
+      @locations = school_id.present? ? Location.where(school_id: school_id) : []
     end
 
-    @equipment = @ticket.location ? Equipment.where(location_id: @ticket.location_id) : []
-    @issue_types = @ticket.equipment ? IssueType.where(equipment_category_id: @ticket.equipment.equipment_category_id) : []
+    @equipment = @ticket.location_id ? Equipment.where(location_id: @ticket.location_id) : []
+    @issue_types = @ticket.equipment&.equipment_category_id ? IssueType.where(equipment_category_id: @ticket.equipment.equipment_category_id) : []
   end
 end
