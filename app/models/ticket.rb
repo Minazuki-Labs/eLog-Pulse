@@ -13,7 +13,6 @@ class Ticket < ApplicationRecord
   validates :school_id, :location_id, :equipment_id, :issue_type_id, presence: true
   validates :status, :priority, presence: true
 
-  validates :custom_issue_text, presence: true, if: :needs_custom_text?
   validate :equipment_must_belong_to_location
 
   scope :open, -> { where(status: [ :pending ]) }
@@ -23,10 +22,6 @@ class Ticket < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
 
   private
-
-  def needs_custom_text?
-    issue_type&.other?
-  end
 
   def equipment_must_belong_to_location
     if equipment && location && equipment.location_id != location_id

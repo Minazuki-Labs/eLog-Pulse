@@ -1,0 +1,13 @@
+<div class="max-w-5xl mx-auto py-10 px-4">
+  <div class="flex items-center justify-between mb-8">
+    <%= link_to root_path, class: "group flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors" do %>
+      <svg class="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      <span class="font-semibold">Back to Tickets</span>
+    <% end %>
+    <h1 class="text-3xl font-black text-slate-900 tracking-tight">Create New Ticket</h1>
+  </div>
+
+  <%= render "form", ticket: @ticket, button_label: "Create Ticket" %>
+</div>

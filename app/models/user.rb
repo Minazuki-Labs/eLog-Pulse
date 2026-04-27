@@ -15,4 +15,19 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
 
   scope :staff, -> { where(role: [ :admin, :employee ]) }
+
+  def staff?
+    admin? || employee?
+  end
+
+  def initials
+    display_name = (name.presence || email).to_s.strip
+    parts = display_name.split
+
+    if parts.length >= 2
+      (parts[0][0] + parts[1][0]).upcase
+    else
+      display_name[0..1].upcase
+    end
+  end
 end

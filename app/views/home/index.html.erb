@@ -1,5 +1,6 @@
 <main class="flex-1 p-8 lg:p-12">
-  <div class="max-w-5xl mx-auto"> <div class="flex justify-between items-center mb-10">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex justify-between items-center mb-10">
       <div>
         <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Support Tickets</h1>
         <p class="text-slate-400 mt-1 text-base">Manage and track your recent activity.</p>
@@ -11,8 +12,35 @@
       <% end %>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <%= render partial: "tickets/ticket_card", collection: @tickets, as: :ticket %>
+    <div class="space-y-6">
+      <% [
+        { name: "Pending", color: "bg-yellow-400", scope: :pending? },
+        { name: "In Progress", color: "bg-blue-500", scope: :in_progress? },
+      ].each do |status| %>
+        <section data-controller="toggle" class="border border-slate-100 rounded-2xl p-4 bg-slate-50/50">
+          <button data-action="click->toggle#toggle" class="flex items-center justify-between w-full group">
+            <div class="flex items-center">
+              <span class="w-3 h-3 <%= status[:color] %> rounded-full mr-3"></span>
+              <h2 class="text-lg font-bold text-slate-700"><%= status[:name] %></h2>
+              <span class="ml-3 text-xs font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                <%= @tickets.select(&status[:scope]).count %>
+              </span>
+            </div>
+            
+            <svg data-toggle-target="icon" class="w-5 h-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+
+          <div data-toggle-target="content" class="grid transition-[grid-template-rows] duration-300 ease-in-out grid-rows-[1fr]">
+            <div class="overflow-hidden">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-6">
+                <%= render partial: "ticket_card", collection: @tickets.select(&status[:scope]), as: :ticket %>
+              </div>
+            </div>
+          </div>
+        </section>
+      <% end %>
     </div>
   </div>
 </main>
