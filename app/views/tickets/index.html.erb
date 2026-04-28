@@ -1,0 +1,44 @@
+<main class="flex-1 p-8 lg:p-12">   
+  <div class="max-w-5xl mx-auto">
+    <div class="flex justify-between items-center mb-10">
+      <div>
+        <% page_title = ticket_page_title %>
+        <% content_for :title, page_title %>
+
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+          <%= page_title %>
+        </h1>
+        
+        <p class="text-slate-400 mt-1 text-base">
+          <%= ticket_page_description %>
+        </p>
+      </div>
+      
+      <div class="relative w-full sm:w-80"> <%= form_with url: tickets_path, method: :get, class: "relative group" do |f| %>
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <%= f.text_field :query, 
+            placeholder: "Search tickets...", 
+            class: "block w-full pl-12 pr-4 py-3.5 border-2 border-slate-100 rounded-2xl bg-white text-sm font-medium placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-md hover:shadow-lg",
+            value: params[:query] %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <% [
+        { name: "Pending", color: "bg-yellow-400", scope: :pending? },
+        { name: "In Progress", color: "bg-blue-500", scope: :in_progress? },
+        { name: "Completed", color: "bg-green-500", scope: :completed? },
+      ].each do |status| %>
+        <%= render "home/status_section", 
+                   name: status[:name], 
+                   color: status[:color], 
+                   tickets: @tickets.select(&status[:scope]) %>
+      <% end %>
+    </div>
+  </div>
+</main>

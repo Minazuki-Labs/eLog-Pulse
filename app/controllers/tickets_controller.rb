@@ -1,4 +1,12 @@
 class TicketsController < ApplicationController
+  def index
+    if current_user.school?
+      @tickets = current_user.reported_tickets.order(created_at: :desc)
+    else
+      @tickets = Ticket.all.order(created_at: :desc)
+    end
+  end
+
   def show
     @ticket = Ticket.includes(:school, :equipment, :issue_type, :location, :comments).find(params[:id])
   end

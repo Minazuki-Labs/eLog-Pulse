@@ -13,7 +13,8 @@ module ApplicationHelper
   end
 
   def sidebar_link(label, path, icon_name)
-    active = current_page?(path)
+    is_exact_match = request.original_fullpath == path
+    active = is_exact_match && (path.include?("?") || request.query_string.blank?)
 
     base_class = "group flex items-center gap-4 px-5 py-3.5 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out"
 

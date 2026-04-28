@@ -1,3 +1,5 @@
+<% is_completed = name == "Completed" %>
+
 <section data-controller="toggle" class="border border-slate-100 rounded-2xl p-4 bg-slate-50/50">
   <button data-action="click->toggle#toggle" class="flex items-center justify-between w-full group">
     <div class="flex items-center">
@@ -8,15 +10,15 @@
       </span>
     </div>
     
-    <svg data-toggle-target="icon" class="w-5 h-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg data-toggle-target="icon" class="w-5 h-5 text-slate-400 transition-transform duration-200 <%= 'rotate-180' if is_completed %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
     </svg>
   </button>
 
-  <div data-toggle-target="content" class="grid transition-[grid-template-rows] duration-300 ease-in-out grid-rows-[1fr]">
+  <div data-toggle-target="content" class="grid transition-[grid-template-rows] duration-300 ease-in-out <%= is_completed ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]' %>">
     <div class="overflow-hidden">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-6">
-        <%= render partial: "ticket_card", collection: tickets, as: :ticket %>
+        <%= render partial: "home/ticket_card", collection: tickets, as: :ticket %>
       </div>
     </div>
   </div>
