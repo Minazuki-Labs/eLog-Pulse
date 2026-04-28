@@ -55,6 +55,17 @@ class TicketsController < ApplicationController
     end
   end
 
+  def destroy
+    @ticket = Ticket.find(params[:id])
+
+    if current_user.admin? || (@ticket.employee_id.nil? && current_user == @ticket.school)
+      @ticket.destroy
+      redirect_to tickets_path, notice: "Ticket was successfully deleted.", status: :see_other
+    else
+      redirect_to @ticket, alert: "You are not authorized to delete this ticket."
+    end
+  end
+
   def locations
     @locations = Location.where(school_id: params[:school_id])
     render json: @locations.select(:id, :name)
