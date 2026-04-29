@@ -1,4 +1,6 @@
 class TicketsController < ApplicationController
+  before_action :store_last_index_path, only: [ :index ]
+
   def index
     @tickets = current_user.school? ? current_user.reported_tickets : Ticket.all
 
@@ -114,5 +116,9 @@ class TicketsController < ApplicationController
 
     @equipment = @ticket.location_id ? Equipment.where(location_id: @ticket.location_id) : []
     @issue_types = @ticket.equipment&.equipment_category_id ? IssueType.where(equipment_category_id: @ticket.equipment.equipment_category_id) : []
+  end
+
+  def store_last_index_path
+    session[:last_tickets_path] = request.fullpath
   end
 end
