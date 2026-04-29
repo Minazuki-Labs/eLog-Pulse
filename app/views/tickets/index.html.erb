@@ -29,15 +29,26 @@
     </div>
 
     <div class="space-y-6">
-      <% [
-        { name: "Pending", color: "bg-yellow-400", scope: :pending? },
-        { name: "In Progress", color: "bg-blue-500", scope: :in_progress? },
-        { name: "Completed", color: "bg-green-500", scope: :completed? },
-      ].each do |status| %>
-        <%= render "home/status_section", 
-                   name: status[:name], 
-                   color: status[:color], 
-                   tickets: @tickets.select(&status[:scope]) %>
+      <% 
+        visible_statuses = case params[:scope]
+          when 'assigned', 'open'
+            ["Pending", "In Progress"]
+          else
+            ["Pending", "In Progress", "Completed"]
+          end
+
+        [
+          { name: "Pending", color: "bg-yellow-400", scope: :pending? },
+          { name: "In Progress", color: "bg-blue-500", scope: :in_progress? },
+          { name: "Completed", color: "bg-green-500", scope: :completed? },
+        ].each do |status| 
+      %>
+        <% if visible_statuses.include?(status[:name]) %>
+          <%= render "home/status_section", 
+                    name: status[:name], 
+                    color: status[:color], 
+                    tickets: @tickets.select(&status[:scope]) %>
+        <% end %>
       <% end %>
     </div>
   </div>

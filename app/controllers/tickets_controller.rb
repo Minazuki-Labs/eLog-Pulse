@@ -1,10 +1,15 @@
 class TicketsController < ApplicationController
   def index
-    if current_user.school?
-      @tickets = current_user.reported_tickets.order(created_at: :desc)
-    else
-      @tickets = Ticket.all.order(created_at: :desc)
+    @tickets = current_user.school? ? current_user.reported_tickets : Ticket.all
+
+    case params[:scope]
+    when "assigned"
+      @tickets = @tickets.assigned_to(current_user).not_completed
+    when "open"
+      @tickets = @tickets.unassigned.not_completed
     end
+
+    @tickets = @tickets.order(created_at: :desc)
   end
 
   def show

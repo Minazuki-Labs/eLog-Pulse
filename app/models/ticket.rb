@@ -20,6 +20,8 @@ class Ticket < ApplicationRecord
 
   scope :assigned_to, ->(user) { where(employee: user) }
   scope :recent, -> { order(created_at: :desc) }
+  scope :unassigned, -> { where(employee_id: nil) }
+  scope :not_completed, -> { where.not(status: :completed) }
 
   private
 
