@@ -67,8 +67,18 @@
         <div>
           <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Technician</label>
           <div class="flex items-center gap-3">
-            
-            <% if current_user.admin? %> <%# Admin View %>
+    
+            <% if @ticket.completed? %> 
+              <% if @ticket.employee.present? %>
+                <div class="w-8 h-8 rounded-lg bg-slate-200 text-slate-500 flex items-center justify-center text-[10px] font-black">
+                  <%= @ticket.employee.initials %>
+                </div>
+                <p class="text-slate-900 font-bold leading-tight"><%= @ticket.employee.name %></p>
+              <% else %>
+                <p class="text-slate-400 text-sm font-medium italic">Unassigned (Closed)</p>
+              <% end %>
+
+            <% elsif current_user.admin? %> <%# Admin View %>
               <%= form_with model: @ticket, class: "w-full" do |f| %>
                 <div class="relative group">
                   <%= f.collection_select :employee_id, 
