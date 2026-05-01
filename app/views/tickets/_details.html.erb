@@ -82,7 +82,7 @@
               <%= form_with model: @ticket, class: "w-full" do |f| %>
                 <div class="relative group">
                   <%= f.collection_select :employee_id, 
-                      User.where(role: :employee), :id, :name, 
+                      User.staff, :id, :name, 
                       { include_blank: "Unassigned" }, 
                       { 
                         class: "block w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none appearance-none",
