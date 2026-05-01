@@ -6,13 +6,26 @@
       ticket_form_issue_types_url_value: issue_types_tickets_path
     }, class: "space-y-8") do |f| %>
 
+    <% if @ticket.errors.any? %>
+      <div class="bg-red-50 text-red-600 p-4 rounded-2xl mb-6 border border-red-100">
+        <p class="font-black mb-2">Please correct the following:</p>
+        <ul class="list-disc ml-5 space-y-1">
+          <% @ticket.errors.each do |error| %>
+            <li class="font-medium"><%= error.message %></li> 
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <% if !current_user.school? %>
         <div class="flex flex-col gap-2">
           <%= f.label :school_id, class: "text-sm font-black text-slate-700 ml-1" %>
           <%= f.collection_select :school_id, @schools, :id, :name, 
-              { prompt: "Select School" }, 
+              { prompt: "" }, 
               { class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700",
+                required: true,
+                placeholder: "Select School",
                 data: { action: "change->ticket-form#updateLocations", ticket_form_target: "school" } } %>
         </div>
       <% end %>
@@ -20,24 +33,30 @@
       <div class="flex flex-col gap-2">
         <%= f.label :location_id, "Room / Location", class: "text-sm font-black text-slate-700 ml-1" %>
         <%= f.collection_select :location_id, @locations, :id, :name, 
-            { prompt: "Select Location" }, 
+            { prompt: "" }, 
             { class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700",
+              required: true,
+              placeholder: "Select Location",
               data: { action: "change->ticket-form#updateEquipment", ticket_form_target: "location" } } %>
       </div>
 
       <div class="flex flex-col gap-2">
         <%= f.label :equipment_id, class: "text-sm font-black text-slate-700 ml-1" %>
         <%= f.collection_select :equipment_id, @equipment, :id, :display_name,
-            { prompt: "Select Equipment" }, 
+            { prompt: "" }, 
             { class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700",
+              required: true,
+              placeholder: "Select Equipment",
               data: { action: "change->ticket-form#updateIssueTypes", ticket_form_target: "equipment" } } %>
       </div>
 
       <div class="flex flex-col gap-2">
         <%= f.label :issue_type_id, class: "text-sm font-black text-slate-700 ml-1" %>
         <%= f.collection_select :issue_type_id, @issue_types, :id, :name, 
-            { prompt: "Select Issue Type" }, 
+            { prompt: "" }, 
             { class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700",
+              required: true,
+              placeholder: "Select Issue Type",
               data: { ticket_form_target: "issueType" } } %>
       </div>
 
