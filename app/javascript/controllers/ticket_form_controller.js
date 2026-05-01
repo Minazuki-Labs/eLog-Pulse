@@ -25,7 +25,7 @@ connect() {
     return new TomSelect(el, {
       create: false,
       placeholder: el.getAttribute('placeholder') || "Search...",
-      allowEmptyOption: true,
+      allowEmptyOption: false,
       maxOptions: 100,
       plugins: ['dropdown_input'],
       searchField: ['text'],
@@ -67,30 +67,33 @@ connect() {
         headers: {
         "Accept": "application/json",
         "X-Requested-With": "XMLHttpRequest"
-        }
+      }
     })
     .then(response => response.json())
     .then(data => {
       const ts = target.tomselect
-      ts.clear()
       ts.clearOptions()
 
-      data.forEach(item => {
-        ts.addOption({
-          value: item.id,
-          text: item.name || item.display_name || item.id
+      if (data.length > 0) {
+        data.forEach(item => {
+          ts.addOption({
+            value: item.id,
+            text: item.name || item.display_name || item.id
+          })
         })
-      })
-      
-      ts.refreshOptions(false)
+        ts.refreshOptions(false)
+        ts.unlock()
+      }
     })
     .catch(error => console.error("Error fetching data:", error))
   }
 
   clearTarget(target) {
     if (target && target.tomselect) {
-      target.tomselect.clear()
-      target.tomselect.clearOptions()
+      const ts = target.tomselect
+      ts.clear()
+      ts.clearOptions()
+      ts.lock() 
     }
   }
 
