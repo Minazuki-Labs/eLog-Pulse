@@ -40,6 +40,8 @@ Devise.setup do |config|
   config.responder.error_status = :unprocessable_content
   config.responder.redirect_status = :see_other
 
+  config.navigational_formats = [ "*/*", :html, :turbo_stream ]
+
   # ==> OmniAuth
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user'
 end
