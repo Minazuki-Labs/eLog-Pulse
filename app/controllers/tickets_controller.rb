@@ -3,6 +3,7 @@ class TicketsController < ApplicationController
 
   def index
     @tickets = current_user.school? ? current_user.reported_tickets : Ticket.all
+    session[:last_tickets_path] = request.fullpath
 
     case params[:scope]
     when "assigned"
