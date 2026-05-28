@@ -1,10 +1,19 @@
 <div class="relative flex gap-6">
   <div class="relative z-10 flex-shrink-0">
-    <div class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white ring-4 ring-white">
-      <span class="text-xs font-bold">
-        <%= comment.user.initials %>
-      </span>
-    </div>
+    <% if comment.system_log? %>
+      <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 ring-4 ring-white border border-slate-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </div>
+    <% else %>
+      <div class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white ring-4 ring-white">
+        <span class="text-xs font-bold">
+          <%= comment.user.initials %>
+        </span>
+      </div>
+    <% end %>
   </div>
   
   <div class="flex-1">
@@ -15,6 +24,9 @@
         <span class="text-xs font-medium text-slate-500">
           <%= time_ago_in_words(comment.created_at) %> ago
         </span>
+        <% if comment.system_log? && comment.created_at != comment.updated_at %>
+          <span class="text-[10px] font-semibold uppercase tracking-wider text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">Batch Updated</span>
+        <% end %>
       </div>
       
       <time class="text-[10px] font-mono font-medium text-slate-400 bg-slate-100/50 px-2 py-0.5 rounded">
@@ -22,10 +34,25 @@
       </time>
     </div>
 
-    <div class="bg-slate-50 border border-slate-200/60 p-5 rounded-2xl rounded-tl-none shadow-sm">
-      <div class="prose prose-sm text-slate-700 leading-relaxed max-w-none">
-        <%= simple_format comment.body %>
+    <% if comment.system_log? %>
+      <div class="pl-1">
+        <p class="text-sm text-slate-500 mb-2">updated the ticket parameters:</p>
+        <% if comment.tracked_changes.is_a?(Hash) && comment.tracked_changes["points"].present? %>
+          <ul class="space-y-1.5 border-l-2 border-slate-200 pl-4 py-0.5">
+            <% comment.tracked_changes["points"].each do |point| %>
+              <li class="text-sm text-slate-700 list-none relative before:content-[''] before:absolute before:-left-[21px] before:top-[7px] before:w-2 before:h-2 before:rounded-full before:bg-slate-300">
+                <%= point.html_safe %>
+              </li>
+            <% end %>
+          <% end %>
+        </ul>
       </div>
-    </div>
+    <% else %>
+      <div class="bg-slate-50 border border-slate-200/60 p-5 rounded-2xl rounded-tl-none shadow-sm">
+        <div class="prose prose-sm text-slate-700 leading-relaxed max-w-none">
+          <%= simple_format comment.body %>
+        </div>
+      </div>
+    <% end %>
   </div>
 </div>
