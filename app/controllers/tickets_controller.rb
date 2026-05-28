@@ -28,6 +28,7 @@ class TicketsController < ApplicationController
 
   def update
     @ticket = Ticket.find(params[:id])
+    @ticket.updater = current_user
 
     if params[:ticket] && params[:ticket][:employee_id]
       new_employee_id = params[:ticket][:employee_id].presence
