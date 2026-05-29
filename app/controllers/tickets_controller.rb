@@ -1,4 +1,20 @@
 class TicketsController < ApplicationController
+  before_action :store_last_index_path, only: [ :index ]
+
+  def index
+    @tickets = current_user.school? ? current_user.reported_tickets : Ticket.all
+    session[:last_tickets_path] = request.fullpath
+
+    case params[:scope]
+    when "assigned"
+      @tickets = @tickets.assigned_to(current_user).not_completed
+    when "open"
+      @tickets = @tickets.unassigned.not_completed
+    end
+
+    @tickets = @tickets.order(created_at: :desc)
+  end
+
   def show
     @ticket = Ticket.includes(:school, :equipment, :issue_type, :location, :comments).find(params[:id])
   end
@@ -48,6 +64,17 @@ class TicketsController < ApplicationController
     end
   end
 
+  def destroy
+    @ticket = Ticket.find(params[:id])
+
+    if current_user.admin? || (@ticket.employee_id.nil? && current_user == @ticket.school)
+      @ticket.destroy
+      redirect_to tickets_path, notice: "Ticket was successfully deleted.", status: :see_other
+    else
+      redirect_to @ticket, alert: "You are not authorized to delete this ticket."
+    end
+  end
+
   def locations
     @locations = Location.where(school_id: params[:school_id])
     render json: @locations.select(:id, :name)
@@ -91,5 +118,9 @@ class TicketsController < ApplicationController
 
     @equipment = @ticket.location_id ? Equipment.where(location_id: @ticket.location_id) : []
     @issue_types = @ticket.equipment&.equipment_category_id ? IssueType.where(equipment_category_id: @ticket.equipment.equipment_category_id) : []
+  end
+
+  def store_last_index_path
+    session[:last_tickets_path] = request.fullpath
   end
 end

@@ -5,34 +5,40 @@ export default class extends Controller {
   static targets = ["school", "location", "equipment", "issueType"]
   static values = { locationsUrl: String, equipmentUrl: String, issueTypesUrl: String }
 
-connect() {
-  const elements = [
-    this.hasSchoolTarget ? this.schoolTarget : null,
-    this.hasLocationTarget ? this.locationTarget : null,
-    this.hasEquipmentTarget ? this.equipmentTarget : null,
-    this.hasIssueTypeTarget ? this.issueTypeTarget : null
-  ].filter(el => el !== null)
+  connect() {
+    const elements = [
+      this.hasSchoolTarget ? this.schoolTarget : null,
+      this.hasLocationTarget ? this.locationTarget : null,
+      this.hasEquipmentTarget ? this.equipmentTarget : null,
+      this.hasIssueTypeTarget ? this.issueTypeTarget : null
+    ].filter(el => el !== null)
 
-  this.instances = elements.map(el => this.initTomSelect(el))
+    this.instances = elements.map(el => this.initTomSelect(el))
 
-  if (this.hasSchoolTarget && this.schoolTarget.value && this.locationTarget.options.length <= 1) {
-    this.updateLocations();
+    if (this.hasSchoolTarget && !this.schoolTarget.value) {
+      if (this.hasLocationTarget) this.locationTarget.tomselect.lock()
+      if (this.hasEquipmentTarget) this.equipmentTarget.tomselect.lock()
+      if (this.hasIssueTypeTarget) this.issueTypeTarget.tomselect.lock()
+    }
+
+    if (this.hasSchoolTarget && this.schoolTarget.value && this.locationTarget.options.length <= 1) {
+      this.updateLocations();
+    }
   }
-}
 
   initTomSelect(el) {
     if (el.tomselect) return el.tomselect
     return new TomSelect(el, {
       create: false,
       placeholder: el.getAttribute('placeholder') || "Search...",
-      allowEmptyOption: false,
+      allowEmptyOption: true,
       maxOptions: 100,
       plugins: ['dropdown_input'],
       searchField: ['text'],
       onInitialize: function() {
         this.wrapper.classList.add('w-full', 'rounded-2xl', 'border-none');
         this.control.classList.add('rounded-2xl', 'bg-slate-50', 'border-none', 'p-4');
-    }
+      }
     })
   }
 
@@ -57,6 +63,7 @@ connect() {
 
   updateIssueTypes() {
     const equipmentId = this.equipmentTarget.value
+    this.clearTarget(this.issueTypeTarget)
 
     if (!equipmentId) return
     this.fetchData(`${this.issueTypesUrlValue}?equipment_id=${equipmentId}`, this.issueTypeTarget)
@@ -64,7 +71,7 @@ connect() {
 
   fetchData(url, target) {
     fetch(url, {
-        headers: {
+      headers: {
         "Accept": "application/json",
         "X-Requested-With": "XMLHttpRequest"
       }
@@ -73,6 +80,7 @@ connect() {
     .then(data => {
       const ts = target.tomselect
       ts.clearOptions()
+      ts.unlock()
 
       if (data.length > 0) {
         data.forEach(item => {
@@ -82,7 +90,6 @@ connect() {
           })
         })
         ts.refreshOptions(false)
-        ts.unlock()
       }
     })
     .catch(error => console.error("Error fetching data:", error))
@@ -91,8 +98,12 @@ connect() {
   clearTarget(target) {
     if (target && target.tomselect) {
       const ts = target.tomselect
-      ts.clear()
+      
+      ts.clear(true)
       ts.clearOptions()
+      
+      target.value = ""
+      
       ts.lock() 
     }
   }
