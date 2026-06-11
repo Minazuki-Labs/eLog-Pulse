@@ -7,6 +7,12 @@ Rails.application.routes.draw do
     put "users" => "devise/registrations#update", as: "user_registration"
   end
 
+  resources :users do
+    collection do
+      get :schools
+    end
+  end
+
   resources :tickets do
     resources :comments, only: [ :create ]
 

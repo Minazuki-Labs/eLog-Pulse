@@ -1,0 +1,38 @@
+<main class="flex-1 p-8 lg:p-12">
+  <div class="max-w-5xl mx-auto">
+
+    <div class="flex justify-between items-center mb-10">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">School Directory</h1>
+        <p class="text-slate-400 mt-1 text-base">Browse and manage registered partner schools.</p>
+      </div>
+      
+      <% if current_user.staff? %>
+        <%= link_to new_user_registration_path, 
+                    class: "inline-flex items-center px-5 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md shadow-blue-100 hover:bg-blue-700 transition-all",
+                    data: { turbo: false },
+                    onclick: "
+                      let email = prompt('Enter the email address for the new school:');
+                      if (!email) { return false; } // Cancels navigation if they hit cancel or leave it blank
+                      this.href = this.href + '?email=' + encodeURIComponent(email);
+                    " do %>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+          </svg>
+          Add New School
+        <% end %>
+      <% end %>
+    </div>
+
+    <% if @schools.any? %>
+      <div class="space-y-3.5">
+        <%= render partial: "users/school_row", collection: @schools, as: :school %>
+      </div>
+    <% else %>
+      <div class="text-center py-16 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+        <p class="text-slate-400 font-medium">No schools have been registered yet.</p>
+      </div>
+    <% end %>
+
+  </div>
+</main>
