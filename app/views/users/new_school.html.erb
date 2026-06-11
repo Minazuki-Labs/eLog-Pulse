@@ -1,0 +1,30 @@
+<main class="flex-1 p-8 lg:p-12">
+  <div class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+    <div class="mb-6">
+      <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-2">Register New School</h1>
+      <p class="text-slate-400 text-sm">Fill out the details below to invite and create a new partner school account.</p>
+    </div>
+
+    <%= form_with model: @school, url: create_school_users_path, local: true, class: "space-y-5" do |f| %>
+      <% if @school.errors.any? %>
+        <div class="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-medium border border-red-100">
+          <%= @school.errors.full_messages.to_sentence %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :name, "School Name", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5" %>
+        <%= f.text_field :name, required: true, class: "w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 text-slate-800 placeholder-slate-300", placeholder: "e.g., Lincoln High School" %>
+      </div>
+
+      <div>
+        <%= f.label :email, "School Email Address", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5" %>
+        <%= f.email_field :email, required: true, class: "w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 text-slate-800 placeholder-slate-300", placeholder: "admin@school.com" %>
+      </div>
+
+      <div class="pt-2">
+        <%= f.submit "Create School Account", class: "w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-100 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+</main>

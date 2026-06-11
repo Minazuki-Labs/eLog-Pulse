@@ -8,14 +8,7 @@
       </div>
       
       <% if current_user.staff? %>
-        <%= link_to new_user_registration_path, 
-                    class: "inline-flex items-center px-5 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md shadow-blue-100 hover:bg-blue-700 transition-all",
-                    data: { turbo: false },
-                    onclick: "
-                      let email = prompt('Enter the email address for the new school:');
-                      if (!email) { return false; } // Cancels navigation if they hit cancel or leave it blank
-                      this.href = this.href + '?email=' + encodeURIComponent(email);
-                    " do %>
+        <%= link_to new_school_users_path, class: "inline-flex items-center px-5 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md shadow-blue-100 hover:bg-blue-700 transition-all" do %>
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
           </svg>

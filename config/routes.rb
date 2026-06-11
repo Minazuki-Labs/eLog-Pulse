@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   resources :users do
     collection do
       get :schools
+      get :new_school
+      post :create_school
     end
   end
 
