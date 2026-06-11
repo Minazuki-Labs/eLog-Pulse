@@ -15,12 +15,21 @@ class UsersController < ApplicationController
   def create_school
     @school = User.new(school_params.merge(role: :school))
 
-    temporary_password = SecureRandom.hex(10)
+    temporary_password = SecureRandom.hex(16)
     @school.password = temporary_password
     @school.password_confirmation = temporary_password
 
     if @school.save
-      redirect_to schools_users_path, notice: "School successfully registered!"
+      raw_otp = sprintf("%06d", rand(10**6))
+
+      @school.otp_codes.create!(
+        token: raw_otp,
+        expires_at: 24.hours.from_now
+      )
+
+      SchoolMailer.welcome_otp_email(@school, raw_otp).deliver_later
+
+      redirect_to schools_users_path, notice: "School successfully registered with an activation OTP!"
     else
       render :new_school, status: :unprocessable_entity
     end

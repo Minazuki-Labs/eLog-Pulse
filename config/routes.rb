@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   get "home/index"
   devise_for :users, skip: [ :registrations ]
 
+  get  "otp_login", to: "otp_sessions#new", as: :new_otp_login
+  post "otp_login", to: "otp_sessions#create", as: :otp_login
+  delete "otp_logout", to: "otp_sessions#destroy", as: :otp_logout
+
   as :user do
     get "users/edit" => "devise/registrations#edit", as: "edit_user_registration"
     put "users" => "devise/registrations#update", as: "user_registration"
