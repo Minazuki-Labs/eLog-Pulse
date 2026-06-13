@@ -2,6 +2,10 @@ class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :ensure_staff!, only: [ :new_school, :create_school ]
 
+  def show
+    @school = User.school.includes(:locations, reported_tickets: [ :equipment, :issue_type ]).find(params[:id])
+  end
+
   def schools
     @schools = User.school.includes(:locations, :reported_tickets).order(:name)
 
