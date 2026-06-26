@@ -28,22 +28,22 @@
         </div>
       <% end %>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="flex flex-col gap-2">
-          <%= f.label :name, "Location / Room Name", class: "text-sm font-black text-slate-700 ml-1" %>
-          <%= f.text_field :name, 
-              placeholder: "e.g., Science Lab 2, Hall 4B", 
-              required: true,
-              class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700 placeholder:text-slate-400" %>
-        </div>
+      <!-- Unified Label Style: Removed ml-1 to align perfectly with Equipment Setup below -->
+      <div class="w-full flex flex-col gap-2">
+        <%= f.label :name, "Location / Room Name", class: "text-lg font-black text-slate-900 tracking-tight" %>
+        <%= f.text_field :name, 
+            placeholder: "e.g., Science Lab 2, Hall 4B", 
+            required: true,
+            class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700 placeholder:text-slate-400" %>
       </div>
 
       <hr class="border-slate-100">
 
       <div class="space-y-4">
+        <!-- Unified Heading Style: Exactly matches the text styling above -->
         <div>
-          <h3 class="text-lg font-black text-slate-900">Equipment Setup</h3>
-          <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Assign specific components to this workspace</p>
+          <h3 class="text-lg font-black text-slate-900 tracking-tight">Equipment Setup</h3>
+          <p class="text-slate-500 font-medium mt-1">Assign specific components to this workspace.</p>
         </div>
 
         <div class="space-y-3" data-nested-form-target="container">
@@ -70,7 +70,7 @@
 
       <div class="flex justify-end pt-6 border-t border-slate-100">
         <%= f.submit "Register Location", 
-            class: "bg-slate-900 hover:bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-base transition-all transform active:scale-95 shadow-xl shadow-slate-900/10 cursor-pointer" %>
+            class: "bg-slate-900 hover:bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-base transition-all transform active:scale-95 shadow-xl shadow-blue-500/20 cursor-pointer" %>
       </div>
     <% end %>
   </div>
