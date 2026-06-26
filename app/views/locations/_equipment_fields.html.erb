@@ -1,0 +1,18 @@
+<div class="nested-fields flex items-center gap-3 bg-slate-50/50 p-3 rounded-2xl border border-slate-100" data-new-record="<%= f.object.new_record? %>">
+  <%= f.hidden_field :_destroy, data: { nested_form_target: "destroy" } %>
+
+  <div class="flex-1">
+    <%= f.collection_select :equipment_category_id, equipment_categories, :id, :name, 
+        { prompt: "Select Equipment Category" }, 
+        { class: "w-full rounded-xl border-none bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-3.5 text-sm font-bold text-slate-700", required: true } %>
+  </div>
+
+  <button type="button" 
+          data-action="click->nested-form#remove" 
+          class="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
+          title="Remove Equipment">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+    </svg>
+  </button>
+</div>
