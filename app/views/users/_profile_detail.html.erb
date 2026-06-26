@@ -1,7 +1,7 @@
 <div class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
-  <div class="flex flex-col md:flex-row">
+  <div class="grid grid-cols-1 lg:grid-cols-3">
     
-    <div class="flex-1 p-8 md:p-12">
+    <div class="lg:col-span-2 p-8 md:p-12">
       <div class="mb-10 flex items-start gap-5">
         <div class="h-16 w-16 shrink-0 rounded-2xl bg-blue-50 text-blue-600 font-black text-xl flex items-center justify-center tracking-wider">
           <%= @school.initials %>
@@ -15,13 +15,23 @@
       </div>
 
       <div class="space-y-4">
-        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          </svg>
-          Registered Locations
-        </h4>
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            Registered Locations
+          </h4>
+
+          <%= link_to new_location_path(school_id: @school.id), 
+              class: "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors shadow-sm border border-blue-100" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Add Location
+          <% end %>
+        </div>
         
         <div class="bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
           <% if @school.locations.any? %>
@@ -40,7 +50,7 @@
       </div>
     </div>
 
-    <div class="w-full md:w-80 bg-slate-50 border-l border-slate-100 p-8 md:p-10">
+    <div class="bg-slate-50 border-t lg:border-t-0 lg:border-l border-slate-100 p-8 md:p-10">
       <div class="space-y-8">
         
         <div>
@@ -66,7 +76,7 @@
         <div class="pt-6 border-t border-slate-200">
           <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Registration Lifecycle</label>
           <div class="space-y-1">
-            <p class="text-xs text-slate-500">Onboarded <span class="text-slate-900 font-bold"><%= time_ago_in_words(@school.created_at) %> ago</span></p>
+            <p class="text-xs text-slate-500">Joined <span class="text-slate-900 font-bold"><%= time_ago_in_words(@school.created_at) %> ago</span></p>
             <p class="text-[10px] font-mono text-slate-400"><%= @school.created_at.strftime("%d %b %Y, %H:%M") %></p>
           </div>
         </div>
