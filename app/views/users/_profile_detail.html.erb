@@ -36,13 +36,24 @@
         <div class="bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
           <% if @school.locations.any? %>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <% @school.locations.each do |location| %>
+              <% @school.locations.take(6).each do |location| %>
                 <div class="flex items-center gap-2.5 bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm">
                   <span class="w-2 h-2 rounded-full bg-blue-500"></span>
                   <span class="text-sm font-bold text-slate-700"><%= location.name %></span>
                 </div>
               <% end %>
             </div>
+            
+            <% if @school.locations.count >= 7 %>
+              <div class="mt-4 pt-2 border-t border-slate-200/60 text-right">
+                <%= link_to user_locations_path(@school), class: "text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1" do %>
+                  <span>and more...</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                <% end %>
+              </div>
+            <% end %>
           <% else %>
             <p class="text-slate-400 text-sm font-medium italic py-2">No functional locations have been mapped to this school yet.</p>
           <% end %>
