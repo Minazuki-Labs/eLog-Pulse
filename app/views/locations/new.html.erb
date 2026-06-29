@@ -14,7 +14,7 @@
       <p class="text-slate-500 font-medium mt-1">Register a room and assign its initial technical infrastructure.</p>
     </div>
 
-    <%= form_with(model: @location, data: { controller: "nested-form" }, class: "space-y-10") do |f| %>
+    <%= form_with(model: [@school, @location], data: { controller: "nested-form" }, class: "space-y-10") do |f| %>
       <%= hidden_field_tag :school_id, @school.id %>
 
       <% if @location.errors.any? %>
