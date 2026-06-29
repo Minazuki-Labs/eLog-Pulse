@@ -12,14 +12,14 @@ Rails.application.routes.draw do
   end
 
   resources :users do
+    resources :locations, only: [ :index, :new, :create ]
+
     collection do
       get :schools
       get :new_school
       post :create_school
     end
   end
-
-  resources :locations, only: [ :new, :create ]
 
   resources :tickets do
     resources :comments, only: [ :create ]

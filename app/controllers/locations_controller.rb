@@ -1,5 +1,9 @@
 class LocationsController < ApplicationController
-  before_action :set_school, only: [ :new, :create ]
+  before_action :set_school, only: [ :index, :new, :create ]
+
+  def index
+    @locations = @school.locations
+  end
 
   def new
     @location = @school.locations.new
@@ -23,7 +27,7 @@ class LocationsController < ApplicationController
   private
 
   def set_school
-    @school = User.school.find(params[:school_id])
+    @school = User.school.find(params[:user_id])
   end
 
   def location_params
