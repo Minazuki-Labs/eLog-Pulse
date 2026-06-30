@@ -2,7 +2,11 @@ class LocationsController < ApplicationController
   before_action :set_school, only: [ :index, :new, :create ]
 
   def index
-    @locations = @school.locations
+    if params[:query].present?
+      @locations = @school.locations.where("LOWER(name) LIKE ?", "%#{params[:query].downcase}%")
+    else
+      @locations = @school.locations
+    end
   end
 
   def new
