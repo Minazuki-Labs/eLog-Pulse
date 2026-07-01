@@ -1,5 +1,5 @@
 class LocationsController < ApplicationController
-  before_action :set_school, only: [ :index, :new, :create ]
+  before_action :set_school, only: [ :index, :new, :create, :show ]
 
   def index
     if params[:query].present?
@@ -7,6 +7,13 @@ class LocationsController < ApplicationController
     else
       @locations = @school.locations
     end
+  end
+
+  def show
+    @location = @school.locations.find(params[:id])
+
+    @equipment = @location.equipment.includes(:equipment_category)
+    @tickets = @location.tickets.includes(:issue_type, :employee).order(created_at: :desc)
   end
 
   def new

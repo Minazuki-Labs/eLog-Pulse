@@ -53,7 +53,7 @@
     <% if @locations.any? %>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <% @locations.each do |location| %>
-          <%= link_to "#", class: "group relative bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between gap-6 overflow-hidden" do %>
+          <%= link_to user_location_path(@school, location), class: "group relative bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between gap-6 overflow-hidden" do %>
             
             <div class="flex items-center gap-4 flex-1 min-w-0">
               <div class="h-11 w-11 shrink-0 rounded-xl bg-blue-50 text-blue-600 font-bold text-xs flex items-center justify-center tracking-wider group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
