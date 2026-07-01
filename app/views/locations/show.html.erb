@@ -23,48 +23,59 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
             </svg>
-            Work Orders & Tickets
+            Tickets
           </h3>
 
           <% if @tickets.any? %>
             <div class="space-y-3">
-              <% @tickets.each do |ticket| %>
-                <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl hover:border-slate-200 transition-colors">
-                  <div class="min-w-0">
-                    <p class="text-sm font-bold text-slate-800 truncate"><%= ticket.description.presence || "No description provided" %></p>
-                    <div class="flex items-center gap-2 mt-1">
-                      <span class="text-[10px] font-mono uppercase bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-500">
-                        <%= ticket.issue_type&.name %>
+              <% @tickets.sort_by { |t| Ticket.statuses[t.status] || 0 }.each do |ticket| %>
+                <%= link_to ticket, class: "flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50/50 hover:bg-blue-50/30 border border-slate-200/60 hover:border-blue-200 rounded-2xl transition-all gap-4 group" do %>
+                  <div class="flex items-center gap-4 flex-1 min-w-0">
+                    <div class="flex flex-col gap-1.5 min-w-[95px] items-start shrink-0">
+                      <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider text-center <%= status_color(ticket.status) %>">
+                        <%= ticket.status %>
                       </span>
-                      <span class="text-xs text-slate-400">
-                        Opened <%= time_ago_in_words(ticket.created_at) %> ago
+                      <span class="text-[11px] font-medium text-slate-400 tabular-nums">
+                        <%= ticket.created_at.strftime("%d %b %Y") %>
                       </span>
                     </div>
+                    
+                    <div class="min-w-0 flex-1">
+                      <h4 class="text-base font-bold text-slate-800 group-hover:text-blue-600 transition-colors truncate">
+                        <%= ticket.equipment&.equipment_category&.name || "Equipment" %>
+                        <span class="text-slate-300 font-normal mx-2">|</span>
+                        <span class="text-sm font-semibold text-slate-500"><%= ticket.issue_type&.name %></span>
+                      </h4>
+                      <p class="text-slate-500 text-xs mt-0.5 truncate max-w-md">
+                        <%= ticket.description %>
+                      </p>
+                    </div>
                   </div>
-                  
-                  <div class="flex items-center gap-3">
-                    <span class="px-2.5 py-1 text-xs font-bold rounded-full border <%= ticket.status == 0 ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100' %>">
-                      <%= ticket.status == 0 ? 'Open' : 'Resolved' %>
-                    </span>
+
+                  <div class="self-end sm:self-center bg-white border border-slate-200 p-2 rounded-xl group-hover:bg-blue-600 group-hover:border-blue-600 transition-all shadow-sm">
+                    <svg class="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
                   </div>
-                </div>
+                <% end %>
               <% end %>
             </div>
           <% else %>
             <div class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-              <p class="text-slate-400 text-sm italic">No active or historic work orders reported for this location.</p>
+              <p class="text-slate-400 text-sm italic">No tickets opened for this location.</p>
             </div>
           <% end %>
         </div>
       </div>
 
+      <!-- Equipment Column -->
       <div class="space-y-6">
         <div class="bg-slate-50 rounded-[2rem] border border-slate-200/60 p-8">
           <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
             </svg>
-            Equipment Inventory
+            Equipment
           </h3>
 
           <% if @equipment.any? %>
@@ -74,7 +85,6 @@
                   <div class="h-2 w-2 rounded-full bg-blue-500"></div>
                   <div class="flex flex-col">
                     <span class="text-sm font-bold text-slate-700"><%= item.display_name %></span>
-                    <span class="text-[10px] font-mono text-slate-400">ID: #<%= item.id %></span>
                   </div>
                 </div>
               <% end %>
