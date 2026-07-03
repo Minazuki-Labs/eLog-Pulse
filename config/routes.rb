@@ -12,7 +12,9 @@ Rails.application.routes.draw do
   end
 
   resources :users do
-    resources :locations, only: [ :index, :new, :create, :show ]
+    resources :locations, only: [ :index, :new, :create, :show ] do
+      resources :equipment, only: [ :create, :destroy ]
+    end
 
     collection do
       get :schools

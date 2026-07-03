@@ -14,6 +14,9 @@ class LocationsController < ApplicationController
 
     @equipment = @location.equipment.includes(:equipment_category)
     @tickets = @location.tickets.includes(:issue_type, :employee).order(created_at: :desc)
+
+    assigned_category_ids = @equipment.pluck(:equipment_category_id)
+    @equipment_categories = EquipmentCategory.where.not(id: assigned_category_ids)
   end
 
   def new
