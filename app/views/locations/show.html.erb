@@ -1,41 +1,47 @@
-<main class="flex-1 p-8 lg:p-12">
+<main class="flex-1 p-8 lg:p-12 bg-slate-50/30 min-h-screen">
   <div class="max-w-5xl mx-auto">
     
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pb-6 border-b border-slate-100">
+    <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
       <div class="flex items-center gap-4">
-        <%= link_to user_locations_path(@school), class: "group p-2.5 bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 rounded-xl border border-slate-200/80 shadow-sm transition-all", title: "Back to Locations" do %>
+        <%= link_to user_locations_path(@school), class: "group p-2.5 bg-white hover:bg-slate-50 text-slate-500 hover:text-blue-600 rounded-xl border border-slate-200/60 shadow-sm transition-all", title: "Back to Locations" do %>
           <svg class="w-5 h-5 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
           </svg>
         <% end %>
         <div>
-          <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight"><%= @location.name %></h1>
-          <p class="text-slate-500 mt-0.5 text-sm font-medium"><%= @school.name %> — Location Details</p>
+          <h1 class="text-3xl font-black text-slate-900 tracking-tight"><%= @location.name %></h1>
+          <p class="text-slate-400 mt-0.5 text-xs font-bold uppercase tracking-wider"><%= @school.name %> — Location Details</p>
         </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
       <div class="lg:col-span-2 space-y-6">
-        <div class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/60 border border-slate-100 p-8">
-          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-            </svg>
-            Tickets
-          </h3>
+        <div class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-100 p-8">
+          
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              Tickets
+            </h3>
+            <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-black ring-1 ring-inset ring-blue-200/50">
+              <%= @tickets.count %>
+            </span>
+          </div>
 
           <% if @tickets.any? %>
             <div class="space-y-3">
               <% @tickets.sort_by { |t| Ticket.statuses[t.status] || 0 }.each do |ticket| %>
-                <%= link_to ticket, class: "flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50/50 hover:bg-blue-50/30 border border-slate-200/60 hover:border-blue-200 rounded-2xl transition-all gap-4 group" do %>
+                <%= link_to ticket, class: "flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50/50 hover:bg-white border border-slate-200/60 hover:border-blue-200 rounded-2xl hover:shadow-lg hover:shadow-slate-100/80 transition-all gap-4 group" do %>
                   <div class="flex items-center gap-4 flex-1 min-w-0">
+                    
                     <div class="flex flex-col gap-1.5 min-w-[95px] items-start shrink-0">
-                      <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider text-center <%= status_color(ticket.status) %>">
+                      <span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider text-center shadow-sm <%= status_color(ticket.status) %>">
                         <%= ticket.status %>
                       </span>
-                      <span class="text-[11px] font-medium text-slate-400 tabular-nums">
+                      <span class="text-[11px] font-semibold text-slate-400 tabular-nums">
                         <%= ticket.created_at.strftime("%d %b %Y") %>
                       </span>
                     </div>
@@ -46,7 +52,7 @@
                         <span class="text-slate-300 font-normal mx-2">|</span>
                         <span class="text-sm font-semibold text-slate-500"><%= ticket.issue_type&.name %></span>
                       </h4>
-                      <p class="text-slate-500 text-xs mt-0.5 truncate max-w-md">
+                      <p class="text-slate-400 text-xs mt-0.5 truncate max-w-md">
                         <%= ticket.description %>
                       </p>
                     </div>
@@ -61,7 +67,7 @@
               <% end %>
             </div>
           <% else %>
-            <div class="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+            <div class="text-center py-12 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
               <p class="text-slate-400 text-sm italic">No tickets opened for this location.</p>
             </div>
           <% end %>
@@ -69,10 +75,11 @@
       </div>
 
       <div class="space-y-6">
-        <div class="bg-slate-50 rounded-[2rem] border border-slate-200/60 p-8 flex flex-col justify-between h-full">
+        <div class="bg-slate-50 rounded-[2rem] border border-slate-200/60 p-8 flex flex-col justify-between min-h-[450px]">
           <div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
               </svg>
               Equipment
@@ -91,8 +98,8 @@
                     
                     <%= button_to user_location_equipment_path(@school, @location, item), 
                                   method: :delete, 
-                                  data: { confirm: "Are you sure you want to remove this equipment item?" }, 
-                                  class: "p-1 text-slate-300 hover:text-red-500 rounded-lg hover:bg-red-50 transition-all", 
+                                  form: { data: { turbo_confirm: "Are you sure you want to remove this equipment item?" } }, 
+                                  class: "p-1.5 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition-all", 
                                   title: "Remove Equipment" do %>
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -102,35 +109,40 @@
                 <% end %>
               </div>
             <% else %>
-              <p class="text-slate-400 text-sm font-medium italic py-2">No hardware assigned to this location yet.</p>
+              <p class="text-slate-400 text-sm italic py-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">No hardware assigned yet.</p>
             <% end %>
           </div>
           
           <div>
-            <%# Dynamic Add Equipment Form %>
-            <div class="mt-6 pt-6 border-t border-slate-200/80">
+            <div class="mt-6 pt-6 border-t border-slate-100">
               <% if @equipment_categories.any? %>
                 <%= form_with(model: [@school, @location, Equipment.new], url: user_location_equipment_index_path(@school, @location), local: true, class: "space-y-3") do |f| %>
                   <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Add Hardware Category</label>
-                    <%= f.collection_select :equipment_category_id, @equipment_categories, :id, :name, { prompt: "Select hardware..." }, { class: "w-full text-sm bg-white rounded-xl border border-slate-200/80 p-2.5 text-slate-700 focus:outline-none focus:border-blue-500 shadow-sm transition-all" } %>
+                    <label class="block text-[11px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Add Hardware Category</label>
+                    <%= f.collection_select :equipment_category_id, 
+                        @equipment_categories, 
+                        :id, 
+                        :name, 
+                        { prompt: "Select hardware..." }, 
+                        { class: "w-full text-sm bg-slate-50 rounded-xl border border-slate-200/60 p-3 pr-10 text-slate-700 bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 shadow-sm transition-all appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px_12px] bg-[right_14px_center] bg-no-repeat" } %>
                   </div>
-                  <%= f.submit "+ Add Equipment", class: "w-full text-center py-2.5 px-4 bg-white border border-slate-200 text-slate-700 font-bold text-xs rounded-xl hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-all shadow-sm cursor-pointer" %>
+                  <%= f.submit "+ Add Equipment", class: "w-full text-center py-2.5 px-4 bg-slate-900 text-white font-bold text-xs rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-slate-900/10 hover:shadow-blue-600/20 cursor-pointer transform active:scale-[0.98]" %>
                 <% end %>
               <% else %>
-                <div class="text-center p-3 bg-slate-100/60 rounded-xl border border-slate-200/40">
+                <div class="text-center p-3 bg-slate-50 rounded-xl border border-slate-200/60">
                   <p class="text-slate-400 text-xs font-medium italic">All available categories assigned to this room.</p>
                 </div>
               <% end %>
             </div>
 
-            <div class="mt-4 pt-4 border-t border-slate-200/50">
-              <div class="flex justify-between text-xs text-slate-500">
+            <div class="mt-4 pt-4 border-t border-slate-100">
+              <div class="flex justify-between text-xs text-slate-400 font-semibold">
                 <span>Total Items:</span>
-                <span class="font-bold text-slate-800"><%= @equipment.count %></span>
+                <span class="font-black text-slate-800"><%= @equipment.count %></span>
               </div>
             </div>
           </div>
+
         </div>
       </div>
 
