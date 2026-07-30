@@ -7,8 +7,8 @@ Rails.application.routes.draw do
   delete "otp_logout", to: "otp_sessions#destroy", as: :otp_logout
 
   as :user do
-    get "users/edit" => "devise/registrations#edit", as: "edit_user_registration"
-    put "users" => "devise/registrations#update", as: "user_registration"
+    get "account/edit" => "devise/registrations#edit", as: "edit_user_registration"
+    put "account" => "devise/registrations#update", as: "user_registration"
   end
 
   resources :users do

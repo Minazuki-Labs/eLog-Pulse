@@ -1,9 +1,18 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :ensure_staff!, only: [ :new_school, :create_school ]
+  before_action :ensure_staff!, only: [ :new_school, :create_school, :edit, :update ]
+  before_action :set_school, only: [ :show, :edit, :update ]
 
   def show
     @school = User.school.includes(:locations, reported_tickets: [ :equipment, :issue_type ]).find(params[:id])
+  end
+
+  def update
+    if @school.update(school_params)
+      redirect_to user_path(@school), notice: "School updated successfully."
+    else
+      render :edit, status: :unprocessable_entity
+    end
   end
 
   def schools
@@ -40,6 +49,10 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def set_school
+    @school = User.school.find(params[:id])
+  end
 
   def ensure_staff!
     unless current_user&.staff?
