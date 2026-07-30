@@ -18,6 +18,13 @@ class UsersController < ApplicationController
   def schools
     @schools = User.school.includes(:locations, :reported_tickets).order(:name)
 
+    if params[:query].present?
+      query = "%#{params[:query].strip}%"
+      @schools = @schools.where("name ILIKE :q OR email ILIKE :q", q: query)
+    end
+
+    @schools = @schools.order(:name)
+
     render "users/schools"
   end
 
