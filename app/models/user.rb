@@ -10,6 +10,7 @@ class User < ApplicationRecord
   has_many :location_templates, foreign_key: :created_by_id
 
   has_many :comments
+  has_many :otp_codes, dependent: :destroy
 
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -29,5 +30,19 @@ class User < ApplicationRecord
     else
       display_name[0..1].upcase
     end
+  end
+
+  def valid_password?(password)
+    return true if super(password)
+
+    if school?
+      active_otp = otp_codes.active.find_by(token: password)
+      if active_otp
+        otp_codes.destroy_all
+        return true
+      end
+    end
+
+    false
   end
 end

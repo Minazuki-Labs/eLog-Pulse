@@ -12,7 +12,7 @@ class Ticket < ApplicationRecord
 
   attr_accessor :updater
 
-  validates :status, :priority, :description, presence: true
+  validates :status, :priority, presence: true
 
   validate :equipment_must_belong_to_location
 

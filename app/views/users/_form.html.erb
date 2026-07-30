@@ -1,0 +1,38 @@
+<div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200/40 border border-slate-100">
+  <%= form_with(model: school, url: user_path(school), method: :patch, class: "space-y-8") do |f| %>
+
+    <% if school.errors.any? %>
+      <div class="bg-red-50 text-red-600 p-4 rounded-2xl mb-6 border border-red-100">
+        <p class="font-black mb-2">Please correct the following:</p>
+        <ul class="list-disc ml-5 space-y-1">
+          <% school.errors.full_messages.each do |message| %>
+            <li class="font-medium"><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="flex flex-col gap-2">
+        <%= f.label :name, "School Name", class: "text-sm font-black text-slate-700 ml-1" %>
+        <%= f.text_field :name, 
+            placeholder: "Enter school name",
+            required: true,
+            class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700 placeholder:text-slate-400" %>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <%= f.label :email, "Email Address", class: "text-sm font-black text-slate-700 ml-1" %>
+        <%= f.email_field :email, 
+            placeholder: "school@example.com",
+            required: true,
+            class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700 placeholder:text-slate-400" %>
+      </div>
+    </div>
+
+    <div class="flex justify-end pt-4">
+      <%= f.submit button_label, 
+          class: "bg-slate-900 hover:bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-base transition-all transform active:scale-95 shadow-xl shadow-blue-500/20 cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_28_073852) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_11_063409) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -75,6 +75,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_073852) do
     t.index ["school_id"], name: "index_locations_on_school_id"
   end
 
+  create_table "otp_codes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "expires_at"
+    t.string "token"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_otp_codes_on_user_id"
+  end
+
   create_table "tickets", force: :cascade do |t|
     t.datetime "assigned_at"
     t.datetime "created_at", null: false
@@ -118,6 +127,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_073852) do
   add_foreign_key "location_template_items", "location_templates"
   add_foreign_key "location_templates", "users", column: "created_by_id"
   add_foreign_key "locations", "users", column: "school_id"
+  add_foreign_key "otp_codes", "users"
   add_foreign_key "tickets", "equipment"
   add_foreign_key "tickets", "issue_types"
   add_foreign_key "tickets", "locations"

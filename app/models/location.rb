@@ -4,6 +4,8 @@ class Location < ApplicationRecord
   has_many :equipment, dependent: :destroy
   has_many :tickets
 
+  accepts_nested_attributes_for :equipment, reject_if: :all_blank, allow_destroy: true
+
   validates :name, presence: true, uniqueness: { scope: :school_id }
 
   validate :owner_must_be_a_school

@@ -18,7 +18,7 @@
       <%= sidebar_link "Open Tickets", tickets_path(scope: 'open'), "inbox" %>
       <%= sidebar_link "All Tickets", tickets_path, "ticket" %>
       <%= sidebar_link "Equipment Directory", "#", "clipboard-document-list" %>
-      <%= sidebar_link "School Directory", "#", "building-office" %>
+      <%= sidebar_link "School Directory", schools_users_path, "building-office" %>
 
       <% if current_user.admin? %>
         <div class="pt-4 mt-4 border-t border-gray-100">
