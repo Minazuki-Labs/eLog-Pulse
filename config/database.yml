@@ -28,3 +28,25 @@ production:
   <<: *default
   # Production DB name defaults to the app name suffix
   database: <%= ENV.fetch("DB_NAME") { 'e_log_pulse_production' } %>
+  username: <%= ENV.fetch("DB_USERNAME") { 'elog' } %>
+  password: '<%= ENV["DB_PASSWORD"] %>'
+  host: <%= ENV.fetch("DB_HOST") { 'localhost' } %>
+  port: <%= ENV.fetch("DB_PORT") { 5432 } %>
+
+cable:
+  <<: *default
+  database: e_log_pulse_production_cable
+  username: <%= ENV.fetch("DB_USERNAME") { 'elog' } %>
+  password: '<%= ENV["DB_PASSWORD"] %>'
+  host: <%= ENV.fetch("DB_HOST") { '127.0.0.1' } %>
+  port: <%= ENV.fetch("DB_PORT") { 5432 } %>
+  migrations_paths: db/cable_migrate
+
+cache:
+  <<: *default
+  database: e_log_pulse_production_cache
+  username: <%= ENV.fetch("DB_USERNAME") { 'elog' } %>
+  password: '<%= ENV["DB_PASSWORD"] %>'
+  host: <%= ENV.fetch("DB_HOST") { '127.0.0.1' } %>
+  port: <%= ENV.fetch("DB_PORT") { 5432 } %>
+  migrations_paths: db/cache_migrate
