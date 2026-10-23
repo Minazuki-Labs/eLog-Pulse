@@ -11,7 +11,11 @@ threads_count = ENV.fetch("RAILS_MAX_THREADS") { 3 }
 threads threads_count, threads_count
 
 # Networking details (Default port is 3000)
-port ENV.fetch("PORT") { 3000 }
+if ENV["RAILS_ENV"] == "production"
+  bind "unix:///home/deploy/elog/tmp/sockets/puma.sock"
+else
+  port ENV.fetch("PORT") { 3000 }
+end
 
 # Deployment and Process Management
 # Allow puma to be restarted by `bin/rails restart` command
