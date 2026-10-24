@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  devise :database_authenticatable, :rememberable, :validatable, authentication_keys: [ :username ]
+  devise :database_authenticatable, :rememberable, authentication_keys: [ :username ]
 
   enum :role, { admin: 0, employee: 1, school: 2 }, validate: true
   enum :state, {
@@ -7,15 +7,18 @@ class User < ApplicationRecord
     negeri_sembilan: 4, pahang: 5, penang: 6, perak: 7,
     perlis: 8, sabah: 9, sarawak: 10, selangor: 11,
     terengganu: 12, kuala_lumpur: 13, labuan: 14, putrajaya: 15
-  }, validate: true
+  }
 
   has_many :school_emails, foreign_key: :school_id, dependent: :destroy
+  accepts_nested_attributes_for :school_emails
+
   has_many :locations, foreign_key: :school_id
   has_many :reported_tickets, class_name: "Ticket", foreign_key: :school_id
   has_many :location_templates, foreign_key: :created_by_id
 
   has_many :comments
 
+  validates :password, presence: true, length: { minimum: 6 }, confirmation: true, if: -> { password.present? }
   validates :name, presence: true
   validates :username, presence: true, uniqueness: true
   validates :state, presence: true, if: :school?

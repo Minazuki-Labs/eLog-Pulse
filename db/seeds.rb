@@ -1,61 +1,86 @@
 # Run bin/rails db:seed
 
 puts "Cleaning database"
-[ Comment, Ticket, Equipment, IssueType, LocationTemplateItem, Location, LocationTemplate, EquipmentCategory, User ].each(&:delete_all)
+[ Comment, Ticket, Equipment, IssueType, LocationTemplateItem, Location, LocationTemplate, EquipmentCategory, SchoolEmail, User, AppConfig ].each(&:delete_all)
+
+puts "Creating app configs"
+AppConfig.group_email = "support@test.edu"
 
 puts "Creating users"
 admin = User.create!(
   name: "Admin",
-  email: "admin@test.com",
+  username: "admin",
   password: "password123",
   role: :admin
 )
 
 school1 = User.create!(
   name: "SJKC Jalan Davidson",
-  email: "school1@test.edu",
+  username: "school1",
   password: "password123",
-  role: :school
+  role: :school,
+  state: :kuala_lumpur,
+  school_emails_attributes: [
+    { email: "school1-1@test.edu" },
+    { email: "school1-2@test.edu" }
+  ]
 )
 
 school2 = User.create!(
   name: "SMK (L) Methodist",
-  email: "school2@test.edu",
+  username: "school2",
   password: "password123",
-  role: :school
+  role: :school,
+  state: :kuala_lumpur,
+  school_emails_attributes: [
+    { email: "school2-1@test.edu" },
+    { email: "school2-2@test.edu" },
+    { email: "school2-3@test.edu" }
+  ]
 )
 
 school3 = User.create!(
   name: "SJKC Chong Wen",
-  email: "school3@test.edu",
+  username: "school3",
   password: "password123",
-  role: :school
+  role: :school,
+  state: :selangor,
+  school_emails_attributes: [
+    { email: "school3-1@test.edu" },
+    { email: "school3-2@test.edu" }
+  ]
 )
 
 school4 = User.create!(
   name: "SJKC Chung Hwa",
-  email: "school4@test.edu",
+  username: "school4",
   password: "password123",
-  role: :school
+  role: :school,
+  state: :melaka,
+  school_emails_attributes: [
+    { email: "school4-1@test.edu" },
+    { email: "school4-2@test.edu" },
+    { email: "school4-3@test.edu" }
+  ]
 )
 
 employee1 = User.create!(
   name: "Employee 1",
-  email: "employee1@test.com",
+  username: "employee1",
   password: "password123",
   role: :employee
 )
 
 employee2 = User.create!(
   name: "Employee 2",
-  email: "employee2@test.com",
+  username: "employee2",
   password: "password123",
   role: :employee
 )
 
 employee3 = User.create!(
   name: "Employee 3",
-  email: "employee3@test.com",
+  username: "employee3",
   password: "password123",
   role: :employee
 )
@@ -182,85 +207,92 @@ computer1_unit = Equipment.find_by!(location: office1, equipment_category: compu
 computer1_issue = IssueType.find_by!(name: "No Network", equipment_category: computer_category)
 
 ticket1 = Ticket.create!(
-    school: school1,
-    location: office1,
-    equipment: computer1_unit,
-    issue_type: computer1_issue,
-    description: "Computer cannot access Google Chrome",
-    priority: :high,
-    status: :in_progress,
-    employee: employee2,
-    assigned_at: Time.current
-  )
+  school: school1,
+  location: office1,
+  equipment: computer1_unit,
+  issue_type: computer1_issue,
+  description: "Computer cannot access Google Chrome",
+  status: :in_progress,
+  teacher_name: "Teacher Alice",
+  teacher_email: "alice@test.edu",
+  teacher_phone_number: "0123456789"
+)
 
 projector_unit = Equipment.find_by!(location: class1, equipment_category: projector_category)
 projector_issue = IssueType.find_by!(name: "No Visual", equipment_category: projector_category)
 
 Ticket.create!(
-    school: school1,
-    location: class1,
-    equipment: projector_unit,
-    issue_type: projector_issue,
-    priority: :low,
-    status: :pending
-  )
+  school: school1,
+  location: class1,
+  equipment: projector_unit,
+  issue_type: projector_issue,
+  status: :new_case,
+  teacher_name: "Teacher Bob",
+  teacher_email: "bob@test.edu",
+  teacher_phone_number: "0123456790"
+)
 
 monitor_unit = Equipment.find_by!(location: class1, equipment_category: monitor_category)
 monitor_issue = IssueType.find_by!(name: "Other", equipment_category: monitor_category)
 
 ticket2 = Ticket.create!(
-    school: school1,
-    location: class1,
-    equipment: monitor_unit,
-    issue_type: monitor_issue,
-    description: "Monitor stolen",
-    priority: :medium,
-    status: :completed,
-    employee: employee1,
-    assigned_at: Time.current
-  )
+  school: school1,
+  location: class1,
+  equipment: monitor_unit,
+  issue_type: monitor_issue,
+  description: "Monitor stolen",
+  status: :completed,
+  teacher_name: "Teacher Charlie",
+  teacher_email: "charlie@test.edu",
+  teacher_phone_number: "0123456791"
+)
 
 smart_board_unit = Equipment.find_by!(location: class4, equipment_category: smart_board_category)
 smart_board_issue = IssueType.find_by!(name: "Touchscreen Not Responding", equipment_category: smart_board_category)
 
 Ticket.create!(
-    school: school2,
-    location: class4,
-    equipment: smart_board_unit,
-    issue_type: smart_board_issue,
-    description: "Touchscreen detecting random places, not calibrated to my finger",
-    priority: :low,
-    status: :pending
-  )
+  school: school2,
+  location: class4,
+  equipment: smart_board_unit,
+  issue_type: smart_board_issue,
+  description: "Touchscreen detecting random places, not calibrated to my finger",
+  status: :new_case,
+  teacher_name: "Teacher David",
+  teacher_email: "david@test.edu",
+  teacher_phone_number: "0123456792"
+)
 
 computer2_unit = Equipment.find_by!(location: office3, equipment_category: computer_category)
 computer2_issue = IssueType.find_by!(name: "No Power", equipment_category: computer_category)
 
 Ticket.create!(
-    school: school3,
-    location: office3,
-    equipment: computer2_unit,
-    issue_type: computer2_issue,
-    priority: :medium,
-    status: :in_progress,
-    employee: employee3,
-    assigned_at: Time.current
-  )
+  school: school3,
+  location: office3,
+  equipment: computer2_unit,
+  issue_type: computer2_issue,
+  status: :in_progress,
+  teacher_name: "Teacher Eve",
+  teacher_email: "eve@test.edu",
+  teacher_phone_number: "0123456793"
+)
 
 Comment.create!(
-    ticket: ticket1,
-    user: school1,
-    body: "Urgent, I need internet ASAP"
-  )
+  ticket: ticket1,
+  user: school1,
+  body: "Urgent, I need internet ASAP",
+  jobsheet: "C1109"
+)
 
 Comment.create!(
   ticket: ticket1,
   user: employee2,
-  body: "I will take a look at this on Monday."
+  body: "I will take a look at this on Monday.",
+  jobsheet: "C0424"
 )
 
 Comment.create!(
   ticket: ticket2,
   user: employee3,
-  body: "Monitor delivered"
+  body: "Monitor delivered",
+  jobsheet: "C2345"
 )
