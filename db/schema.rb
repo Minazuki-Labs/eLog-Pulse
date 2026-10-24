@@ -14,10 +14,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_063409) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
+  create_table "app_configs", force: :cascade do |t|
+    t.string "key", null: false
+    t.text "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_app_configs_on_key", unique: true
+  end
+
   create_table "comments", force: :cascade do |t|
     t.text "body"
     t.integer "comment_type"
     t.datetime "created_at", null: false
+    t.string "jobsheet", null: false
     t.bigint "ticket_id", null: false
     t.json "tracked_changes"
     t.datetime "updated_at", null: false
@@ -75,29 +84,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_063409) do
     t.index ["school_id"], name: "index_locations_on_school_id"
   end
 
-  create_table "otp_codes", force: :cascade do |t|
+  create_table "school_emails", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.datetime "expires_at"
-    t.string "token"
+    t.string "email", null: false
+    t.bigint "school_id", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["user_id"], name: "index_otp_codes_on_user_id"
+    t.index ["school_id"], name: "index_school_emails_on_school_id"
   end
 
   create_table "tickets", force: :cascade do |t|
-    t.datetime "assigned_at"
     t.datetime "created_at", null: false
     t.text "description"
-    t.bigint "employee_id"
     t.bigint "equipment_id", null: false
     t.bigint "issue_type_id", null: false
     t.bigint "location_id", null: false
-    t.integer "priority", default: 0
     t.datetime "resolved_at"
     t.bigint "school_id", null: false
     t.integer "status", default: 0
+    t.string "teacher_email", null: false
+    t.string "teacher_name", null: false
+    t.string "teacher_phone_number", null: false
     t.datetime "updated_at", null: false
-    t.index ["employee_id"], name: "index_tickets_on_employee_id"
     t.index ["equipment_id"], name: "index_tickets_on_equipment_id"
     t.index ["issue_type_id"], name: "index_tickets_on_issue_type_id"
     t.index ["location_id"], name: "index_tickets_on_location_id"
@@ -106,16 +113,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_063409) do
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "email", default: "", null: false
+    t.string "username", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "name"
     t.datetime "remember_created_at"
-    t.datetime "reset_password_sent_at"
-    t.string "reset_password_token"
     t.integer "role", default: 1
+    t.integer "state"
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
   add_foreign_key "comments", "tickets"
@@ -127,10 +131,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_063409) do
   add_foreign_key "location_template_items", "location_templates"
   add_foreign_key "location_templates", "users", column: "created_by_id"
   add_foreign_key "locations", "users", column: "school_id"
-  add_foreign_key "otp_codes", "users"
+  add_foreign_key "school_emails", "users", column: "school_id"
   add_foreign_key "tickets", "equipment"
   add_foreign_key "tickets", "issue_types"
   add_foreign_key "tickets", "locations"
-  add_foreign_key "tickets", "users", column: "employee_id"
   add_foreign_key "tickets", "users", column: "school_id"
 end
