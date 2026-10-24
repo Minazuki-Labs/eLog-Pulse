@@ -1,7 +1,7 @@
 # Run bin/rails db:seed
 
 puts "Cleaning database"
-[ Comment, Ticket, Equipment, IssueType, LocationTemplateItem, Location, LocationTemplate, EquipmentCategory, SchoolEmail, User, AppConfig ].each(&:delete_all)
+[ Comment, Ticket, Equipment, IssueType, LocationTemplateItem, Location, LocationTemplate, EquipmentCategory, SchoolEmail, EmployeeSchool, User, AppConfig ].each(&:delete_all)
 
 puts "Creating app configs"
 AppConfig.group_email = "support@test.edu"
@@ -84,6 +84,13 @@ employee3 = User.create!(
   password: "password123",
   role: :employee
 )
+
+EmployeeSchool.create!(school: school1, employee: employee1)
+EmployeeSchool.create!(school: school1, employee: employee2)
+EmployeeSchool.create!(school: school2, employee: employee2)
+EmployeeSchool.create!(school: school2, employee: employee3)
+EmployeeSchool.create!(school: school3, employee: employee1)
+EmployeeSchool.create!(school: school4, employee: employee3)
 
 puts "Creating equipment categories and issue types"
 category_issues = {

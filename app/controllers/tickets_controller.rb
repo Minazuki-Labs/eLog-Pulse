@@ -6,10 +6,14 @@ class TicketsController < ApplicationController
     session[:last_tickets_path] = request.fullpath
 
     case params[:scope]
-    when "assigned"
-      @tickets = @tickets.assigned_to(current_user).not_completed
     when "open"
-      @tickets = @tickets.unassigned.not_completed
+      @tickets = @tickets.open.not_completed
+    when "assigned"
+      if current_user.employee?
+        @tickets = @tickets.where(school_id: current_user.assigned_schools.select(:id))
+      elsif current_user.admin?
+        @tickets = @tickets.joins(school: :employee_schools).distinct
+      end
     end
 
     @tickets = @tickets.order(created_at: :desc)
@@ -46,28 +50,18 @@ class TicketsController < ApplicationController
     @ticket = Ticket.find(params[:id])
     @ticket.updater = current_user
 
-    if params[:ticket] && params[:ticket][:employee_id]
-      new_employee_id = params[:ticket][:employee_id].presence
-      if @ticket.update(employee_id: new_employee_id)
-        notice = new_employee_id ? "Ticket assigned successfully." : "Ticket unassigned."
-        redirect_to @ticket, notice: notice
-      else
-        redirect_to @ticket, alert: "Failed to update assignment."
-      end
+    if @ticket.update(ticket_params)
+      redirect_to @ticket, notice: "Status updated to #{@ticket.status.humanize}"
     else
-      if @ticket.update(ticket_params)
-        redirect_to @ticket, notice: "Status updated to #{@ticket.status.humanize}"
-      else
-        setup_form_variables
-        render :edit, status: :unprocessable_entity
-      end
+      setup_form_variables
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
     @ticket = Ticket.find(params[:id])
 
-    if current_user.admin? || (@ticket.employee_id.nil? && current_user == @ticket.school)
+    if current_user.admin? || current_user == @ticket.school
       @ticket.destroy
       redirect_to tickets_path, notice: "Ticket was successfully deleted.", status: :see_other
     else
@@ -102,7 +96,7 @@ class TicketsController < ApplicationController
   private
 
   def ticket_params
-    params.require(:ticket).permit(:school_id, :location_id, :equipment_id, :issue_type_id, :description, :priority, :status, :employee_id)
+    params.require(:ticket).permit(:school_id, :location_id, :equipment_id, :issue_type_id, :description, :status, :resolved_at, :teacher_name, :teacher_phone_number, :teacher_email)
   end
 
   def setup_form_variables

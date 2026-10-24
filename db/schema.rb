@@ -35,6 +35,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_063409) do
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
+  create_table "employee_schools", force: :cascade do |t|
+    t.bigint "employee_id", null: false
+    t.bigint "school_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["employee_id"], name: "index_employee_schools_on_employee_id"
+    t.index ["school_id"], name: "index_employee_schools_on_school_id"
+  end
+
   create_table "equipment", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "equipment_category_id", null: false
@@ -124,6 +133,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_063409) do
 
   add_foreign_key "comments", "tickets"
   add_foreign_key "comments", "users"
+  add_foreign_key "employee_schools", "users", column: "employee_id"
+  add_foreign_key "employee_schools", "users", column: "school_id"
   add_foreign_key "equipment", "equipment_categories"
   add_foreign_key "equipment", "locations"
   add_foreign_key "issue_types", "equipment_categories"

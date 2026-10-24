@@ -12,6 +12,12 @@ class User < ApplicationRecord
   has_many :school_emails, foreign_key: :school_id, dependent: :destroy
   accepts_nested_attributes_for :school_emails
 
+  has_many :employee_schools, foreign_key: :school_id, dependent: :destroy
+  has_many :assigned_employees, through: :employee_schools, source: :employee
+
+  has_many :employer_schools, class_name: "EmployeeSchool", foreign_key: :employee_id, dependent: :destroy
+  has_many :assigned_schools, through: :employer_schools, source: :school
+
   has_many :locations, foreign_key: :school_id
   has_many :reported_tickets, class_name: "Ticket", foreign_key: :school_id
   has_many :location_templates, foreign_key: :created_by_id

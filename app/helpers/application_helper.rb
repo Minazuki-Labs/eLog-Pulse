@@ -1,7 +1,7 @@
 module ApplicationHelper
   def status_color(status)
     case status
-    when "pending"
+    when "new_case"
       "bg-amber-100 text-amber-700 border border-amber-200"
     when "in_progress"
       "bg-blue-100 text-blue-700 border border-blue-200"
