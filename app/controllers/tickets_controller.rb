@@ -2,16 +2,21 @@ class TicketsController < ApplicationController
   before_action :store_last_index_path, only: [ :index ]
 
   def index
-    @tickets = current_user.school? ? current_user.reported_tickets : Ticket.all
+    @tickets = if current_user.school?
+      current_user.reported_tickets
+    elsif current_user.employee?
+      Ticket.where(school_id: current_user.assigned_schools.select(:id))
+    else
+      Ticket.all
+    end
+
     session[:last_tickets_path] = request.fullpath
 
     case params[:scope]
     when "open"
       @tickets = @tickets.open.not_completed
     when "assigned"
-      if current_user.employee?
-        @tickets = @tickets.where(school_id: current_user.assigned_schools.select(:id))
-      elsif current_user.admin?
+      if current_user.admin?
         @tickets = @tickets.joins(school: :employee_schools).distinct
       end
     end
