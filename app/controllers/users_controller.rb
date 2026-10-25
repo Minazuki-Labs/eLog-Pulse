@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :ensure_staff!, only: [ :new_school, :create_school, :edit, :update ]
-  before_action :set_user, only: [ :show, :edit, :update ]
+  before_action :ensure_staff!, only: [ :new_school, :create_school, :edit, :update, :edit_assignment, :update_assignment ]
+  before_action :set_user, only: [ :show, :edit, :update, :edit_assignment, :update_assignment ]
 
   def show
     if @user.school?
@@ -87,6 +87,29 @@ class UsersController < ApplicationController
     else
       render :new_employee, status: :unprocessable_entity
     end
+  end
+
+  def edit_assignment
+    @employee = @user
+    @schools = User.school.order(:name)
+
+    if params[:query].present?
+      query = "%#{params[:query].strip}%"
+      @schools = @schools.where("name ILIKE :q OR username ILIKE :q", q: query)
+    end
+
+    if params[:state].present?
+      @schools = @schools.where(state: params[:state])
+    end
+  end
+
+  def update_assignment
+    @employee = @user
+    school_ids = params[:school_ids] || []
+
+    @employee.assigned_school_ids = school_ids
+
+    redirect_to user_path(@employee), notice: "School assignments successfully updated."
   end
 
   private

@@ -12,6 +12,11 @@ Rails.application.routes.draw do
   end
 
   resources :users do
+    member do
+      get :edit_assignment
+      patch :update_assignment
+    end
+
     resources :locations, only: [ :index, :new, :create, :show ] do
       resources :equipment, only: [ :create, :destroy ]
     end
