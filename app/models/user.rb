@@ -24,7 +24,8 @@ class User < ApplicationRecord
 
   has_many :comments
 
-  validates :password, presence: true, length: { minimum: 6 }, confirmation: true, if: -> { password.present? }
+  validates :password, presence: true, length: { minimum: 6 }, on: :create
+  validates :password, length: { minimum: 6 }, allow_blank: true, on: :update
   validates :name, presence: true
   validates :username, presence: true, uniqueness: true
   validates :state, presence: true, if: :school?

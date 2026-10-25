@@ -7,7 +7,7 @@ class TicketsController < ApplicationController
     elsif current_user.employee?
       Ticket.where(school_id: current_user.assigned_schools.select(:id))
     else
-      Ticket.all
+      current_user.admin? ? Ticket.all : Ticket.none
     end
 
     session[:last_tickets_path] = request.fullpath

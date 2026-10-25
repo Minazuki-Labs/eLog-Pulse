@@ -5,7 +5,7 @@ class UsersController < ApplicationController
 
   def show
     if @user.school?
-      @school = User.includes(:locations, reported_tickets: [ :equipment, :issue_type ]).find(params[:id])
+      @school = User.includes(:locations, :school_emails, reported_tickets: [ :equipment, :issue_type ]).find(params[:id])
     elsif @user.staff?
       @employee = User.includes(:assigned_schools).find(params[:id])
     end
@@ -57,20 +57,7 @@ class UsersController < ApplicationController
   def create_school
     @school = User.new(school_params.merge(role: :school))
 
-    temporary_password = SecureRandom.hex(16)
-    @school.password = temporary_password
-    @school.password_confirmation = temporary_password
-
     if @school.save
-      raw_otp = sprintf("%06d", rand(10**6))
-
-      @school.otp_codes.create!(
-        token: raw_otp,
-        expires_at: 24.hours.from_now
-      )
-
-      SchoolMailer.welcome_otp_email(@school, raw_otp).deliver_later
-
       redirect_to schools_users_path, notice: "School successfully registered with an activation OTP!"
     else
       render :new_school, status: :unprocessable_entity
@@ -95,10 +82,6 @@ class UsersController < ApplicationController
   def create_employee
     @employee = User.new(employee_params.merge(role: :employee))
 
-    temporary_password = SecureRandom.hex(8) # Generate a temporary password
-    @employee.password = temporary_password
-    @employee.password_confirmation = temporary_password
-
     if @employee.save
       redirect_to employees_users_path, notice: "Employee successfully registered."
     else
@@ -119,10 +102,22 @@ class UsersController < ApplicationController
   end
 
   def school_params
-    params.require(:user).permit(:name, :username)
+    params.require(:user).permit(
+      :name,
+      :username,
+      :password,
+      :password_confirmation,
+      :state,
+      school_emails_attributes: [ :id, :email, :_destroy ]
+    )
   end
 
   def employee_params
-    params.require(:user).permit(:name, :username)
+    params.require(:user).permit(
+      :name,
+      :username,
+      :password,
+      :password_confirmation
+    )
   end
 end
