@@ -13,7 +13,7 @@ class LocationsController < ApplicationController
     @location = @school.locations.find(params[:id])
 
     @equipment = @location.equipment.includes(:equipment_category)
-    @tickets = @location.tickets.includes(:issue_type, :employee).order(created_at: :desc)
+    @tickets = @location.tickets.includes(:issue_type).order(created_at: :desc)
 
     assigned_category_ids = @equipment.pluck(:equipment_category_id)
     @equipment_categories = EquipmentCategory.where.not(id: assigned_category_ids)

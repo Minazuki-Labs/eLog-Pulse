@@ -20,6 +20,10 @@ Rails.application.routes.draw do
       get :schools
       get :new_school
       post :create_school
+
+      get :employees
+      get :new_employee
+      post :create_employee
     end
   end
 

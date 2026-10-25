@@ -1,0 +1,33 @@
+<main class="flex-1 p-8 lg:p-12">
+  <div class="max-w-xl mx-auto bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+    <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-2">Register New Employee</h1>
+    <p class="text-slate-400 text-sm mb-8">Fill in the details to add a new staff member to the system.</p>
+
+    <%= form_with model: @employee, url: create_employee_users_path, local: true, class: "space-y-6" do |f| %>
+      <% if @employee.errors.any? %>
+        <div class="bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-medium">
+          <ul class="list-disc pl-4 space-y-1">
+            <% @employee.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :name, class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" %>
+        <%= f.text_field :name, class: "block w-full px-4 py-3.5 border-2 border-slate-100 rounded-2xl bg-slate-50 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all" %>
+      </div>
+
+      <div>
+        <%= f.label :username, class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" %>
+        <%= f.text_field :username, class: "block w-full px-4 py-3.5 border-2 border-slate-100 rounded-2xl bg-slate-50 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all" %>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-4">
+        <%= link_to "Cancel", employees_users_path, class: "px-5 py-3.5 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-2xl transition-all" %>
+        <%= f.submit "Create Employee", class: "px-6 py-3.5 bg-blue-600 text-white text-sm font-bold rounded-2xl shadow-md shadow-blue-100 hover:bg-blue-700 transition-all cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+</main>
