@@ -14,6 +14,9 @@ Rails.application.routes.draw do
     end
 
     resources :locations, only: [ :index, :new, :create, :show ] do
+      member do
+        patch :update_equipment
+      end
       resources :equipment, only: [ :create, :destroy ]
     end
 
