@@ -46,10 +46,10 @@ gem "devise"
 # App icon
 gem "heroicon"
 
-# .env file suppor
-gem "dotenv-rails", require: "dotenv/load"
-
 group :development, :test do
+  # .env file support
+  gem "dotenv-rails", require: "dotenv/load"
+
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
 
