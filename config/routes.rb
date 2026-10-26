@@ -11,6 +11,7 @@ Rails.application.routes.draw do
     member do
       get :edit_assignment
       patch :update_assignment
+      patch :toggle_role
     end
 
     resources :locations, only: [ :index, :new, :create, :show ] do

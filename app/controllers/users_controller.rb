@@ -1,7 +1,8 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :ensure_staff!, only: [ :new_school, :create_school, :edit, :update, :edit_assignment, :update_assignment ]
-  before_action :set_user, only: [ :show, :edit, :update, :edit_assignment, :update_assignment ]
+  before_action :ensure_staff!, only: [ :schools, :employees ]
+  before_action :ensure_admin!, only: [ :new_school, :create_school, :edit, :update, :toggle_role, :destroy, :edit_assignment, :update_assignment ]
+  before_action :set_user, only: [ :show, :edit, :update, :edit_assignment, :update_assignment, :toggle_role, :destroy ]
 
   def show
     if @user.school?
@@ -112,10 +113,47 @@ class UsersController < ApplicationController
     redirect_to user_path(@employee), notice: "School assignments successfully updated."
   end
 
+  def toggle_role
+    if @user.school?
+      redirect_to employees_users_path, alert: "Cannot change role of a school."
+      return
+    end
+
+    new_role = @user.admin? ? :employee : :admin
+
+    if @user.update(role: new_role)
+      redirect_to user_path(@user), notice: "#{@user.name}'s role was updated to #{@user.role.titleize}."
+    else
+      redirect_to user_path(@user), alert: "Failed to update role."
+    end
+  end
+
+  def destroy
+    if @user == current_user
+      redirect_to employees_users_path, alert: "You cannot delete your own account."
+      return
+    end
+
+    user_type = @user.school? ? "School" : "Employee"
+    redirect_path = @user.school? ? schools_users_path : employees_users_path
+
+    if @user.destroy
+      redirect_to redirect_path, notice: "#{user_type} was successfully deleted."
+    else
+      redirect_to user_path(@user), alert: "Failed to delete user."
+    end
+  end
+
   private
 
   def set_user
     @user = User.find(params[:id])
+  end
+
+  def ensure_admin!
+    unless current_user&.admin?
+      redirect_to root_path, alert: "You are not authorized to perform this action."
+    end
   end
 
   def ensure_staff!
