@@ -106,7 +106,11 @@ category_issues = {
 cat_records = {}
 
 category_issues.each do |cat_name, issues|
-  cat = EquipmentCategory.find_or_create_by!(name: cat_name)
+  cat = EquipmentCategory.find_or_create_by!(name: cat_name) do |c|
+    issues.each do |issue_name|
+      c.issue_types.build(name: issue_name)
+    end
+  end
   cat_records[cat_name] = cat
 
   # Create the specific issues for this category
