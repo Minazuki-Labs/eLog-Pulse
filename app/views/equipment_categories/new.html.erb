@@ -1,0 +1,67 @@
+<main class="flex-1 p-8 lg:p-12">
+  <div class="max-w-xl mx-auto bg-white p-8 lg:p-10 rounded-2xl border border-slate-200 shadow-sm">
+    <div class="mb-6">
+      <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-2">Create New Equipment Category</h1>
+      <p class="text-slate-400 text-sm">Fill out the details below to add a new equipment category and its associated issues.</p>
+    </div>
+
+    <%= form_with model: @equipment_category, url: equipment_categories_path, local: true, class: "space-y-5" do |f| %>
+      <% if @equipment_category.errors.any? %>
+        <div class="bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-medium border border-red-100">
+          <ul class="list-disc pl-4 space-y-1">
+            <% @equipment_category.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :name, "Equipment Name", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5" %>
+        <%= f.text_field :name, class: "block w-full px-4 py-3.5 border-2 #{ @equipment_category.errors[:name].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all" %>
+      </div>
+
+      <div class="space-y-3" data-controller="email-fields" data-email-fields-max-value="10">
+        <div class="flex items-center justify-between">
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Equipment Issues (Minimum 1)</label>
+          <button type="button" data-action="click->email-fields#add" class="text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer">
+            + Add Another Issue
+          </button>
+        </div>
+
+        <div data-email-fields-target="container" class="space-y-2.5">
+          <% user_issues = @equipment_category.issue_types.reject { |i| i.name.to_s.strip.casecmp(IssueType::OTHER_NAME).zero? } %>
+          <% user_issues = [ @equipment_category.issue_types.build ] if user_issues.empty? %>
+          
+          <%= f.fields_for :issue_types, user_issues do |builder| %>
+            <div class="email-group flex items-center gap-2">
+              <%= builder.text_field :name, placeholder: "e.g. Won't turn on", class: "flex-1 block w-full px-4 py-3.5 border-2 #{ builder.object.errors[:name].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all" %>
+              <button type="button" data-action="click->email-fields#remove" class="remove-btn px-3 py-3.5 text-slate-400 hover:text-red-600 font-bold text-sm transition-colors cursor-pointer" title="Remove Issue">
+                ✕
+              </button>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <input type="text" value="Other" disabled class="flex-1 block w-full px-4 py-3.5 border-2 border-slate-100 bg-slate-100 rounded-2xl text-sm font-medium text-slate-400 cursor-not-allowed" />
+        </div>
+
+        <template data-email-fields-target="template">
+          <div class="email-group flex items-center gap-2">
+            <%= f.fields_for :issue_types, IssueType.new, child_index: "TEMPLATE_RECORD" do |builder| %>
+              <%= builder.text_field :name, placeholder: "e.g. Won't turn on", class: "flex-1 block w-full px-4 py-3.5 border-2 border-slate-100 bg-slate-50 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all" %>
+            <% end %>
+            <button type="button" data-action="click->email-fields#remove" class="remove-btn px-3 py-3.5 text-slate-400 hover:text-red-600 font-bold text-sm transition-colors cursor-pointer" title="Remove Issue">
+              ✕
+            </button>
+          </div>
+        </template>
+      </div>
+
+      <div class="pt-2">
+        <%= f.submit "Create Equipment Category", class: "w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-100 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+</main>

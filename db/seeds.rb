@@ -116,11 +116,6 @@ category_issues.each do |cat_name, issues|
       equipment_category: cat
     )
   end
-
-  IssueType.find_or_create_by!(
-    name: IssueType::OTHER_NAME,
-    equipment_category: cat
-  )
 end
 
 puts "Creating locations and assigning equipment"
