@@ -14,7 +14,7 @@
 
     <div class="space-y-6">
       <% [
-        { name: "Pending", color: "bg-yellow-400", scope: :pending? },
+        { name: "New Case", color: "bg-yellow-400", scope: :new_case? },
         { name: "In Progress", color: "bg-blue-500", scope: :in_progress? },
       ].each do |status| %>
         <%= render "status_section", 

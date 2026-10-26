@@ -1,0 +1,37 @@
+<%= link_to equipment_category_path(equipment_category), class: "group relative bg-white rounded-2xl p-5 border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-0.5 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden block" do %>
+
+  <div class="flex items-center gap-4 flex-1 min-w-0">
+    <div class="min-w-0 flex-1">
+      <h3 class="text-lg font-extrabold text-slate-800 pl-4 group-hover:text-blue-600 transition-colors leading-snug truncate">
+        <%= equipment_category.name %>
+      </h3>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between md:justify-end gap-4 shrink-0 border-t border-slate-50 pt-4 md:pt-0 md:border-none">
+    <div class="flex flex-wrap gap-1.5 max-w-xs justify-end">
+      <% visible_issues = equipment_category.issue_types.reject { |issue| issue.name.to_s.strip.casecmp(IssueType::OTHER_NAME).zero? } %>
+      
+      <% visible_issues.first(3).each do |issue| %>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+          <%= issue.name %>
+        </span>
+      <% end %>
+      
+      <% if visible_issues.count > 3 %>
+        <span class="inline-flex items-center px-2 py-1 rounded-xl text-xs font-semibold bg-slate-50 text-slate-400">
+          +<%= visible_issues.count - 3 %> more
+        </span>
+      <% end %>
+    </div>
+
+    <div class="bg-blue-50 text-blue-600 p-2.5 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+      </svg>
+    </div>
+  </div>
+
+  <div class="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-blue-500 to-indigo-600 scale-y-0 group-hover:scale-y-100 transition-transform origin-top duration-300"></div>
+
+<% end %>

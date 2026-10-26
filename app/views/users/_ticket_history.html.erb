@@ -3,16 +3,16 @@
     
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <h3 id="ticket-history-heading" class="text-2xl font-black text-slate-900 tracking-tight">Ticket History Log</h3>
+        <h3 id="ticket-history-heading" class="text-2xl font-black text-slate-900 tracking-tight">Active Tickets</h3>
         <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-black ring-1 ring-inset ring-blue-200/50">
-          <%= @school.reported_tickets.count %>
+          <%= @school.reported_tickets.not_completed.count %>
         </span>
       </div>
     </div>
 
     <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-slate-200">
-      <% if @school.reported_tickets.any? %>
-        <% @school.reported_tickets.order(status: :asc, created_at: :desc).each_with_index do |ticket, index| %>
+      <% if @school.reported_tickets.not_completed.any? %>
+        <% @school.reported_tickets.not_completed.order(status: :asc, created_at: :desc).each_with_index do |ticket, index| %>
           <% is_hidden = index >= 5 %>
           
           <div class="relative pl-10 group ticket-row <%= 'hidden' if is_hidden %>"
@@ -56,12 +56,12 @@
         <% end %>
       <% else %>
         <div class="relative pl-10 text-slate-400 italic text-sm">
-          No maintenance or service tickets have been reported by this school yet.
+          No active or incomplete maintenance tickets for this school.
         </div>
       <% end %>
     </div>
 
-    <% if @school.reported_tickets.count > 5 %>
+    <% if @school.reported_tickets.not_completed.count > 5 %>
       <div class="flex justify-center pt-4">
         <button data-action="click->ticket-toggle#toggle" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-600 font-bold text-sm shadow-sm hover:shadow active:scale-95 transition-all duration-200 cursor-pointer">
           <span data-ticket-toggle-target="text">Show More Tickets</span>

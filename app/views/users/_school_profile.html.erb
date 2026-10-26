@@ -4,13 +4,13 @@
     <div class="lg:col-span-2 p-8 md:p-12">
       <div class="mb-10 flex items-start gap-5">
         <div class="h-16 w-16 shrink-0 rounded-2xl bg-blue-50 text-blue-600 font-black text-xl flex items-center justify-center tracking-wider">
-          <%= @school.initials %>
+          <%= school.initials %>
         </div>
         <div>
           <h1 class="text-4xl font-black text-slate-900 mt-2 tracking-tight leading-tight">
-            <%= @school.name %>
+            <%= school.name %>
           </h1>
-          <p class="text-xl text-slate-500 font-medium mt-1"><%= @school.email %></p>
+          <p class="text-xl text-slate-500 font-medium mt-1">@<%= school.username %></p>
         </div>
       </div>
 
@@ -24,7 +24,7 @@
             Registered Locations
           </h4>
 
-          <%= link_to new_user_location_path(@school), 
+          <%= link_to new_user_location_path(school), 
               class: "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors shadow-sm border border-blue-100" do %>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -34,19 +34,19 @@
         </div>
         
         <div class="bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
-          <% if @school.locations.any? %>
+          <% if school.locations.any? %>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <% @school.locations.take(6).each do |location| %>
-                <%= link_to user_location_path(@school, location), class: "flex items-center gap-2.5 bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm hover:border-blue-400 hover:shadow-md transition-all group" do %>
+              <% school.locations.take(6).each do |location| %>
+                <%= link_to user_location_path(school, location), class: "flex items-center gap-2.5 bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm hover:border-blue-400 hover:shadow-md transition-all group" do %>
                   <span class="w-2 h-2 rounded-full bg-blue-500 group-hover:scale-110 transition-transform"></span>
                   <span class="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors"><%= location.name %></span>
                 <% end %>
               <% end %>
             </div>
             
-            <% if @school.locations.count >= 7 %>
+            <% if school.locations.count >= 7 %>
               <div class="mt-4 pt-2 border-t border-slate-200/60 text-right">
-                <%= link_to user_locations_path(@school), class: "text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1" do %>
+                <%= link_to user_locations_path(school), class: "text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1" do %>
                   <span>and more...</span>
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -63,35 +63,65 @@
 
     <div class="bg-slate-50 border-t lg:border-t-0 lg:border-l border-slate-100 p-8 md:p-10">
       <div class="space-y-8">
-        
+        <div>
+          <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Campus Location</label>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 font-black text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+            </div>
+            <p class="text-slate-900 font-bold leading-tight"><%= school.state.to_s.titleize %></p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">School Emails</label>
+          <div class="space-y-2">
+            <% if school.school_emails.any? %>
+              <% school.school_emails.each do |school_email| %>
+                <div class="flex items-center gap-2.5 bg-white p-3 rounded-xl border border-slate-200/60 shadow-sm">
+                  <svg class="w-4 h-4 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                  <span class="text-xs font-bold text-slate-700 break-all"><%= school_email.email %></span>
+                </div>
+              <% end %>
+            <% else %>
+              <p class="text-xs text-slate-400 italic">No emails recorded.</p>
+            <% end %>
+          </div>
+        </div>
+
         <div>
           <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Campus Capacity</label>
-          <%= link_to user_locations_path(@school), class: "flex items-center gap-3 group hover:opacity-80 transition-opacity" do %>
+          <%= link_to user_locations_path(school), class: "flex items-center gap-3 group hover:opacity-80 transition-opacity" do %>
             <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 font-black text-sm group-hover:bg-blue-200 transition-colors">
-              <%= @school.locations.count %>
+              <%= school.locations.count %>
             </div>
             <p class="text-slate-900 font-bold leading-tight group-hover:text-blue-600 transition-colors">Active Locations</p>
           <% end %>
         </div>
 
         <div>
-          <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Total Work Orders</label>
+          <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Total Active Orders</label>
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white font-black text-sm">
-              <%= @school.reported_tickets.count %>
+              <%= school.reported_tickets.not_completed.count %>
             </div>
-            <p class="text-slate-900 font-bold leading-tight">Reported Tickets</p>
+            <p class="text-slate-900 font-bold leading-tight">Active Tickets</p>
           </div>
         </div>
 
         <div class="pt-6 border-t border-slate-200">
           <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Registration Lifecycle</label>
           <div class="space-y-1">
-            <p class="text-xs text-slate-500">Joined <span class="text-slate-900 font-bold"><%= time_ago_in_words(@school.created_at) %> ago</span></p>
-            <p class="text-[10px] font-mono text-slate-400"><%= @school.created_at.strftime("%d %b %Y, %H:%M") %></p>
+            <p class="text-xs text-slate-500">Joined <span class="text-slate-900 font-bold"><%= time_ago_in_words(school.created_at) %> ago</span></p>
+            <p class="text-[10px] font-mono text-slate-400"><%= school.created_at.strftime("%d %b %Y, %H:%M") %></p>
           </div>
         </div>
       </div>
     </div>
+
   </div>
 </div>

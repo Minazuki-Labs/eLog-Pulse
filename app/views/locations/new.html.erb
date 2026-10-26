@@ -43,27 +43,15 @@
           <h3 class="text-lg font-black text-slate-900 tracking-tight">Equipment Setup</h3>
           <p class="text-slate-500 font-medium mt-1">Assign specific components to this workspace.</p>
         </div>
-
-        <div class="space-y-3" data-nested-form-target="container">
-          <template data-nested-form-target="template">
-            <%= f.fields_for :equipment, Equipment.new, child_index: "NEW_RECORD" do |e| %>
-              <%= render "equipment_fields", f: e, equipment_categories: @equipment_categories %>
-            <% end %>
-          </template>
-
-          <%= f.fields_for :equipment do |e| %>
-            <%= render "equipment_fields", f: e, equipment_categories: @equipment_categories %>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <% @equipment_categories.each do |category| %>
+            <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200/60 cursor-pointer hover:border-blue-300 transition-all">
+              <%= check_box_tag "location[equipment_category_ids][]", category.id, false, class: "rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4" %>
+              <span class="text-sm font-bold text-slate-700"><%= category.name %></span>
+            </label>
           <% end %>
         </div>
-
-        <button type="button" 
-                data-action="click->nested-form#add" 
-                class="inline-flex items-center gap-2 text-sm font-black text-blue-600 bg-blue-50 hover:bg-blue-100 px-4 py-2.5 rounded-xl transition-all border border-blue-100 mt-2 cursor-pointer">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          Add Another Component
-        </button>
       </div>
 
       <div class="flex justify-end pt-6 border-t border-slate-100">

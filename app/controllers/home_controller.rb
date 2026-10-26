@@ -2,10 +2,12 @@ class HomeController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    if current_user.school?
-      @tickets = current_user.reported_tickets.order(created_at: :desc)
+    @tickets = if current_user.school?
+      current_user.reported_tickets
+    elsif current_user.employee?
+      Ticket.where(school_id: current_user.assigned_schools.select(:id))
     else
-      @tickets = Ticket.all.order(created_at: :desc)
+      Ticket.all
     end
   end
 end

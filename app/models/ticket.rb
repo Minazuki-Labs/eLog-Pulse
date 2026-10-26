@@ -1,9 +1,7 @@
 class Ticket < ApplicationRecord
-  enum :status, { pending: 0, in_progress: 1, completed: 2 }, default: :pending
-  enum :priority, { low: 0, medium: 1, high: 2 }, default: :low
+  enum :status, { new_case: 0, in_progress: 1, completed: 2 }, default: :new_case
 
   belongs_to :school, class_name: "User"
-  belongs_to :employee, class_name: "User", optional: true
   belongs_to :location
   belongs_to :equipment
   belongs_to :issue_type
@@ -12,18 +10,15 @@ class Ticket < ApplicationRecord
 
   attr_accessor :updater
 
-  validates :status, :priority, presence: true
+  validates :status, :teacher_name, :teacher_phone_number, :teacher_email, presence: true
+  validates :teacher_email, format: { with: URI::MailTo::EMAIL_REGEXP }
 
   validate :equipment_must_belong_to_location
 
   after_update :log_manual_activity, if: -> { updater.present? && tracking_changes_present? }
 
-  scope :open, -> { where(status: [ :pending ]) }
-  scope :high_priority, -> { where(priority: :high) }
-
-  scope :assigned_to, ->(user) { where(employee: user) }
+  scope :open, -> { where(status: [ :new_case ]) }
   scope :recent, -> { order(created_at: :desc) }
-  scope :unassigned, -> { where(employee_id: nil) }
   scope :not_completed, -> { where.not(status: :completed) }
 
   private
@@ -35,7 +30,7 @@ class Ticket < ApplicationRecord
   end
 
   def tracking_changes_present?
-    (saved_changes.keys & %w[status priority employee_id]).any?
+    (saved_changes.keys & %w[status]).any?
   end
 
   def log_manual_activity
@@ -45,27 +40,6 @@ class Ticket < ApplicationRecord
     if saved_changes.key?("status")
       old_val, new_val = saved_changes["status"]
       new_changes << "Changed status from <b>*#{old_val.to_s.titleize}</b> to <b>#{new_val.to_s.titleize}</b>"
-    end
-
-    # Priority changes
-    if saved_changes.key?("priority")
-      old_val, new_val = saved_changes["priority"]
-      new_changes << "Changed priority from <b>#{old_val.to_s.titleize}</b> to <b>#{new_val.to_s.titleize}</b>"
-    end
-
-    # Assignment changes
-    if saved_changes.key?("employee_id")
-      old_id, new_id = saved_changes["employee_id"]
-
-      users = User.where(id: [ old_id, new_id ].compact).index_by(&:id)
-      old_emp = users[old_id]&.name || "Unassigned"
-      new_emp = users[new_id]&.name || "Unassigned"
-
-      if old_id.nil? && new_id == updater.id
-        new_changes << "<b>Assigned themselves</b> to this ticket"
-      else
-        new_changes << "Changed assignment from <b>#{old_emp}</b> to <b>#{new_emp}</b>"
-      end
     end
 
     return if new_changes.empty?
