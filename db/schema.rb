@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_11_063409) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_27_133739) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,7 +26,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_063409) do
     t.text "body"
     t.integer "comment_type"
     t.datetime "created_at", null: false
-    t.string "jobsheet", null: false
+    t.string "jobsheet"
     t.bigint "ticket_id", null: false
     t.json "tracked_changes"
     t.datetime "updated_at", null: false

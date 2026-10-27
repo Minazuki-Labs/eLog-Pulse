@@ -39,7 +39,7 @@ class Ticket < ApplicationRecord
     # Status changes
     if saved_changes.key?("status")
       old_val, new_val = saved_changes["status"]
-      new_changes << "Changed status from <b>*#{old_val.to_s.titleize}</b> to <b>#{new_val.to_s.titleize}</b>"
+      new_changes << "Changed status from <b>#{old_val.to_s.titleize}</b> to <b>#{new_val.to_s.titleize}</b>"
     end
 
     return if new_changes.empty?
