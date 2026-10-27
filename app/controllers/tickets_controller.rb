@@ -150,6 +150,7 @@ class TicketsController < ApplicationController
 
     if equipment
       @issue_types = IssueType.where(equipment_category_id: equipment.equipment_category_id)
+                              .order(Arel.sql("CASE WHEN name = 'Other' THEN 1 ELSE 0 END, name ASC"))
       render json: @issue_types.select(:id, :name)
     else
       render json: []
@@ -174,7 +175,13 @@ class TicketsController < ApplicationController
     end
 
     @equipment = @ticket.location_id ? Equipment.where(location_id: @ticket.location_id) : []
-    @issue_types = @ticket.equipment&.equipment_category_id ? IssueType.where(equipment_category_id: @ticket.equipment.equipment_category_id) : []
+
+    @issue_types = if @ticket.equipment&.equipment_category_id
+      IssueType.where(equipment_category_id: @ticket.equipment.equipment_category_id)
+               .order(Arel.sql("CASE WHEN name = 'Other' THEN 1 ELSE 0 END, name ASC"))
+    else
+      []
+    end
   end
 
   def store_last_index_path
