@@ -284,8 +284,8 @@ Ticket.create!(
 
 Comment.create!(
   ticket: ticket1,
-  user: school1,
-  body: "Urgent, I need internet ASAP",
+  user: employee1,
+  body: "Waiting for router",
   jobsheet: "C1109"
 )
 
