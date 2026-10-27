@@ -1,0 +1,9 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+  <% if @tickets.blank? %>
+    <div class="col-span-full bg-white rounded-2xl p-8 text-center border border-slate-200/60 text-slate-400">
+      No completed tickets found.
+    </div>
+  <% else %>
+    <%= render partial: "home/ticket_card", collection: @tickets, as: :ticket, locals: { show_school: true } %>
+  <% end %>
+</div>
