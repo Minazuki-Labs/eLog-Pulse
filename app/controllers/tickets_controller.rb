@@ -2,7 +2,9 @@ class TicketsController < ApplicationController
   before_action :store_last_index_path, only: [ :index ]
 
   def index
-    @tickets = if current_user.school?
+    @scope = params[:scope] || "open"
+
+    base_tickets = if current_user.school?
       current_user.reported_tickets
     elsif current_user.employee?
       Ticket.where(school_id: current_user.assigned_schools.select(:id))
@@ -21,19 +23,11 @@ class TicketsController < ApplicationController
       []
     end
 
-    case params[:scope]
-    when "open"
-      @tickets = @tickets.open
-    when "in_progress"
-      @tickets = @tickets.where(status: :in_progress)
-    when "completed"
-      @tickets = @tickets.where(status: :completed)
-    end
-
     # Search query filter
+    scoped_tickets = base_tickets
     if params[:query].present?
       q = "%#{params[:query].strip.downcase}%"
-      @tickets = @tickets.left_joins(:school).where(
+      scoped_tickets = scoped_tickets.left_joins(:school).where(
         "LOWER(tickets.teacher_name) LIKE ? OR LOWER(tickets.teacher_email) LIKE ? OR LOWER(tickets.description) LIKE ? OR LOWER(users.name) LIKE ? OR LOWER(users.email) LIKE ?",
         q, q, q, q, q
       ).distinct
@@ -41,19 +35,51 @@ class TicketsController < ApplicationController
 
     # School filter
     if params[:school_id].present?
-      @tickets = @tickets.where(school_id: params[:school_id])
+      scoped_tickets = scoped_tickets.where(school_id: params[:school_id])
     end
 
     # Date range filter
     if params[:start_date].present?
-      @tickets = @tickets.where("tickets.created_at >= ?", params[:start_date].to_date.beginning_of_day)
+      scoped_tickets = scoped_tickets.where("tickets.created_at >= ?", params[:start_date].to_date.beginning_of_day)
     end
 
     if params[:end_date].present?
-      @tickets = @tickets.where("tickets.created_at <= ?", params[:end_date].to_date.end_of_day)
+      scoped_tickets = scoped_tickets.where("tickets.created_at <= ?", params[:end_date].to_date.end_of_day)
     end
 
-    @tickets = @tickets.order(created_at: :desc)
+    if current_user.school?
+      @tickets = scoped_tickets.includes(:location, { equipment: :equipment_category }, :issue_type).order(created_at: :desc)
+    elsif @scope == "completed"
+      @tickets = scoped_tickets.where(status: :completed).includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(created_at: :desc)
+    else
+      current_scoped_tickets = case @scope
+      when "open"
+        scoped_tickets.open
+      when "in_progress"
+        scoped_tickets.where(status: :in_progress)
+      else
+        scoped_tickets
+      end
+
+      allowed_schools = if current_user.employee?
+        current_user.assigned_schools
+      else
+        User.school
+      end
+
+      allowed_schools = allowed_schools.where(id: params[:school_id]) if params[:school_id].present?
+
+      @states_data = User.states.keys.map do |state_key|
+        state_schools = allowed_schools.where(state: state_key)
+
+        active_schools = state_schools.map do |school|
+          school_tickets = current_scoped_tickets.where(school_id: school.id).includes(:location, { equipment: :equipment_category }, :issue_type).order(created_at: :desc)
+          { school: school, tickets: school_tickets } if school_tickets.any?
+        end.compact
+
+        { state: state_key, schools: active_schools } if active_schools.any?
+      end.compact
+    end
   end
 
   def show
