@@ -1,5 +1,5 @@
 class LocationsController < ApplicationController
-  before_action :set_school, only: [ :index, :new, :create, :show, :update_equipment ]
+  before_action :set_school, only: [ :index, :new, :create, :show, :edit, :update, :update_equipment ]
 
   def index
     if params[:query].present?
@@ -38,6 +38,20 @@ class LocationsController < ApplicationController
     else
       @equipment_categories = EquipmentCategory.all
       render :new, status: :unprocessable_entity
+    end
+  end
+
+  def edit
+    @location = @school.locations.find(params[:id])
+  end
+
+  def update
+    @location = @school.locations.find(params[:id])
+
+    if @location.update(location_params)
+      redirect_to user_location_path(@school, @location), notice: "Location was successfully updated."
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
