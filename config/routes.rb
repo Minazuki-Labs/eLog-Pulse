@@ -14,7 +14,7 @@ Rails.application.routes.draw do
       patch :toggle_role
     end
 
-    resources :locations, only: [ :index, :new, :create, :show, :edit, :update ] do
+    resources :locations, only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do
       member do
         patch :update_equipment
       end
