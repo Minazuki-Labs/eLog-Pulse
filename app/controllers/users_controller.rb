@@ -92,7 +92,7 @@ class UsersController < ApplicationController
 
   def edit_assignment
     @employee = @user
-    @schools = User.school.order(:name)
+    @schools = User.school
 
     if params[:query].present?
       query = "%#{params[:query].strip}%"
@@ -102,6 +102,12 @@ class UsersController < ApplicationController
     if params[:state].present?
       @schools = @schools.where(state: params[:state])
     end
+
+    @schools = @schools.order(
+      Arel.sql("EXISTS (SELECT 1 FROM employee_schools WHERE employee_schools.school_id = users.id AND employee_schools.employee_id = ?) ASC", @employee.id),
+      :state,
+      :name
+    )
   end
 
   def update_assignment

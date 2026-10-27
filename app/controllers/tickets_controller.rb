@@ -12,13 +12,45 @@ class TicketsController < ApplicationController
 
     session[:last_tickets_path] = request.fullpath
 
+    # Load schools available for filtering based on user role
+    @schools = if current_user.admin?
+      User.where(role: :school)
+    elsif current_user.employee?
+      current_user.assigned_schools
+    else
+      []
+    end
+
     case params[:scope]
     when "open"
-      @tickets = @tickets.open.not_completed
-    when "assigned"
-      if current_user.admin?
-        @tickets = @tickets.joins(school: :employee_schools).distinct
-      end
+      @tickets = @tickets.open
+    when "in_progress"
+      @tickets = @tickets.where(status: :in_progress)
+    when "completed"
+      @tickets = @tickets.where(status: :completed)
+    end
+
+    # Search query filter
+    if params[:query].present?
+      q = "%#{params[:query].strip.downcase}%"
+      @tickets = @tickets.left_joins(:school).where(
+        "LOWER(tickets.teacher_name) LIKE ? OR LOWER(tickets.teacher_email) LIKE ? OR LOWER(tickets.description) LIKE ? OR LOWER(users.name) LIKE ? OR LOWER(users.email) LIKE ?",
+        q, q, q, q, q
+      ).distinct
+    end
+
+    # School filter
+    if params[:school_id].present?
+      @tickets = @tickets.where(school_id: params[:school_id])
+    end
+
+    # Date range filter
+    if params[:start_date].present?
+      @tickets = @tickets.where("tickets.created_at >= ?", params[:start_date].to_date.beginning_of_day)
+    end
+
+    if params[:end_date].present?
+      @tickets = @tickets.where("tickets.created_at <= ?", params[:end_date].to_date.end_of_day)
     end
 
     @tickets = @tickets.order(created_at: :desc)

@@ -1,13 +1,17 @@
 <%= link_to ticket, class: "group relative bg-white rounded-3xl p-7 border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full overflow-hidden" do %>
 
-  <div class="flex justify-between items-center mb-6">
-    <div class="flex items-center gap-2">
-      <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold uppercase tracking-widest <%= status_color(ticket.status) %>">
+  <div class="flex justify-between items-start mb-6">
+    <div class="flex flex-col gap-1.5">
+      <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold uppercase tracking-widest bg-slate-100 text-slate-600 tabular-nums w-fit">
+        Case ID: #<%= ticket.id %>
+      </span>
+
+      <span class="px-2.5 py-0.5 rounded-lg text-[11px] font-bold uppercase tracking-widest <%= status_color(ticket.status) %> w-fit">
         <%= ticket.status.humanize %>
       </span>
     </div>
     
-    <span class="text-[11px] font-semibold text-slate-400 tabular-nums">
+    <span class="text-[11px] font-semibold text-slate-400 tabular-nums whitespace-nowrap">
       <%= ticket.created_at.strftime("%d %b %Y") %>
     </span>
   </div>
