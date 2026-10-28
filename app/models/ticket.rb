@@ -41,7 +41,7 @@ class Ticket < ApplicationRecord
 
     while added_days < business_days
       current_date -= 1.day
-      added_days += 1 unless current_date.weekend?
+      added_days += 1 unless current_date.on_weekend?
     end
 
     current_date
