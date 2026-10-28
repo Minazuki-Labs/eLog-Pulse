@@ -39,6 +39,7 @@ Rails.application.routes.draw do
       get :locations
       get :equipment
       get :issue_types
+      get :schools_by_state
     end
   end
 

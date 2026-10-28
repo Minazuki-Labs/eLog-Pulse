@@ -30,9 +30,6 @@
             Jobsheet: <%= comment.jobsheet %>
           </span>
         <% end %>
-        <% if comment.system_log? && comment.created_at != comment.updated_at %>
-          <span class="text-[10px] font-semibold uppercase tracking-wider text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">Batch Updated</span>
-        <% end %>
       </div>
       
       <time class="text-[10px] font-mono font-medium text-slate-400 bg-slate-100/50 px-2 py-0.5 rounded">

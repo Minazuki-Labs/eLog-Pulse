@@ -43,7 +43,7 @@ class UsersController < ApplicationController
 
     if params[:query].present?
       query = "%#{params[:query].strip}%"
-      @schools = @schools.where("name ILIKE :q OR email ILIKE :q", q: query)
+      @schools = @schools.where("name ILIKE :q OR username ILIKE :q", q: query)
     end
 
     @schools = @schools.order(:name)
