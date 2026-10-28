@@ -21,6 +21,8 @@ class Ticket < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :not_completed, -> { where.not(status: :completed) }
 
+  after_create :send_new_ticket_notification
+
   def new_case_warning?
     new_case? && created_at <= business_days_ago(3)
   end
@@ -91,5 +93,9 @@ class Ticket < ApplicationRecord
         tracked_changes: { "points" => new_changes }
       )
     end
+  end
+
+  def send_new_ticket_notification
+    TicketMailer.new_ticket(self).deliver_later
   end
 end

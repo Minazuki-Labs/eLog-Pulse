@@ -19,4 +19,17 @@ Rails.application.configure do
 
   # Turn on "fragment caching" to speed up view rendering.
   config.action_controller.perform_caching = true
+
+  # SMTP Mailer Configuration
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address:              "mail.multiple.com.my",
+    port:                 465,
+    domain:               "multiple.com.my",
+    user_name:            "elog@multiple.com.my",
+    password:             "Dyna@b00k",
+    authentication:       :login,
+    ssl:                  true,
+    enable_starttls_auto: false
+  }
 end

@@ -4,18 +4,25 @@ class CommentsController < ApplicationController
   before_action :require_staff!
 
   def create
-    @comment = @ticket.comments.build(comment_params)
-    @comment.user = current_user
+    @ticket.updater = current_user
 
     if params[:complete_case] == "1"
-      @ticket.updater = current_user
       @ticket.status = :completed
     elsif @ticket.new_case?
-      @ticket.updater = current_user
       @ticket.status = :in_progress
     end
 
-    if @comment.save && (@ticket.changed? ? @ticket.save : true)
+    @comment = @ticket.comments.build(comment_params)
+    @comment.user = current_user
+
+    success = ActiveRecord::Base.transaction do
+      ticket_saved = @ticket.changed? ? @ticket.save : true
+      comment_saved = @comment.save
+
+      ticket_saved && comment_saved
+    end
+
+    if success
       status_msg = @ticket.saved_change_to_status? ? " and status updated to #{@ticket.status.humanize}" : ""
       redirect_to @ticket, notice: "Comment posted successfully#{status_msg}."
     else
