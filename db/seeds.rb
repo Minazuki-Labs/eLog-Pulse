@@ -223,25 +223,28 @@ ticket1 = Ticket.create!(
   teacher_email: "alice@test.edu",
   teacher_phone_number: "0123456789"
 )
+ticket1.update_columns(created_at: 20.days.ago, updated_at: 15.days.ago)
 
 projector_unit = Equipment.find_by!(location: class1, equipment_category: projector_category)
 projector_issue = IssueType.find_by!(name: "No Visual", equipment_category: projector_category)
 
-Ticket.create!(
+ticket2 = Ticket.create!(
   school: school1,
   location: class1,
   equipment: projector_unit,
   issue_type: projector_issue,
+  description: "Projector displays black screen",
   status: :new_case,
   teacher_name: "Teacher Bob",
   teacher_email: "bob@test.edu",
   teacher_phone_number: "0123456790"
 )
+ticket2.update_columns(created_at: 4.days.ago, updated_at: 4.days.ago)
 
 monitor_unit = Equipment.find_by!(location: class1, equipment_category: monitor_category)
 monitor_issue = IssueType.find_by!(name: "Other", equipment_category: monitor_category)
 
-ticket2 = Ticket.create!(
+ticket3 = Ticket.create!(
   school: school1,
   location: class1,
   equipment: monitor_unit,
@@ -290,14 +293,7 @@ Comment.create!(
 )
 
 Comment.create!(
-  ticket: ticket1,
-  user: employee2,
-  body: "I will take a look at this on Monday.",
-  jobsheet: "C0424"
-)
-
-Comment.create!(
-  ticket: ticket2,
+  ticket: ticket3,
   user: employee3,
   body: "Monitor delivered",
   jobsheet: "C2345"

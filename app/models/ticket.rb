@@ -21,6 +21,18 @@ class Ticket < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :not_completed, -> { where.not(status: :completed) }
 
+  def new_case_warning?
+    new_case? && created_at <= 3.days.ago
+  end
+
+  def in_progress_warning?
+    in_progress? && updated_at <= 14.days.ago
+  end
+
+  def warning?
+    new_case_warning? || in_progress_warning?
+  end
+
   private
 
   def equipment_must_belong_to_location

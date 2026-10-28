@@ -62,6 +62,8 @@ class TicketsController < ApplicationController
     # Date range filter
     if params[:start_date].present?
       scoped_tickets = scoped_tickets.where("tickets.created_at >= ?", params[:start_date].to_date.beginning_of_day)
+    elsif @scope == "completed" && params[:end_date].blank?
+      scoped_tickets = scoped_tickets.where("tickets.created_at >= ?", 30.days.ago.beginning_of_day)
     end
 
     if params[:end_date].present?
