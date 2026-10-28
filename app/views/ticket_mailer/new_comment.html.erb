@@ -1,4 +1,13 @@
 <div>
+  <!-- Greeting -->
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 20px;">
+    <tr>
+      <td style="font-size: 15px; color: #1e293b; font-weight: 600;">
+        Hi, <%= @ticket.teacher_name %>,
+      </td>
+    </tr>
+  </table>
+
   <!-- Title & Status Header -->
   <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 24px;">
     <tr>
@@ -69,4 +78,25 @@
       </tr>
     </table>
   <% end %>
+
+  <!-- Closing & Company Sign-off -->
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 32px; border-top: 1px solid #f1f5f9; padding-top: 24px;">
+    <tr>
+      <td style="font-size: 14px; color: #334155; line-height: 1.6;">
+        <p style="margin: 0 0 16px 0;">
+          If you have any further questions then do let us know.
+        </p>
+        <p style="margin: 0 0 16px 0;">
+          Thanks and regards,
+        </p>
+        <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.5;">
+          <strong style="color: #1e293b; display: block; margin-bottom: 2px;">DIGITAL IT SOLUTIONS SDN BHD (DITS)</strong>
+          No.10, Jalan 15/22,<br>
+          Tiong Nam Industrial Park,<br>
+          Section 15, 40200 Shah Alam, Malaysia.<br>
+          Tel: <a href="tel:+60355231781" style="color: #2563eb; text-decoration: none;">+60 3 5523 1781</a>
+        </p>
+      </td>
+    </tr>
+  </table>
 </div>
