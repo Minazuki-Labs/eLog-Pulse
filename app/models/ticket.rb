@@ -22,11 +22,11 @@ class Ticket < ApplicationRecord
   scope :not_completed, -> { where.not(status: :completed) }
 
   def new_case_warning?
-    new_case? && created_at <= 3.days.ago
+    new_case? && created_at <= business_days_ago(3)
   end
 
   def in_progress_warning?
-    in_progress? && updated_at <= 14.days.ago
+    in_progress? && updated_at <= business_days_ago(14)
   end
 
   def warning?
@@ -34,6 +34,18 @@ class Ticket < ApplicationRecord
   end
 
   private
+
+  def business_days_ago(business_days)
+    current_date = Time.current
+    added_days = 0
+
+    while added_days < business_days
+      current_date -= 1.day
+      added_days += 1 unless current_date.weekend?
+    end
+
+    current_date
+  end
 
   def equipment_must_belong_to_location
     if equipment && location && equipment.location_id != location_id
