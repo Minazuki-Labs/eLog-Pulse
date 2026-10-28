@@ -30,7 +30,6 @@
         </div>
 
         <div data-email-fields-target="container" class="space-y-2.5">
-          <% # Render only non-Other issues for the dynamic user input fields %>
           <% user_issues = @equipment_category.issue_types.reject { |i| i.name.to_s.strip.casecmp(IssueType::OTHER_NAME).zero? } %>
           <% user_issues = [ @equipment_category.issue_types.build ] if user_issues.empty? %>
           

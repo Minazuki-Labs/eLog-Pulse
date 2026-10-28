@@ -23,6 +23,15 @@ class TicketsController < ApplicationController
       []
     end
 
+    # Filter schools by state if present
+    if params[:state].present?
+      @schools = @schools.where(state: params[:state]) if @schools.respond_to?(:where)
+    end
+
+    # Load locations and equipment based on selected school_id
+    @locations = params[:school_id].present? ? Location.where(school_id: params[:school_id]) : []
+    @equipment = params[:location_id].present? ? Equipment.where(location_id: params[:location_id]) : []
+
     # Search query filter
     scoped_tickets = base_tickets
     if params[:query].present?
@@ -33,9 +42,21 @@ class TicketsController < ApplicationController
       ).distinct
     end
 
-    # School filter
+    # State, School, Location, and Equipment filters
+    if params[:state].present?
+      scoped_tickets = scoped_tickets.joins(:school).where(users: { state: params[:state] })
+    end
+
     if params[:school_id].present?
       scoped_tickets = scoped_tickets.where(school_id: params[:school_id])
+    end
+
+    if params[:location_id].present?
+      scoped_tickets = scoped_tickets.where(location_id: params[:location_id])
+    end
+
+    if params[:equipment_id].present?
+      scoped_tickets = scoped_tickets.where(equipment_id: params[:equipment_id])
     end
 
     # Date range filter
@@ -155,6 +176,19 @@ class TicketsController < ApplicationController
     else
       render json: []
     end
+  end
+
+  def schools_by_state
+    allowed_schools = if current_user.admin?
+      User.where(role: :school)
+    elsif current_user.employee?
+      current_user.assigned_schools
+    else
+      User.none
+    end
+
+    schools = params[:state].present? ? allowed_schools.where(state: params[:state]) : allowed_schools
+    render json: schools.select(:id, :name)
   end
 
   private
