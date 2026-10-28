@@ -4,7 +4,7 @@
       <div class="mb-10">
         <div class="flex justify-between items-center gap-4 flex-wrap">
           <div class="flex items-center">
-            <% if current_user.staff? %>
+            <% if current_user.admin? %>
               <%= form_with model: @ticket, class: "inline-block" do |f| %>
                 <div class="relative group cursor-pointer">
                   <span class="inline-flex items-center px-4 py-2.5 pr-10 rounded-full text-[11px] font-black uppercase tracking-widest <%= status_color(@ticket.status) %> ring-1 ring-inset ring-black/5 transition-all group-hover:ring-black/20 shadow-sm">
@@ -18,7 +18,7 @@
                   </div>
 
                   <%= f.select :status, 
-                      Ticket.statuses.keys.map { |s| [s.titleize, s] }, 
+                      Ticket.statuses.except(:new_case).keys.map { |s| [s.titleize, s] }, 
                       {}, 
                       { 
                         class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10",

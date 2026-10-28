@@ -132,6 +132,17 @@ class TicketsController < ApplicationController
 
   def update
     @ticket = Ticket.find(params[:id])
+
+    if !current_user.admin? && ticket_params.key?(:status)
+      redirect_to @ticket, alert: "You are not authorized to change the ticket status."
+      return
+    end
+
+    if ticket_params[:status] == "new_case"
+      redirect_to @ticket, alert: "Tickets cannot be changed back to New Case."
+      return
+    end
+
     @ticket.updater = current_user
 
     if @ticket.update(ticket_params)
