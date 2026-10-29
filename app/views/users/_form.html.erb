@@ -31,6 +31,15 @@
             class: "block w-full px-4 py-3.5 border-2 #{ school.errors[:username].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700" %>
       </div>
 
+      <!-- User Type Selection Field  -->
+      <% unless school.school? %>
+        <div>
+          <%= f.label :role, "User Type", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1" %>
+          <%= f.select :role, [["Employee", "employee"], ["Contractor", "contractor"], ["Admin", "admin"]], {}, 
+              class: "block w-full px-4 py-3.5 border-2 border-slate-100 bg-slate-50 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700" %>
+        </div>
+      <% end %>
+
       <% if school.school? %>
         <!-- State Selection Field -->
         <div>

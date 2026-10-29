@@ -6,9 +6,11 @@
         <p class="text-slate-400 mt-1 text-base">Manage and track your recent activity.</p>
       </div>
       
-      <%= link_to new_ticket_path, class: "inline-flex items-center px-5 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md shadow-blue-100 hover:bg-blue-700 transition-all" do %>
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-        New Ticket
+      <% unless current_user.contractor? %>
+        <%= link_to new_ticket_path, class: "inline-flex items-center px-5 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md shadow-blue-100 hover:bg-blue-700 transition-all" do %>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          New Ticket
+        <% end %>
       <% end %>
     </div>
 

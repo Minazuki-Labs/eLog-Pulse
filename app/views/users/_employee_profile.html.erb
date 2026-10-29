@@ -14,61 +14,111 @@
         </div>
       </div>
 
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
+      <% unless employee.contractor? %>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              Assigned Schools
+            </h4>
+
+            <% if current_user.staff? %>
+              <%= link_to edit_assignment_user_path(employee), 
+                  class: "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors shadow-sm border border-blue-100" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Edit Assignment
+              <% end %>
+            <% end %>
+          </div>
+
+          <div class="bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
+            <% if employee.assigned_schools.any? %>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <% employee.assigned_schools.take(6).each do |assigned_school| %>
+                  <%= link_to user_path(assigned_school), class: "flex items-center gap-2.5 bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm hover:border-blue-400 hover:shadow-md transition-all group" do %>
+                    <span class="w-2 h-2 rounded-full bg-blue-500 group-hover:scale-110 transition-transform"></span>
+                    <span class="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors"><%= assigned_school.name %></span>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <% if employee.assigned_schools.count >= 7 %>
+                <div class="mt-4 pt-2 border-t border-slate-200/60 text-right">
+                  <%= link_to edit_assignment_user_path(employee), class: "text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1" do %>
+                    <span>and more...</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  <% end %>
+                </div>
+              <% end %>
+            <% else %>
+              <p class="text-slate-400 text-sm font-medium italic py-2">No schools have been assigned to this employee yet.</p>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <div class="space-y-4">
           <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
             </svg>
             Assigned Schools
           </h4>
-
-          <% if current_user.staff? %>
-            <%= link_to edit_assignment_user_path(employee), 
-                class: "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors shadow-sm border border-blue-100" do %>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-              </svg>
-              Edit Assignment
-            <% end %>
-          <% end %>
+          <div class="bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
+            <p class="text-slate-400 text-sm font-medium italic py-2">Contractors do not have assigned schools. They can view and handle tickets directly assigned to them.</p>
+          </div>
         </div>
-
-        <div class="bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
-          <% if employee.assigned_schools.any? %>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <% employee.assigned_schools.each do |assigned_school| %>
-                <%= link_to user_path(assigned_school), class: "flex items-center gap-2.5 bg-white p-4 rounded-xl border border-slate-200/60 shadow-sm hover:border-blue-400 hover:shadow-md transition-all group" do %>
-                  <span class="w-2 h-2 rounded-full bg-blue-500 group-hover:scale-110 transition-transform"></span>
-                  <span class="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors"><%= assigned_school.name %></span>
-                <% end %>
-              <% end %>
-            </div>
-          <% else %>
-            <p class="text-slate-400 text-sm font-medium italic py-2">No schools have been assigned to this employee yet.</p>
-          <% end %>
-        </div>
-      </div>
+      <% end %>
     </div>
 
-    <div class="bg-slate-50 border-t lg:border-t-0 lg:border-l border-slate-100 p-8 md:p-10">
-      <div class="space-y-8">
-        <div>
-          <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Assigned Portfolio</label>
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 font-black text-sm">
-              <%= employee.assigned_schools.count %>
-            </div>
-            <p class="text-slate-900 font-bold leading-tight">Managed Schools</p>
-          </div>
-        </div>
+    <div class="bg-slate-50 border-t lg:border-t-0 lg:border-l border-slate-100 p-8 md:p-10 space-y-8">      
+      <div>
+        <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">User Type</label>
+        
+        <% if current_user.admin? && current_user != employee %>
+          <%= form_with model: employee, url: user_path(employee), method: :patch, class: "inline-block", 
+              data: { controller: "role-warning" } do |f| %>
+            <div class="relative group cursor-pointer inline-block">
+              <span class="inline-flex items-center px-4 py-2.5 pr-10 rounded-full text-[11px] font-black uppercase tracking-widest <%= employee.admin? ? 'bg-purple-100 text-purple-700 ring-purple-200/50' : (employee.contractor? ? 'bg-amber-100 text-amber-800 ring-amber-200/50' : 'bg-blue-100 text-blue-700 ring-blue-200/50') %> ring-1 ring-inset transition-all group-hover:ring-black/20 shadow-sm">
+                <%= employee.role.titleize %>
+              </span>
+              
+              <div class="absolute right-3 top-1/2 -translate-y-1/2 text-current opacity-60 group-hover:opacity-100 transition-opacity">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
+                </svg>
+              </div>
 
-        <div class="pt-6 border-t border-slate-200">
-          <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Registration Lifecycle</label>
-          <div class="space-y-1">
-            <p class="text-xs text-slate-500">Joined <span class="text-slate-900 font-bold"><%= time_ago_in_words(employee.created_at) %> ago</span></p>
-            <p class="text-[10px] font-mono text-slate-400"><%= employee.created_at.strftime("%d %b %Y, %H:%M") %></p>
-          </div>
+              <%= f.select :role, 
+                  [["Employee", "employee"], ["Contractor", "contractor"], ["Admin", "admin"]], 
+                  {}, 
+                  { 
+                    class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10",
+                    data: { 
+                      current_role: employee.role,
+                      action: "change->role-warning#confirmChange" 
+                    }
+                  } 
+              %>
+            </div>
+          <% end %>
+        <% else %>
+          <span class="inline-flex items-center px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest <%= employee.admin? ? 'bg-purple-100 text-purple-700' : (employee.contractor? ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-700') %> ring-1 ring-inset ring-black/5">
+            <%= employee.role.titleize %>
+          </span>
+        <% end %>
+      </div>
+
+      <div class="pt-6 border-t border-slate-200">
+        <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Registration Lifecycle</label>
+        <div class="space-y-1">
+          <p class="text-xs text-slate-500">Joined <span class="text-slate-900 font-bold"><%= time_ago_in_words(employee.created_at) %> ago</span></p>
+          <p class="text-[10px] font-mono text-slate-400"><%= employee.created_at.strftime("%d %b %Y, %H:%M") %></p>
         </div>
       </div>
     </div>

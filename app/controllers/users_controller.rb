@@ -1,25 +1,21 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :ensure_staff!, only: [ :schools, :employees ]
-  before_action :ensure_admin!, only: [ :new_school, :create_school, :new_contractor, :create_contractor, :edit, :update, :toggle_role, :destroy, :edit_assignment, :update_assignment ]
+  before_action :ensure_admin!, only: [ :new_school, :create_school, :edit, :update, :toggle_role, :destroy, :edit_assignment, :update_assignment ]
   before_action :set_user, only: [ :show, :edit, :update, :edit_assignment, :update_assignment, :toggle_role, :destroy ]
 
   def show
     if @user.school?
       @school = User.includes(:locations, :school_emails, reported_tickets: [ :equipment, :issue_type ]).find(params[:id])
-    elsif @user.contractor?
-      @contractor = User.includes(assigned_tickets: [ :equipment, :issue_type, :school ]).find(params[:id])
-    elsif @user.staff?
-      @employee = User.includes(:assigned_schools).find(params[:id])
+    elsif @user.staff? || @user.contractor?
+      @employee = User.includes(:assigned_schools, assigned_tickets: [ :equipment, :issue_type, :school ]).find(params[:id])
     end
   end
 
   def edit
     if @user.school?
       @school = @user
-    elsif @user.contractor
-      @contractor = @user
-    elsif @user.staff?
+    elsif @user.staff? || @user.contractor?
       @employee = @user
     end
   end
@@ -32,17 +28,16 @@ class UsersController < ApplicationController
       else
         render :edit, status: :unprocessable_entity
       end
-    elsif @user.contractor
-      @contractor = @user
-      if @contractor.update(contractor_params)
-        redirect_to user_path(@contractor), notice: "Contractor updated successfully."
-      else
-        render :edit, status: :unprocessable_entity
-      end
-    elsif @user.staff?
+    elsif @user.staff? || @user.contractor?
       @employee = @user
+
+      switching_to_contractor = employee_params[:role] == "contractor" && !@employee.contractor?
+
       if @employee.update(employee_params)
-        redirect_to user_path(@employee), notice: "Employee updated successfully."
+        if switching_to_contractor
+          @employee.assigned_schools.clear
+        end
+        redirect_to user_path(@employee), notice: "Staff updated successfully."
       else
         render :edit, status: :unprocessable_entity
       end
@@ -77,12 +72,18 @@ class UsersController < ApplicationController
   end
 
   def employees
-    @employees = User.directory_users.includes(:assigned_schools, :assigned_tickets).order(:name)
+    @employees = User.directory_users.includes(:assigned_schools, :assigned_tickets)
 
     if params[:query].present?
       query = "%#{params[:query].strip}%"
       @employees = @employees.where("name ILIKE :q OR username ILIKE :q", q: query)
     end
+
+    if params[:role].present?
+      @employees = @employees.where(role: params[:role])
+    end
+
+    @employees = @employees.order(Arel.sql("CASE role WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 3 THEN 3 ELSE 4 END"), :name)
 
     render "users/employees"
   end
@@ -92,26 +93,12 @@ class UsersController < ApplicationController
   end
 
   def create_employee
-    @employee = User.new(employee_params.merge(role: :employee))
+    @employee = User.new(employee_params)
 
     if @employee.save
-      redirect_to employees_users_path, notice: "Employee successfully registered."
+      redirect_to employees_users_path, notice: "Staff successfully registered."
     else
       render :new_employee, status: :unprocessable_entity
-    end
-  end
-
-  def new_contractor
-    @contractor = User.new(role: :contractor)
-  end
-
-  def create_contractor
-    @contractor = User.new(contractor_params.merge(role: :contractor))
-
-    if @contractor.save
-      redirect_to employees_users_path, notice: "Contractor successfully registered."
-    else
-      render :new_contractor, status: :unprocessable_entity
     end
   end
 
@@ -213,16 +200,8 @@ class UsersController < ApplicationController
       :name,
       :username,
       :password,
-      :password_confirmation
-    )
-  end
-
-  def contractor_params
-    params.require(:user).permit(
-      :name,
-      :username,
-      :password,
-      :password_confirmation
+      :password_confirmation,
+      :role
     )
   end
 end
