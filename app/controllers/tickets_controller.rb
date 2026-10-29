@@ -36,10 +36,28 @@ class TicketsController < ApplicationController
     scoped_tickets = base_tickets
     if params[:query].present?
       q = "%#{params[:query].strip.downcase}%"
-      scoped_tickets = scoped_tickets.left_joins(:school).where(
-        "LOWER(tickets.teacher_name) LIKE ? OR LOWER(tickets.teacher_email) LIKE ? OR LOWER(tickets.description) LIKE ? OR LOWER(users.name) LIKE ? OR LOWER(users.email) LIKE ?",
-        q, q, q, q, q
-      ).distinct
+
+      # Determine if the query is a number to allow searching by Ticket ID
+      id_condition = params[:query].strip.to_i > 0 ? "OR tickets.id = ?" : nil
+      id_param = params[:query].strip.to_i > 0 ? params[:query].strip.to_i : nil
+
+      scoped_tickets = scoped_tickets
+        .left_joins(:school, :location, :issue_type, equipment: :equipment_category)
+        .where(
+          [
+            "LOWER(tickets.teacher_name) LIKE ? OR " \
+            "LOWER(tickets.teacher_email) LIKE ? OR " \
+            "LOWER(tickets.teacher_phone_number) LIKE ? OR " \
+            "LOWER(tickets.description) LIKE ? OR " \
+            "LOWER(users.name) LIKE ? OR " \
+            "LOWER(users.username) LIKE ? OR " \
+            "LOWER(locations.name) LIKE ? OR " \
+            "LOWER(issue_types.name) LIKE ? OR " \
+            "LOWER(equipment_categories.name) LIKE ?",
+            id_condition ? "#{id_condition.split('OR').last} OR ..." : nil
+          ].compact.join(" OR "),
+          q, q, q, q, q, q, q, q, q, *(id_param ? [ id_param ] : [])
+        ).distinct
     end
 
     # State, School, Location, and Equipment filters
