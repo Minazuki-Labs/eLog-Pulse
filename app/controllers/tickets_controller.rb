@@ -103,6 +103,24 @@ class TicketsController < ApplicationController
         { state: state_key, schools: active_schools } if active_schools.any?
       end.compact
     end
+
+    respond_to do |format|
+      format.html
+      format.pdf do
+        html_content = render_to_string(
+          template: "tickets/completed_report_pdf",
+          layout: false,
+          formats: [ :html ]
+        )
+
+        send_data(
+          Grover.new(html_content).to_pdf,
+          filename: "completed_tickets_report_#{Date.today}.pdf",
+          type: "application/pdf",
+          disposition: "inline"
+        )
+      end
+    end
   end
 
   def show
