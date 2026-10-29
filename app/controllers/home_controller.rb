@@ -4,6 +4,8 @@ class HomeController < ApplicationController
   def index
     if current_user.school?
       @tickets = current_user.reported_tickets.not_completed.includes(:location, { equipment: :equipment_category }, :issue_type).order(created_at: :desc)
+    elsif current_user.contractor?
+      @tickets = current_user.assigned_tickets.not_completed.includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(created_at: :desc)
     else
       @states_data = User.states.keys.map do |state_key|
         state_schools = User.school.where(state: state_key).includes(reported_tickets: [ :location, { equipment: :equipment_category }, :issue_type ])

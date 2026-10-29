@@ -5,6 +5,7 @@ class Ticket < ApplicationRecord
   belongs_to :location
   belongs_to :equipment
   belongs_to :issue_type
+  belongs_to :assignee, class_name: "User", optional: true
 
   has_many :comments, dependent: :destroy
 
@@ -12,8 +13,8 @@ class Ticket < ApplicationRecord
 
   validates :status, :teacher_name, :teacher_phone_number, :teacher_email, presence: true
   validates :teacher_email, format: { with: URI::MailTo::EMAIL_REGEXP }
-
   validate :equipment_must_belong_to_location
+  validate :validate_technician_permissions, if: -> { updater&.technician? }
 
   after_update :log_manual_activity, if: -> { updater.present? && tracking_changes_present? }
 
@@ -52,6 +53,12 @@ class Ticket < ApplicationRecord
   def equipment_must_belong_to_location
     if equipment && location && equipment.location_id != location_id
       errors.add(:equipment, "must be located in the selected room (#{location.name})")
+    end
+  end
+
+  def validate_technician_permissions
+    if completed? && status_changed?
+      errors.add(:status, "cannot be set to completed by technicians")
     end
   end
 

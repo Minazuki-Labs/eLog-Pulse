@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_27_133739) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_29_052143) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -114,6 +114,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_133739) do
     t.string "teacher_name", null: false
     t.string "teacher_phone_number", null: false
     t.datetime "updated_at", null: false
+    t.bigint "assignee_id"
+    t.index ["assignee_id"], name: "index_tickets_on_assignee_id"
     t.index ["equipment_id"], name: "index_tickets_on_equipment_id"
     t.index ["issue_type_id"], name: "index_tickets_on_issue_type_id"
     t.index ["location_id"], name: "index_tickets_on_location_id"
@@ -146,5 +148,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_133739) do
   add_foreign_key "tickets", "equipment"
   add_foreign_key "tickets", "issue_types"
   add_foreign_key "tickets", "locations"
+  add_foreign_key "tickets", "users", column: "assignee_id"
   add_foreign_key "tickets", "users", column: "school_id"
 end

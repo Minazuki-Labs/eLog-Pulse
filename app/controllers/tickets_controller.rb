@@ -6,6 +6,8 @@ class TicketsController < ApplicationController
 
     base_tickets = if current_user.school?
       current_user.reported_tickets
+    elsif current_user.contractor?
+      current_user.assigned_tickets
     elsif current_user.employee?
       Ticket.where(school_id: current_user.assigned_schools.select(:id))
     else
@@ -88,8 +90,8 @@ class TicketsController < ApplicationController
       scoped_tickets = scoped_tickets.where("tickets.created_at <= ?", params[:end_date].to_date.end_of_day)
     end
 
-    if current_user.school?
-      @tickets = scoped_tickets.includes(:location, { equipment: :equipment_category }, :issue_type).order(created_at: :desc)
+    if current_user.school? || current_user.contractor?
+      @tickets = scoped_tickets.includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(created_at: :desc)
     elsif @scope == "completed"
       @tickets = scoped_tickets.where(status: :completed).includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(created_at: :desc)
     else
@@ -124,7 +126,7 @@ class TicketsController < ApplicationController
   end
 
   def show
-    @ticket = Ticket.includes(:school, :equipment, :issue_type, :location, :comments).find(params[:id])
+    @ticket = Ticket.includes(:school, :equipment, :issue_type, :location, :comments, :assignee).find(params[:id])
   end
 
   def new
@@ -153,9 +155,17 @@ class TicketsController < ApplicationController
   def update
     @ticket = Ticket.find(params[:id])
 
-    if !current_user.admin? && ticket_params.key?(:status)
-      redirect_to @ticket, alert: "You are not authorized to change the ticket status."
-      return
+    if ticket_params.key?(:status)
+      if current_user.admin?
+      elsif current_user.contractor?
+        if ticket_params[:status] == "completed"
+          redirect_to @ticket, alert: "Contractor cannot close cases."
+          return
+        end
+      else
+        redirect_to @ticket, alert: "You are not authorized to change the ticket status."
+        return
+      end
     end
 
     if ticket_params[:status] == "new_case"
@@ -225,7 +235,7 @@ class TicketsController < ApplicationController
   private
 
   def ticket_params
-    params.require(:ticket).permit(:school_id, :location_id, :equipment_id, :issue_type_id, :description, :status, :resolved_at, :teacher_name, :teacher_phone_number, :teacher_email)
+    params.require(:ticket).permit(:school_id, :location_id, :equipment_id, :issue_type_id, :description, :status, :resolved_at, :teacher_name, :teacher_phone_number, :teacher_email, :assignee_id)
   end
 
   def setup_form_variables

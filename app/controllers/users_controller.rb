@@ -1,12 +1,14 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :ensure_staff!, only: [ :schools, :employees ]
-  before_action :ensure_admin!, only: [ :new_school, :create_school, :edit, :update, :toggle_role, :destroy, :edit_assignment, :update_assignment ]
+  before_action :ensure_admin!, only: [ :new_school, :create_school, :new_contractor, :create_contractor, :edit, :update, :toggle_role, :destroy, :edit_assignment, :update_assignment ]
   before_action :set_user, only: [ :show, :edit, :update, :edit_assignment, :update_assignment, :toggle_role, :destroy ]
 
   def show
     if @user.school?
       @school = User.includes(:locations, :school_emails, reported_tickets: [ :equipment, :issue_type ]).find(params[:id])
+    elsif @user.contractor?
+      @contractor = User.includes(assigned_tickets: [ :equipment, :issue_type, :school ]).find(params[:id])
     elsif @user.staff?
       @employee = User.includes(:assigned_schools).find(params[:id])
     end
@@ -15,6 +17,8 @@ class UsersController < ApplicationController
   def edit
     if @user.school?
       @school = @user
+    elsif @user.contractor
+      @contractor = @user
     elsif @user.staff?
       @employee = @user
     end
@@ -25,6 +29,13 @@ class UsersController < ApplicationController
       @school = @user
       if @school.update(school_params)
         redirect_to user_path(@school), notice: "School updated successfully."
+      else
+        render :edit, status: :unprocessable_entity
+      end
+    elsif @user.contractor
+      @contractor = @user
+      if @contractor.update(contractor_params)
+        redirect_to user_path(@contractor), notice: "Contractor updated successfully."
       else
         render :edit, status: :unprocessable_entity
       end
@@ -66,7 +77,7 @@ class UsersController < ApplicationController
   end
 
   def employees
-    @employees = User.staff.includes(:assigned_schools).order(:name)
+    @employees = User.directory_users.includes(:assigned_schools, :assigned_tickets).order(:name)
 
     if params[:query].present?
       query = "%#{params[:query].strip}%"
@@ -87,6 +98,20 @@ class UsersController < ApplicationController
       redirect_to employees_users_path, notice: "Employee successfully registered."
     else
       render :new_employee, status: :unprocessable_entity
+    end
+  end
+
+  def new_contractor
+    @contractor = User.new(role: :contractor)
+  end
+
+  def create_contractor
+    @contractor = User.new(contractor_params.merge(role: :contractor))
+
+    if @contractor.save
+      redirect_to employees_users_path, notice: "Contractor successfully registered."
+    else
+      render :new_contractor, status: :unprocessable_entity
     end
   end
 
@@ -140,7 +165,11 @@ class UsersController < ApplicationController
       return
     end
 
-    user_type = @user.school? ? "School" : "Employee"
+    user_type = case
+    when @user.school? then "School"
+    when @user.contractor then "Contractor"
+    else "Employee"
+    end
     redirect_path = @user.school? ? schools_users_path : employees_users_path
 
     if @user.destroy
@@ -180,6 +209,15 @@ class UsersController < ApplicationController
   end
 
   def employee_params
+    params.require(:user).permit(
+      :name,
+      :username,
+      :password,
+      :password_confirmation
+    )
+  end
+
+  def contractor_params
     params.require(:user).permit(
       :name,
       :username,
