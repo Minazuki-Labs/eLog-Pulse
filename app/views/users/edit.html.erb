@@ -12,8 +12,8 @@
   </div>
 
   <% if @user.school? %>
-    <%= render "form", school: @school, button_label: "Update School" %>
+    <%= render "form", user: @school, button_label: "Update School" %>
   <% elsif @user.staff? %>
-    <%= render "form", school: @employee, button_label: "Update Employee" %>
+    <%= render "form", user: @employee, button_label: "Update Employee" %>
   <% end %>
 </div>

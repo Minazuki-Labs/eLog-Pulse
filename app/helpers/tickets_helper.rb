@@ -2,7 +2,7 @@ module TicketsHelper
   def ticket_page_title
     case params[:scope]
     when "open"        then "New Tickets"
-    when "in_progress" then "In Progress"
+    when "in_progress" then "In Progress Tickets"
     when "completed"   then "Completed Tickets"
     else
       current_user.school? ? "My Tickets" : "All Tickets"

@@ -1,11 +1,11 @@
 <div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200/40 border border-slate-100">
-  <%= form_with(model: school, url: user_path(school), method: :patch, class: "space-y-8") do |f| %>
+  <%= form_with(model: user, url: user_path(user), data: { controller: "role-warning" }, method: :patch, class: "space-y-8") do |f| %>
 
-    <% if school.errors.any? %>
+    <% if user.errors.any? %>
       <div class="bg-red-50 text-red-600 p-4 rounded-2xl mb-6 border border-red-100">
         <p class="font-black mb-2">Please correct the following:</p>
         <ul class="list-disc ml-5 space-y-1">
-          <% school.errors.full_messages.each do |message| %>
+          <% user.errors.full_messages.each do |message| %>
             <li class="font-medium"><%= message %></li>
           <% end %>
         </ul>
@@ -15,28 +15,44 @@
     <div class="space-y-6">
       <!-- Name Field -->
       <div>
-        <%= f.label :name, school.school? ? "School Name" : "Employee Name", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1" %>
+        <%= f.label :name, user.school? ? "School Name" : "Employee Name", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1" %>
         <%= f.text_field :name, 
-            placeholder: school.school? ? "Enter school name" : "Enter employee name",
+            placeholder: user.school? ? "Enter school name" : "Enter employee name",
             required: true,
-            class: "block w-full px-4 py-3.5 border-2 #{ school.errors[:name].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700" %>
+            class: "block w-full px-4 py-3.5 border-2 #{ user.errors[:name].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700" %>
       </div>
 
       <!-- Username / School Code Field -->
       <div>
-        <%= f.label :username, school.school? ? "School Code" : "Username", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1" %>
+        <%= f.label :username, user.school? ? "School Code" : "Username", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1" %>
         <%= f.text_field :username, 
-            placeholder: school.school? ? "Enter school code" : "Enter username",
+            placeholder: user.school? ? "Enter school code" : "Enter username",
             required: true,
-            class: "block w-full px-4 py-3.5 border-2 #{ school.errors[:username].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700" %>
+            class: "block w-full px-4 py-3.5 border-2 #{ user.errors[:username].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700" %>
       </div>
 
-      <% if school.school? %>
+      <!-- User Type Selection Field  -->
+      <% unless user.school? %>
+        <div>
+          <%= f.label :role, "Role", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1" %>
+          <%= f.select :role, [["Employee", "employee"], ["Contractor", "contractor"], ["Admin", "admin"]], {}, 
+              { 
+                class: "block w-full px-4 py-3.5 border-2 border-slate-100 bg-slate-50 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700",
+                data: { 
+                  role_warning_target: "select",
+                  current_role: user.role,
+                  action: "change->role-warning#confirmChange" 
+                } 
+              } %>
+        </div>
+      <% end %>
+
+      <% if user.school? %>
         <!-- State Selection Field -->
         <div>
           <%= f.label :state, "State", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1" %>
           <%= f.select :state, User.states.keys.map { |s| [s.humanize, s] }, { prompt: "Select State" }, 
-              class: "block w-full px-4 py-3.5 border-2 #{ school.errors[:state].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700" %>
+              class: "block w-full px-4 py-3.5 border-2 #{ user.errors[:state].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700" %>
         </div>
 
         <!-- School Emails Dynamic Section -->
@@ -49,7 +65,7 @@
           </div>
 
           <div data-email-fields-target="container" class="space-y-2.5">
-            <% emails_to_render = school.school_emails.empty? ? [school.school_emails.build] : school.school_emails %>
+            <% emails_to_render = user.school_emails.empty? ? [user.school_emails.build] : user.school_emails %>
             
             <%= f.fields_for :school_emails, emails_to_render do |builder| %>
               <div class="email-group flex items-center gap-2">
@@ -87,7 +103,7 @@
         <p class="text-xs text-slate-400 ml-1 mb-3">Leave blank if you do not want to change the current password.</p>
         
         <%= f.password_field :password, data: { password_generator_target: "input" }, placeholder: "••••••••", 
-            class: "block w-full px-4 py-3.5 border-2 #{ school.errors[:password].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700 placeholder:text-slate-400" %>
+            class: "block w-full px-4 py-3.5 border-2 #{ user.errors[:password].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700 placeholder:text-slate-400" %>
         <%= f.hidden_field :password_confirmation, data: { password_generator_target: "confirmation" } %>
 
         <div data-password-generator-target="display" class="bg-blue-50/80 border border-blue-100 p-4 rounded-2xl mt-3 hidden space-y-1">
@@ -99,7 +115,7 @@
     </div>
 
     <div class="flex items-center justify-end gap-3 pt-4">
-      <%= link_to "Cancel", user_path(school), class: "px-5 py-3.5 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-2xl transition-all" %>
+      <%= link_to "Cancel", user_path(user), class: "px-5 py-3.5 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-2xl transition-all" %>
       <%= f.submit button_label, 
           class: "px-6 py-3.5 bg-blue-600 text-white text-sm font-bold rounded-2xl shadow-md shadow-blue-100 hover:bg-blue-700 transition-all cursor-pointer" %>
     </div>
