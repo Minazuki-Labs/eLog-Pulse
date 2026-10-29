@@ -94,7 +94,7 @@
           </div>
         </div>
         
-        <% if current_user.admin? %>
+        <% if current_user.admin? && !@ticket.completed? %>
           <div class="pt-4">
             <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Assign To Contractor</label>
             <%= form_with model: @ticket, class: "space-y-2" do |f| %>
