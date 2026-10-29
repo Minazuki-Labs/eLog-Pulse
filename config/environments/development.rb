@@ -39,6 +39,8 @@ Rails.application.configure do
   # Required for generating links in emails (e.g., password resets).
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
+  config.action_mailer.delivery_method = :letter_opener_web
+
   # Prints warnings about deprecated Rails features to the terminal/log file.
   config.active_support.deprecation = :log
 

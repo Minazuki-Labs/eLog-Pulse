@@ -1,0 +1,102 @@
+<div>
+  <!-- Confirmation Banner -->
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; margin-bottom: 24px;">
+    <tr>
+      <td style="padding: 16px 20px;">
+        <p style="margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: #065f46;">
+          Thank you for using our system! Your request was submitted successfully.
+        </p>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Title & Header -->
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 24px;">
+    <tr>
+      <td>
+        <h2 style="margin: 0 0 6px 0; font-size: 22px; font-weight: 900; color: #1e293b; letter-spacing: -0.03em;">
+          New Ticket Created
+        </h2>
+        <p style="margin: 0; font-size: 14px; color: #64748b; font-weight: 500;">
+          A new ticket has been submitted <strong style="color: #0f172a;">#<%= @ticket.id %></strong>
+        </p>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Main Info Card -->
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; margin-bottom: 24px;">
+    <tr>
+      <td style="padding: 24px;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td style="padding-bottom: 12px;">
+              <span style="display: inline-block; padding: 4px 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; background-color: #eff6ff; color: #2563eb; border-radius: 9999px;">
+                <%= @ticket.status.humanize %>
+              </span>
+              <span style="float: right; font-size: 12px; font-weight: 800; color: #64748b;">
+                Case ID: #<%= @ticket.id %>
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-bottom: 4px; font-size: 20px; font-weight: 900; color: #0f172a;">
+              <%= @ticket.equipment&.equipment_category&.name %>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-bottom: 16px; font-size: 14px; color: #64748b; font-weight: 500;">
+              <%= @ticket.issue_type&.name %>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-top: 12px; border-top: 1px solid #e2e8f0;">
+              <strong style="font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px;">Description</strong>
+              <div style="font-size: 14px; color: #334155; line-height: 1.6; background-color: #ffffff; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <%= simple_format @ticket.description %>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Meta Details Card (School, Location, Reporter, Timeline) -->
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px;">
+    <tr>
+      <td style="padding: 24px;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <% if @school.present? %>
+            <tr>
+              <td style="padding-bottom: 16px; font-size: 13px; color: #64748b;">
+                <strong style="display: block; font-size: 10px; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em; margin-bottom: 2px;">School</strong>
+                <span style="color: #1e293b; font-weight: 700;"><%= @school.name %></span>
+              </td>
+            </tr>
+          <% end %>
+          <tr>
+            <td style="padding-bottom: 16px; font-size: 13px; color: #64748b;">
+              <strong style="display: block; font-size: 10px; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em; margin-bottom: 2px;">Location</strong>
+              <span style="color: #1e293b; font-weight: 600;"><%= @ticket.location&.name %></span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-bottom: 16px; font-size: 13px; color: #64748b;">
+              <strong style="display: block; font-size: 10px; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em; margin-bottom: 2px;">Reporter Details</strong>
+              <span style="color: #1e293b; font-weight: 700; display: block;"><%= @ticket.teacher_name %></span>
+              <span style="color: #64748b; font-size: 12px; display: block;"><%= @ticket.teacher_phone_number %></span>
+              <span style="color: #2563eb; font-size: 12px; display: block;"><%= @ticket.teacher_email %></span>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+              <strong style="display: block; font-size: 10px; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em; margin-bottom: 2px;">Timeline</strong>
+              <span>Created <%= @ticket.created_at.strftime("%d %b %Y, %H:%M") %></span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>

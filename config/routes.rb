@@ -46,4 +46,8 @@ Rails.application.routes.draw do
   resources :equipment_categories, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
 
   root to: "home#index"
+
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
 end
