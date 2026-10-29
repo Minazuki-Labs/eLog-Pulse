@@ -117,7 +117,7 @@ class TicketsController < ApplicationController
           Grover.new(html_content).to_pdf,
           filename: "completed_tickets_report_#{Date.today}.pdf",
           type: "application/pdf",
-          disposition: "inline"
+          disposition: "attachment"
         )
       end
     end

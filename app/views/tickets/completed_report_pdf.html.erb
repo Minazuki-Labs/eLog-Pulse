@@ -32,15 +32,16 @@
   <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
     <thead>
       <tr style="border-bottom: 1px solid #e2e8f0; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; background-color: #f8fafc;">
-        <th style="padding: 10px 12px;">Case ID</th>
-        <th style="padding: 10px 12px;">Date</th>
-        <th style="padding: 10px 12px;">Status</th>
-        <th style="padding: 10px 12px;">Device & Issue Details</th>
-        <th style="padding: 10px 12px;">Requested By / Location</th>
+        <th style="padding: 10px 12px; width: 10%;">Case ID</th>
+        <th style="padding: 10px 12px; width: 15%;">Date</th>
+        <th style="padding: 10px 12px; width: 12%;">Status</th>
+        <th style="padding: 10px 12px; width: 43%;">Device & Issue Details</th>
+        <th style="padding: 10px 12px; width: 20%;">Requested By / Location</th>
       </tr>
     </thead>
     <tbody>
       <% @tickets.each do |ticket| %>
+        <% last_user_comment = ticket.comments.user_note.order(created_at: :desc).first %>
         <tr style="border-bottom: 1px solid #f1f5f9;">
           <td style="padding: 12px; font-weight: bold; color: #0f172a; vertical-align: top;">#<%= ticket.id %></td>
           <td style="padding: 12px; color: #475569; vertical-align: top; white-space: nowrap;"><%= ticket.created_at.strftime("%d %b %Y") %></td>
@@ -51,11 +52,15 @@
             <div style="font-weight: bold; color: #0f172a; text-transform: uppercase;"><%= ticket.equipment&.display_name || "Equipment ##{ticket.equipment_id}" %></div>
             <div style="color: #475569; margin-top: 4px;"><%= ticket.description %></div>
             
-            <!-- Last Update -->
-            <div style="margin-top: 8px; font-size: 10px; background-color: #f8fafc; border-left: 3px solid #6366f1; padding: 6px 8px; color: #475569;">
-              <div style="font-weight: 600; color: #4f46e5;">Last Update by Technical:</div>
-              <div style="margin-top: 2px;"><%= ticket.updated_at.strftime("%d %b %Y, %I:%M%p") %></div>
-            </div>
+            <% if last_user_comment.present? %>
+              <!-- Last User Note -->
+              <div style="margin-top: 8px; font-size: 10px; background-color: #f8fafc; border-left: 3px solid #6366f1; padding: 6px 8px; color: #475569;">
+                <div style="font-weight: 600; color: #4f46e5;">
+                  Last Note by <%= last_user_comment.user&.name || "User" %> (<%= last_user_comment.created_at.strftime("%d %b %Y") %>):
+                </div>
+                <div style="margin-top: 2px;"><%= last_user_comment.body %></div>
+              </div>
+            <% end %>
           </td>
           <td style="padding: 12px; vertical-align: top;">
             <div style="color: #334155;"><%= ticket.school&.name %></div>
