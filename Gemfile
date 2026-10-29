@@ -46,6 +46,9 @@ gem "devise"
 # App icon
 gem "heroicon"
 
+# PDF generation
+gem "grover"
+
 group :development, :test do
   # .env file support
   gem "dotenv-rails", require: "dotenv/load"
