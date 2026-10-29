@@ -129,7 +129,7 @@ class TicketsController < ApplicationController
           template: "tickets/completed_report_pdf",
           layout: false,
           formats: [ :html ]
-        )
+        ).force_encoding("UTF-8")
 
         send_data(
           Grover.new(html_content).to_pdf,
