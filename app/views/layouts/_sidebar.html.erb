@@ -17,7 +17,7 @@
         <span>Settings</span>
       </div>
 
-    <% elsif current_user.employee? || current_user.admin? || current_user.contractor? %>
+    <% elsif current_user.staff? %>
       <%= sidebar_link "Dashboard", root_path, "squares-2x2" %>
       <% unless current_user.contractor? %>
         <%= sidebar_link "Create New Ticket", new_ticket_path, "plus-circle" %>

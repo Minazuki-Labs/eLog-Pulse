@@ -76,52 +76,33 @@
       <% end %>
     </div>
 
-    <div class="bg-slate-50 border-t lg:border-t-0 lg:border-l border-slate-100 p-8 md:p-10 space-y-8">      
-      <div>
-        <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">User Type</label>
-        
-        <% if current_user.admin? && current_user != employee %>
-          <%= form_with model: employee, url: user_path(employee), method: :patch, class: "inline-block", 
-              data: { controller: "role-warning" } do |f| %>
-            <div class="relative group cursor-pointer inline-block">
-              <span class="inline-flex items-center px-4 py-2.5 pr-10 rounded-full text-[11px] font-black uppercase tracking-widest <%= employee.admin? ? 'bg-purple-100 text-purple-700 ring-purple-200/50' : (employee.contractor? ? 'bg-amber-100 text-amber-800 ring-amber-200/50' : 'bg-blue-100 text-blue-700 ring-blue-200/50') %> ring-1 ring-inset transition-all group-hover:ring-black/20 shadow-sm">
-                <%= employee.role.titleize %>
-              </span>
-              
-              <div class="absolute right-3 top-1/2 -translate-y-1/2 text-current opacity-60 group-hover:opacity-100 transition-opacity">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
-                </svg>
-              </div>
-
-              <%= f.select :role, 
-                  [["Employee", "employee"], ["Contractor", "contractor"], ["Admin", "admin"]], 
-                  {}, 
-                  { 
-                    class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10",
-                    data: { 
-                      current_role: employee.role,
-                      action: "change->role-warning#confirmChange" 
-                    }
-                  } 
-              %>
+    <div class="bg-slate-50 border-t lg:border-t-0 lg:border-l border-slate-100 p-8 md:p-10">
+      <div class="space-y-8">
+        <div>
+          <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Assigned Portfolio</label>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 font-black text-sm">
+              <%= employee.assigned_schools.count %>
             </div>
-          <% end %>
-        <% else %>
-          <span class="inline-flex items-center px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest <%= employee.admin? ? 'bg-purple-100 text-purple-700' : (employee.contractor? ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-700') %> ring-1 ring-inset ring-black/5">
-            <%= employee.role.titleize %>
-          </span>
-        <% end %>
-      </div>
+            <p class="text-slate-900 font-bold leading-tight">Managed Schools</p>
+          </div>
+        </div>
 
-      <div class="pt-6 border-t border-slate-200">
-        <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Registration Lifecycle</label>
-        <div class="space-y-1">
-          <p class="text-xs text-slate-500">Joined <span class="text-slate-900 font-bold"><%= time_ago_in_words(employee.created_at) %> ago</span></p>
-          <p class="text-[10px] font-mono text-slate-400"><%= employee.created_at.strftime("%d %b %Y, %H:%M") %></p>
+        <div>
+          <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">User Type</label>
+          <span class="inline-flex items-center px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest <%= employee.admin? ? 'bg-purple-100 text-purple-700' : (employee.contractor? ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-700') %> ring-1 ring-inset ring-black/5">
+              <%= employee.role.titleize %>
+            </span>
+        </div>
+
+        <div class="pt-6 border-t border-slate-200">
+          <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Registration Lifecycle</label>
+          <div class="space-y-1">
+            <p class="text-xs text-slate-500">Joined <span class="text-slate-900 font-bold"><%= time_ago_in_words(employee.created_at) %> ago</span></p>
+            <p class="text-[10px] font-mono text-slate-400"><%= employee.created_at.strftime("%d %b %Y, %H:%M") %></p>
+          </div>
         </div>
       </div>
     </div>
-
   </div>
 </div>

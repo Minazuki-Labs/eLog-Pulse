@@ -90,7 +90,7 @@ class TicketsController < ApplicationController
       scoped_tickets = scoped_tickets.where("tickets.created_at <= ?", params[:end_date].to_date.end_of_day)
     end
 
-    if current_user.school? || current_user.contractor?
+    if current_user.school?
       @tickets = scoped_tickets.includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(created_at: :desc)
     elsif @scope == "completed"
       @tickets = scoped_tickets.where(status: :completed).includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(created_at: :desc)
@@ -172,6 +172,10 @@ class TicketsController < ApplicationController
 
   def update
     @ticket = Ticket.find(params[:id])
+
+    if current_user.admin? && ticket_params[:assignee_id].present?
+      params[:ticket][:status] = "in_progress" if @ticket.new_case?
+    end
 
     if ticket_params.key?(:status)
       if current_user.admin?

@@ -36,7 +36,7 @@ class User < ApplicationRecord
   scope :directory_users, -> { where(role: [ :admin, :employee, :contractor ]) }
 
   def staff?
-    admin? || employee?
+    admin? || employee? || contractor?
   end
 
   def initials

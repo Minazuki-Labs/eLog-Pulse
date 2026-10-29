@@ -93,6 +93,24 @@
             </div>
           </div>
         </div>
+        
+        <% if current_user.admin? %>
+          <div class="pt-4">
+            <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Assign To Contractor</label>
+            <%= form_with model: @ticket, class: "space-y-2" do |f| %>
+              <%= f.collection_select :assignee_id, 
+                  User.where(role: :contractor), 
+                  :id, 
+                  :name, 
+                  { include_blank: "Select Contractor..." }, 
+                  { 
+                    class: "w-full rounded-xl border-slate-200 bg-white text-slate-700 text-xs font-semibold focus:ring-blue-500 focus:border-blue-500 p-2.5 shadow-sm",
+                    onchange: "this.form.requestSubmit()" 
+                  } 
+              %>
+            <% end %>
+          </div>
+        <% end %>
 
         <div class="pt-6 border-t border-slate-200">
           <label class="block text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Timeline</label>

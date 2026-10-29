@@ -4,15 +4,29 @@ class HomeController < ApplicationController
   def index
     if current_user.school?
       @tickets = current_user.reported_tickets.not_completed.includes(:location, { equipment: :equipment_category }, :issue_type).order(created_at: :desc)
-    elsif current_user.contractor?
-      @tickets = current_user.assigned_tickets.not_completed.includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(created_at: :desc)
     else
+      base_tickets = if current_user.contractor?
+        current_user.assigned_tickets.where(status: :in_progress)
+      elsif current_user.employee?
+        Ticket.where(school_id: current_user.assigned_schools.select(:id))
+      else
+        Ticket.all
+      end
+
+      allowed_schools = if current_user.employee?
+        current_user.assigned_schools
+      elsif current_user.contractor?
+        User.joins(:reported_tickets).where(tickets: { id: base_tickets.select(:id) }).distinct
+      else
+        User.school
+      end
+
       @states_data = User.states.keys.map do |state_key|
-        state_schools = User.school.where(state: state_key).includes(reported_tickets: [ :location, { equipment: :equipment_category }, :issue_type ])
+        state_schools = allowed_schools.where(state: state_key)
 
         active_schools = state_schools.map do |school|
-          not_completed_tickets = school.reported_tickets.select { |t| !t.completed? }
-          { school: school, tickets: not_completed_tickets } if not_completed_tickets.any?
+          school_tickets = base_tickets.where(school_id: school.id).includes(:location, { equipment: :equipment_category }, :issue_type).order(created_at: :desc)
+          { school: school, tickets: school_tickets } if school_tickets.any?
         end.compact
 
         { state: state_key, schools: active_schools } if active_schools.any?

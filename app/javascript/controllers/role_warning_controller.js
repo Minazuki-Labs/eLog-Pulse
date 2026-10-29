@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static targets = ["select"]
+
   confirmChange(event) {
     const select = event.target
     const currentRole = select.dataset.currentRole
@@ -14,8 +16,5 @@ export default class extends Controller {
         return
       }
     }
-    
-    // Proceed to submit the form automatically
-    select.form.requestSubmit()
   }
 }
