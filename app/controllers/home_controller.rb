@@ -9,8 +9,11 @@ class HomeController < ApplicationController
         state_schools = User.school.where(state: state_key).includes(reported_tickets: [ :location, { equipment: :equipment_category }, :issue_type ])
 
         active_schools = state_schools.map do |school|
-          not_completed_tickets = school.reported_tickets.select { |t| !t.completed? }
-          { school: school, tickets: not_completed_tickets } if not_completed_tickets.any?
+          not_completed_tickets = school.reported_tickets.reject(&:completed?)
+
+          if not_completed_tickets.any?
+            { school: school, tickets: not_completed_tickets }
+          end
         end.compact
 
         { state: state_key, schools: active_schools } if active_schools.any?
