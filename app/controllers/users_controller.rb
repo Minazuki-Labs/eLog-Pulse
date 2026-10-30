@@ -7,15 +7,15 @@ class UsersController < ApplicationController
   def show
     if @user.school?
       @school = User.includes(:locations, :school_emails, reported_tickets: [ :equipment, :issue_type ]).find(params[:id])
-    elsif @user.staff?
-      @employee = User.includes(:assigned_schools).find(params[:id])
+    elsif @user.staff? || @user.contractor?
+      @employee = User.includes(:assigned_schools, assigned_tickets: [ :equipment, :issue_type, :school ]).find(params[:id])
     end
   end
 
   def edit
     if @user.school?
       @school = @user
-    elsif @user.staff?
+    elsif @user.staff? || @user.contractor?
       @employee = @user
     end
   end
@@ -28,10 +28,16 @@ class UsersController < ApplicationController
       else
         render :edit, status: :unprocessable_entity
       end
-    elsif @user.staff?
+    elsif @user.staff? || @user.contractor?
       @employee = @user
+
+      switching_to_contractor = employee_params[:role] == "contractor" && !@employee.contractor?
+
       if @employee.update(employee_params)
-        redirect_to user_path(@employee), notice: "Employee updated successfully."
+        if switching_to_contractor
+          @employee.assigned_schools.clear
+        end
+        redirect_to user_path(@employee), notice: "Staff updated successfully."
       else
         render :edit, status: :unprocessable_entity
       end
@@ -66,12 +72,18 @@ class UsersController < ApplicationController
   end
 
   def employees
-    @employees = User.staff.includes(:assigned_schools).order(:name)
+    @employees = User.directory_users.includes(:assigned_schools, :assigned_tickets)
 
     if params[:query].present?
       query = "%#{params[:query].strip}%"
       @employees = @employees.where("name ILIKE :q OR username ILIKE :q", q: query)
     end
+
+    if params[:role].present?
+      @employees = @employees.where(role: params[:role])
+    end
+
+    @employees = @employees.order(Arel.sql("CASE role WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 3 THEN 3 ELSE 4 END"), :name)
 
     render "users/employees"
   end
@@ -81,10 +93,10 @@ class UsersController < ApplicationController
   end
 
   def create_employee
-    @employee = User.new(employee_params.merge(role: :employee))
+    @employee = User.new(employee_params)
 
     if @employee.save
-      redirect_to employees_users_path, notice: "Employee successfully registered."
+      redirect_to employees_users_path, notice: "Staff successfully registered."
     else
       render :new_employee, status: :unprocessable_entity
     end
@@ -140,7 +152,11 @@ class UsersController < ApplicationController
       return
     end
 
-    user_type = @user.school? ? "School" : "Employee"
+    user_type = case
+    when @user.school? then "School"
+    when @user.contractor then "Contractor"
+    else "Employee"
+    end
     redirect_path = @user.school? ? schools_users_path : employees_users_path
 
     if @user.destroy
@@ -184,7 +200,8 @@ class UsersController < ApplicationController
       :name,
       :username,
       :password,
-      :password_confirmation
+      :password_confirmation,
+      :role
     )
   end
 end
