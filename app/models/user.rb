@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   devise :database_authenticatable, :rememberable, authentication_keys: [ :username ]
 
-  enum :role, { admin: 0, employee: 1, school: 2, contractor: 3 }, validate: true
+  enum :role, { employee: 1, school: 2, contractor: 3 }, validate: true
   enum :state, {
     johor: 0, kedah: 1, kelantan: 2, melaka: 3,
     negeri_sembilan: 4, pahang: 5, penang: 6, perak: 7,
@@ -25,6 +25,12 @@ class User < ApplicationRecord
 
   has_many :comments
 
+  has_many :stock_orders, dependent: :destroy
+  has_many :managed_stock_orders, class_name: "StockOrder", foreign_key: :manager_id, dependent: :nullify
+  has_many :approved_stock_orders_as_first, class_name: "StockOrder", foreign_key: :approver_1_id, dependent: :nullify
+  has_many :approved_stock_orders_as_second, class_name: "StockOrder", foreign_key: :approver_2_id, dependent: :nullify
+  has_many :school_stock_orders, class_name: "StockOrder", foreign_key: :school_id, dependent: :destroy
+
   validates :password, presence: true, length: { minimum: 6 }, on: :create
   validates :password, length: { minimum: 6 }, allow_blank: true, on: :update
   validates :name, presence: true
@@ -32,11 +38,10 @@ class User < ApplicationRecord
   validates :state, presence: true, if: :school?
   validates :school_emails, length: { in: 1..3 }, if: :school?
 
-  scope :staff, -> { where(role: [ :admin, :employee ]) }
-  scope :directory_users, -> { where(role: [ :admin, :employee, :contractor ]) }
+  scope :staff, -> { where(role: [ :employee, :contractor ]) }
 
   def staff?
-    admin? || employee? || contractor?
+    employee? || contractor?
   end
 
   def initials
