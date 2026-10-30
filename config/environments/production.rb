@@ -23,11 +23,11 @@ Rails.application.configure do
   # SMTP Mailer Configuration
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address:              "mail.multiple.com.my",
-    port:                 465,
-    domain:               "multiple.com.my",
-    user_name:            "elog@multiple.com.my",
-    password:             "Dyna@b00k",
+    address:              ENV.fetch("SMTP_ADDRESS", "mail.multiple.com.my"),
+    port:                 ENV.fetch("SMTP_PORT", 465).to_i,
+    domain:               ENV.fetch("SMTP_DOMAIN", "multiple.com.my"),
+    user_name:            ENV["SMTP_USERNAME"],
+    password:             ENV["SMTP_PASSWORD"],
     authentication:       :login,
     ssl:                  true,
     enable_starttls_auto: false

@@ -1,7 +1,7 @@
 <main class="flex-1 p-8 lg:p-12">
   <div class="max-w-xl mx-auto bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
-    <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-2">Register New Employee</h1>
-    <p class="text-slate-400 text-sm mb-8">Fill in the details to add a new staff member to the system.</p>
+    <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-2">Register New Staff</h1>
+    <p class="text-slate-400 text-sm mb-8">Fill in the details to add a new staff to the system.</p>
 
     <%= form_with model: @employee, url: create_employee_users_path, local: true, class: "space-y-6" do |f| %>
       <% if @employee.errors.any? %>
@@ -22,6 +22,12 @@
       <div>
         <%= f.label :username, class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" %>
         <%= f.text_field :username, class: "block w-full px-4 py-3.5 border-2 #{ @employee.errors[:username].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all" %>
+      </div>
+
+      <div>
+        <%= f.label :role, "User Type", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" %>
+        <%= f.select :role, [["Employee", "employee"], ["Contractor", "contractor"], ["Admin", "admin"]], {}, 
+            class: "block w-full px-4 py-3.5 border-2 border-slate-100 bg-slate-50 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700" %>
       </div>
 
       <div data-controller="password-generator" class="space-y-2">

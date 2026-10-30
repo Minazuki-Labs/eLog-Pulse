@@ -6,6 +6,8 @@ class TicketsController < ApplicationController
 
     base_tickets = if current_user.school?
       current_user.reported_tickets
+    elsif current_user.contractor?
+      current_user.assigned_tickets
     elsif current_user.employee?
       Ticket.where(school_id: current_user.assigned_schools.select(:id))
     else
@@ -36,10 +38,28 @@ class TicketsController < ApplicationController
     scoped_tickets = base_tickets
     if params[:query].present?
       q = "%#{params[:query].strip.downcase}%"
-      scoped_tickets = scoped_tickets.left_joins(:school).where(
-        "LOWER(tickets.teacher_name) LIKE ? OR LOWER(tickets.teacher_email) LIKE ? OR LOWER(tickets.description) LIKE ? OR LOWER(users.name) LIKE ? OR LOWER(users.email) LIKE ?",
-        q, q, q, q, q
-      ).distinct
+
+      # Determine if the query is a number to allow searching by Ticket ID
+      id_condition = params[:query].strip.to_i > 0 ? "OR tickets.id = ?" : nil
+      id_param = params[:query].strip.to_i > 0 ? params[:query].strip.to_i : nil
+
+      scoped_tickets = scoped_tickets
+        .left_joins(:school, :location, :issue_type, equipment: :equipment_category)
+        .where(
+          [
+            "LOWER(tickets.teacher_name) LIKE ? OR " \
+            "LOWER(tickets.teacher_email) LIKE ? OR " \
+            "LOWER(tickets.teacher_phone_number) LIKE ? OR " \
+            "LOWER(tickets.description) LIKE ? OR " \
+            "LOWER(users.name) LIKE ? OR " \
+            "LOWER(users.username) LIKE ? OR " \
+            "LOWER(locations.name) LIKE ? OR " \
+            "LOWER(issue_types.name) LIKE ? OR " \
+            "LOWER(equipment_categories.name) LIKE ?",
+            id_condition ? "#{id_condition.split('OR').last} OR ..." : nil
+          ].compact.join(" OR "),
+          q, q, q, q, q, q, q, q, q, *(id_param ? [ id_param ] : [])
+        ).distinct
     end
 
     # State, School, Location, and Equipment filters
@@ -71,7 +91,7 @@ class TicketsController < ApplicationController
     end
 
     if current_user.school?
-      @tickets = scoped_tickets.includes(:location, { equipment: :equipment_category }, :issue_type).order(created_at: :desc)
+      @tickets = scoped_tickets.includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(created_at: :desc)
     elsif @scope == "completed"
       @tickets = scoped_tickets.where(status: :completed).includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(created_at: :desc)
     else
@@ -103,10 +123,28 @@ class TicketsController < ApplicationController
         { state: state_key, schools: active_schools } if active_schools.any?
       end.compact
     end
+
+    respond_to do |format|
+      format.html
+      format.pdf do
+        html_content = render_to_string(
+          template: "tickets/completed_report_pdf",
+          layout: false,
+          formats: [ :html ]
+        ).force_encoding("UTF-8")
+
+        send_data(
+          Grover.new(html_content).to_pdf,
+          filename: "completed_tickets_report_#{Date.today}.pdf",
+          type: "application/pdf",
+          disposition: "attachment"
+        )
+      end
+    end
   end
 
   def show
-    @ticket = Ticket.includes(:school, :equipment, :issue_type, :location, :comments).find(params[:id])
+    @ticket = Ticket.includes(:school, :equipment, :issue_type, :location, :comments, :assignee).find(params[:id])
   end
 
   def new
@@ -135,9 +173,21 @@ class TicketsController < ApplicationController
   def update
     @ticket = Ticket.find(params[:id])
 
-    if !current_user.admin? && ticket_params.key?(:status)
-      redirect_to @ticket, alert: "You are not authorized to change the ticket status."
-      return
+    if current_user.admin? && ticket_params[:assignee_id].present?
+      params[:ticket][:status] = "in_progress" if @ticket.new_case?
+    end
+
+    if ticket_params.key?(:status)
+      if current_user.admin?
+      elsif current_user.contractor?
+        if ticket_params[:status] == "completed"
+          redirect_to @ticket, alert: "Contractor cannot close cases."
+          return
+        end
+      else
+        redirect_to @ticket, alert: "You are not authorized to change the ticket status."
+        return
+      end
     end
 
     if ticket_params[:status] == "new_case"
@@ -207,7 +257,7 @@ class TicketsController < ApplicationController
   private
 
   def ticket_params
-    params.require(:ticket).permit(:school_id, :location_id, :equipment_id, :issue_type_id, :description, :status, :resolved_at, :teacher_name, :teacher_phone_number, :teacher_email)
+    params.require(:ticket).permit(:school_id, :location_id, :equipment_id, :issue_type_id, :description, :status, :resolved_at, :teacher_name, :teacher_phone_number, :teacher_email, :assignee_id)
   end
 
   def setup_form_variables

@@ -5,6 +5,7 @@ class Ticket < ApplicationRecord
   belongs_to :location
   belongs_to :equipment
   belongs_to :issue_type
+  belongs_to :assignee, class_name: "User", optional: true
 
   has_many :comments, dependent: :destroy
 
@@ -12,8 +13,8 @@ class Ticket < ApplicationRecord
 
   validates :status, :teacher_name, :teacher_phone_number, :teacher_email, presence: true
   validates :teacher_email, format: { with: URI::MailTo::EMAIL_REGEXP }
-
   validate :equipment_must_belong_to_location
+  validate :validate_contractor_permissions, if: -> { updater&.contractor? }
 
   after_update :log_manual_activity, if: -> { updater.present? && tracking_changes_present? }
 
@@ -55,8 +56,14 @@ class Ticket < ApplicationRecord
     end
   end
 
+  def validate_contractor_permissions
+    if completed? && status_changed?
+      errors.add(:status, "cannot be set to completed by technicians")
+    end
+  end
+
   def tracking_changes_present?
-    (saved_changes.keys & %w[status]).any?
+    (saved_changes.keys & %w[status assignee_id]).any?
   end
 
   def log_manual_activity
@@ -66,6 +73,16 @@ class Ticket < ApplicationRecord
     if saved_changes.key?("status")
       old_val, new_val = saved_changes["status"]
       new_changes << "Changed status from <b>#{old_val.to_s.titleize}</b> to <b>#{new_val.to_s.titleize}</b>"
+    end
+
+    # Assignee changes
+    if saved_changes.key?("assignee_id")
+      old_assignee = User.find_by(id: saved_changes["assignee_id"][0])
+      new_assignee = User.find_by(id: saved_changes["assignee_id"][1])
+
+      old_name = old_assignee ? old_assignee.name : "Unassigned"
+      new_name = new_assignee ? new_assignee.name : "Unassigned"
+      new_changes << "Assigned ticket from <b>#{old_name}</b> to <b>#{new_name}</b>"
     end
 
     return if new_changes.empty?

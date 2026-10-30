@@ -6,9 +6,11 @@
         <p class="text-slate-400 mt-1 text-base">Manage and track your recent activity.</p>
       </div>
       
-      <%= link_to new_ticket_path, class: "inline-flex items-center px-5 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md shadow-blue-100 hover:bg-blue-700 transition-all" do %>
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-        New Ticket
+      <% unless current_user.contractor? %>
+        <%= link_to new_ticket_path, class: "inline-flex items-center px-5 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md shadow-blue-100 hover:bg-blue-700 transition-all" do %>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          New Ticket
+        <% end %>
       <% end %>
     </div>
 
@@ -62,8 +64,11 @@
               <div class="p-5 space-y-4 border-t border-slate-100 bg-slate-50/30">
                 <% state_group[:schools].each do |school_group| %>
                   <% school = school_group[:school] %>
-                  <% school_tickets = school_group[:tickets] %>
-                  <% school_has_warning = current_user.staff? && school_tickets.any?(&:warning?) %>
+                  <% school_tickets = school_group[:tickets] %>                  
+                  <% active_school_tickets = school_tickets.select { |t| t.new_case? || t.in_progress? } %>
+                  <% next if active_school_tickets.empty? %>
+
+                  <% school_has_warning = current_user.staff? && active_school_tickets.any?(&:warning?) %>
 
                   <details name="schools-accordion-<%= state_name.parameterize %>" class="border border-slate-200/80 rounded-xl bg-white shadow-sm overflow-hidden transition-all">
                     <summary class="flex items-center justify-between w-full p-4 cursor-pointer bg-white hover:bg-slate-50 transition-colors select-none">
@@ -72,9 +77,11 @@
                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-7h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                         </div>
                         <h3 class="text-base font-bold text-slate-700 uppercase"><%= school.name %></h3>
+                        
                         <span class="ml-3 text-xs font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-                          <%= school_tickets.count %>
+                          <%= active_school_tickets.count %>
                         </span>
+
                         <% if school_has_warning %>
                           <span class="ml-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200/60" title="Contains tickets requiring attention">
                             <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

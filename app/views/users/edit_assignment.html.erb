@@ -20,10 +20,10 @@
         </p>
       </div>
 
-      <!-- Search and Filter Bar matching Tickets View -->
+      <!-- Search and Filter Bar -->
       <div class="flex items-center gap-3 w-full md:w-auto">
         <%= form_with url: edit_assignment_user_path(@employee), method: :get, local: true, class: "flex items-center gap-3 w-full md:w-auto" do %>
-          <div class="relative w-full sm:w-80">
+          <div class="relative w-full sm:w-80 group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -34,26 +34,58 @@
                 class: "block w-full pl-12 pr-4 py-3.5 border-2 border-slate-100 rounded-2xl bg-white text-sm font-medium placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-md hover:shadow-lg" %>
           </div>
 
-          <!-- State Filter Dropdown hidden inside/next to filter button UX -->
+          <% has_filters = params[:state].present? %>
           <div class="relative">
-            <%= select_tag :state, options_for_select(User.states.keys.map { |s| [s.titleize, s] }, params[:state]), 
-                include_blank: "All States", 
-                onchange: "this.form.requestSubmit();",
-                class: "sr-only" %>
+            <details class="group relative">
+              <summary class="list-none flex items-center justify-center p-3.5 border-2 rounded-2xl cursor-pointer shadow-md hover:shadow-lg transition-all select-none focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 <%= has_filters ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700' : 'bg-white border-slate-100 text-slate-400 hover:text-blue-600 hover:bg-blue-50' %>" title="Filter Schools">
+                <div class="relative flex items-center justify-center">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  </svg>
+                </div>
+              </summary>
 
-            <label for="state" class="cursor-pointer p-3.5 bg-white border-2 border-slate-100 text-slate-600 rounded-2xl shadow-md hover:shadow-lg hover:bg-slate-50 transition-all focus:outline-none focus:ring-4 focus:ring-blue-500/10 flex items-center justify-center">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              <span class="sr-only">Filters</span>
-            </label>
+              <div class="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 p-6 z-50 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h3 class="font-bold text-slate-900 text-base">Filter Schools</h3>
+                  <%= link_to "Reset", edit_assignment_user_path(@employee, query: params[:query]), class: "text-xs font-semibold text-blue-600 hover:text-blue-800" %>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">State</label>
+                  <%= select_tag :state, 
+                      options_for_select(User.states.keys.map { |s| [s.titleize, s] }, params[:state]), 
+                      include_blank: "All States",
+                      class: "w-full rounded-xl border-2 border-slate-100 px-3 py-2.5 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 bg-white" %>
+                </div>
+
+                <div class="pt-2">
+                  <%= submit_tag "Apply Filters", class: "w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition-all text-center cursor-pointer" %>
+                </div>
+              </div>
+            </details>
           </div>
         <% end %>
       </div>
     </div>
 
     <!-- Toggle List Form -->
-    <%= form_with url: update_assignment_user_path(@employee), method: :patch, local: true do %>
+    <%= form_with url: update_assignment_user_path(@employee), method: :patch, local: true, html: { data: { controller: "select-all" } } do %>
+      
+      <!-- Select All Bar -->
+      <% if @schools.any? %>
+        <div class="flex items-center justify-between px-5 py-3 mb-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
+          <label class="flex items-center gap-3 cursor-pointer select-none">
+            <input type="checkbox" 
+                   data-select-all-target="master" 
+                   data-action="change->select-all#toggle" 
+                   class="w-5 h-5 text-blue-600 rounded-lg border-2 border-slate-200 focus:ring-blue-500/10 focus:ring-4 transition-all cursor-pointer">
+            <span class="text-sm font-bold text-slate-700">Select All Visible Filtered Schools</span>
+          </label>
+          <span class="text-xs font-semibold text-slate-400"><%= @schools.count %> schools found</span>
+        </div>
+      <% end %>
+
       <div class="space-y-4 max-h-[500px] overflow-y-auto pr-2 mb-8">
         <% if @schools.any? %>
           <% @schools.each do |school| %>
@@ -67,8 +99,9 @@
                 </div>
               </div>
 
-              <!-- Custom Checkbox Toggle Field -->
-              <%= check_box_tag "school_ids[]", school.id, is_assigned, class: "w-6 h-6 text-blue-600 rounded-lg border-2 border-slate-200 focus:ring-blue-500/10 focus:ring-4 transition-all cursor-pointer" %>
+              <%= check_box_tag "school_ids[]", school.id, is_assigned, 
+                  data: { select_all_target: "item" }, 
+                  class: "w-6 h-6 text-blue-600 rounded-lg border-2 border-slate-200 focus:ring-blue-500/10 focus:ring-4 transition-all cursor-pointer" %>
             </label>
           <% end %>
         <% else %>
