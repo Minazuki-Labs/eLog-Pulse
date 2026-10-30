@@ -74,9 +74,12 @@
                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-7h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                         </div>
                         <h3 class="text-base font-bold text-slate-700 uppercase"><%= school.name %></h3>
+                        
+                        <% active_school_ticket_count = ["New Case", "In Progress"].sum { |status_name| school_tickets.select { |t| status_name == "New Case" ? t.new_case? : t.in_progress? }.count } %>
                         <span class="ml-3 text-xs font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-                          <%= school_tickets.count %>
+                          <%= active_school_ticket_count %>
                         </span>
+
                         <% if school_has_warning %>
                           <span class="ml-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200/60" title="Contains tickets requiring attention">
                             <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

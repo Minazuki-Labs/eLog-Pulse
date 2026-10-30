@@ -37,7 +37,7 @@
       </div>
     </div>
 
-    <% if current_user.staff? %>
+    <% if current_user.staff? && !@ticket.completed? %>
       <div class="bg-white rounded-[2rem] p-4 shadow-xl shadow-slate-200/40 border border-slate-100">
         <%= form_with(model: [ @ticket, @comment || Comment.new ], class: "space-y-3 relative") do |f| %>
           <% if @comment && @comment.errors.any? %>
