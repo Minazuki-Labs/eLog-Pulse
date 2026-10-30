@@ -8,9 +8,9 @@ class HomeController < ApplicationController
       base_tickets = if current_user.contractor?
         current_user.assigned_tickets.where(status: :in_progress)
       elsif current_user.employee?
-        Ticket.where(school_id: current_user.assigned_schools.select(:id))
+        Ticket.where(school_id: current_user.assigned_schools.select(:id)).not_completed
       else
-        Ticket.all
+        Ticket.all.not_completed
       end
 
       allowed_schools = if current_user.employee?
@@ -26,7 +26,9 @@ class HomeController < ApplicationController
 
         active_schools = state_schools.map do |school|
           school_tickets = base_tickets.where(school_id: school.id).includes(:location, { equipment: :equipment_category }, :issue_type).order(created_at: :desc)
-          { school: school, tickets: school_tickets } if school_tickets.any?
+
+          active_count = school_tickets.select { |t| t.new_case? || t.in_progress? }.count
+          { school: school, tickets: school_tickets } if active_count > 0
         end.compact
 
         { state: state_key, schools: active_schools } if active_schools.any?
