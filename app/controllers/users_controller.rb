@@ -72,7 +72,7 @@ class UsersController < ApplicationController
   end
 
   def employees
-    @employees = User.directory_users.includes(:assigned_schools, :assigned_tickets)
+    @employees = User.staff.includes(:assigned_schools, :assigned_tickets)
 
     if params[:query].present?
       query = "%#{params[:query].strip}%"
