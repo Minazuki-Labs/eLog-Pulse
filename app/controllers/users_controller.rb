@@ -15,7 +15,7 @@ class UsersController < ApplicationController
   def edit
     if @user.school?
       @school = @user
-    elsif @user.staff? || @user.contractor?
+    elsif @user.staff?
       @employee = @user
     end
   end
@@ -28,7 +28,7 @@ class UsersController < ApplicationController
       else
         render :edit, status: :unprocessable_entity
       end
-    elsif @user.staff? || @user.contractor?
+    elsif @user.staff?
       @employee = @user
 
       switching_to_contractor = employee_params[:role] == "contractor" && !@employee.contractor?
@@ -89,7 +89,7 @@ class UsersController < ApplicationController
   end
 
   def new_employee
-    @employee = User.new(role: :employee)
+    @employee = User.new
   end
 
   def create_employee
@@ -135,14 +135,18 @@ class UsersController < ApplicationController
     if @user.school?
       redirect_to employees_users_path, alert: "Cannot change role of a school."
       return
+    elsif current_user == @user
+      redirect_to @user, alert: "You cannot change your own admin status."
+      return
     end
 
-    new_role = @user.admin? ? :employee : :admin
+    new_admin_status = !@user.admin?
 
-    if @user.update(role: new_role)
-      redirect_to user_path(@user), notice: "#{@user.name}'s role was updated to #{@user.role.titleize}."
+    if @user.update(admin: new_admin_status)
+      status_name = new_admin_status ? "Admin" : "Employee"
+      redirect_to user_path(@user), notice: "#{@user.name}'s role was updated to #{status_name}."
     else
-      redirect_to user_path(@user), alert: "Failed to update role."
+      redirect_to user_path(@user), alert: "Failed to update admin status."
     end
   end
 
@@ -201,7 +205,10 @@ class UsersController < ApplicationController
       :username,
       :password,
       :password_confirmation,
-      :role
+      :role,
+      :manager,
+      :teacher,
+      :admin
     )
   end
 end

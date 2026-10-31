@@ -1,16 +1,16 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["select"]
+  static targets = ["contractorCheckbox"]
 
   confirmChange(event) {
-    const select = event.target
-    const currentRole = select.dataset.currentRole
-    const newRole = select.value
+    const checkbox = event.target
+    const isBecomingContractor = checkbox.checked
+    const wasContractor = checkbox.dataset.wasContractor === "true"
 
-    if (newRole === "contractor" && currentRole !== "contractor") {
+    if (isBecomingContractor && !wasContractor) {
       if (!confirm("Warning: Changing this user to a Contractor will remove all current school assignments. Do you wish to proceed?")) {
-        select.value = currentRole // Revert back to original role
+        checkbox.checked = false // Revert checkbox state
         event.preventDefault()
         event.stopPropagation()
         return
