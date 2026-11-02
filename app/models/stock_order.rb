@@ -27,10 +27,14 @@ class StockOrder < ApplicationRecord
   before_save :auto_set_in_delivery_status
 
   scope :accessible_by, ->(user) {
-    where(user_id: user.id)
-      .or(where(manager_id: user.id))
-      .or(where(approver_1_id: user.id))
-      .or(where(approver_2_id: user.id))
+    if user.admin?
+      all
+    else
+      where(user_id: user.id)
+        .or(where(manager_id: user.id))
+        .or(where(approver_1_id: user.id))
+        .or(where(approver_2_id: user.id))
+    end
   }
 
   private

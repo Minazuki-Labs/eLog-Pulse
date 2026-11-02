@@ -3,7 +3,9 @@ class StockOrdersController < ApplicationController
   before_action :set_stock_order, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @stock_orders = StockOrder.accessible_by(current_user).includes(:user, :school, :stock_sub_items)
+    @stock_orders = StockOrder.accessible_by(current_user)
+                              .where.not(status: [ :rejected, :completed ])
+                              .includes(:user, :school, :stock_sub_items)
     apply_filters_and_group
   end
 
@@ -12,6 +14,14 @@ class StockOrdersController < ApplicationController
                               .where(status: [ :pending, :in_delivery ])
                               .includes(:user, :school, :stock_sub_items)
     apply_filters_and_group
+  end
+
+  def completed
+    @stock_orders = StockOrder.accessible_by(current_user)
+                              .where(status: [ :rejected, :completed ])
+                              .includes(:user, :school, :stock_sub_items)
+    apply_filters_and_group
+    render :index
   end
 
   def show
@@ -85,7 +95,8 @@ class StockOrdersController < ApplicationController
     end
 
     # Dropdown collections for filters
-    @schools = User.school.where(id: StockOrder.accessible_by(current_user).select(:school_id))
+    orders_scope = current_user.admin? ? StockOrder.all : StockOrder.accessible_by(current_user)
+    @schools = User.school.where(id: orders_scope.select(:school_id))
 
     @states_data = User.states.keys.map do |state_key|
       state_schools = @schools.where(state: state_key)
@@ -100,7 +111,9 @@ class StockOrdersController < ApplicationController
   end
 
   def load_form_collections
-    @schools = if current_user.school?
+    @schools = if current_user.admin?
+      User.school
+    elsif current_user.school?
       [ current_user ]
     else
       current_user.assigned_schools.presence || User.school

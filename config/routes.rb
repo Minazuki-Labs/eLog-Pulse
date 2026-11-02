@@ -50,6 +50,7 @@ Rails.application.routes.draw do
   resources :stock_orders do
     collection do
       get :pending
+      get :completed
     end
     resources :stock_order_items, only: [ :destroy ]
   end

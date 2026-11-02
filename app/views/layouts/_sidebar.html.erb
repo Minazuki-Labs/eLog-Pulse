@@ -51,10 +51,13 @@
             <% if current_user.admin? || current_user.teacher? %>
               <%= sidebar_link "Create New Order", new_stock_order_path, "plus-circle" %>
             <% end %>
+            <% if current_user.teacher? %>
+              <%= sidebar_link "My Stock Orders", stock_orders_path, "shopping-cart" %>
+            <% end %>
             <% if current_user.admin? || current_user.manager? %>
               <%= sidebar_link "Pending Orders", pending_stock_orders_path, "clock" %>
             <% end %>
-            <%= sidebar_link "My Stock Orders", stock_orders_path, "shopping-cart" %>
+            <%= sidebar_link "Completed Orders", completed_stock_orders_path, "check-circle" %>
           </div>
         </div>
       </div>
