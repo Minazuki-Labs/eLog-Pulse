@@ -124,7 +124,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_165134) do
     t.bigint "manager_id"
     t.bigint "approver_1_id"
     t.bigint "approver_2_id"
-    t.string "company_name", null: false
+    t.string "company_name"
     t.text "purpose"
     t.integer "status", default: 0, null: false
     t.string "teacher_phone_number", null: false

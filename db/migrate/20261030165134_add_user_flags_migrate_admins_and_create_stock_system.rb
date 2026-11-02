@@ -45,7 +45,7 @@ class AddUserFlagsMigrateAdminsAndCreateStockSystem < ActiveRecord::Migration[8.
       t.references :approver_1, foreign_key: { to_table: :users }
       t.references :approver_2, foreign_key: { to_table: :users }
 
-      t.string :company_name, null: false
+      t.string :company_name
       t.text :purpose
       t.integer :status, default: 0, null: false
 

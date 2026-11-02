@@ -1,15 +1,28 @@
-<div class="nested-fields grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100 items-center" data-new-record="<%= f.object.new_record? %>">
+<% sub_items_hash = StockSubItem.all.group_by(&:stock_item_id) %>
+
+<div class="nested-fields grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100 items-center" 
+     data-controller="stock-dependent" 
+     data-stock-dependent-sub-items-value="<%= sub_items_hash.to_json %>"
+     data-new-record="<%= f.object.new_record? %>">
+  
   <div>
     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Stock Item</label>
-    <%= select_tag :stock_item_id, options_from_collection_for_select(StockItem.all, :id, :name), 
-        { prompt: "Select Item", class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700" } %>
+    <%= select_tag :stock_item_id, 
+        options_from_collection_for_select(StockItem.all, :id, :name, f.object.stock_sub_item&.stock_item_id), 
+        { prompt: "Select Item", 
+          class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700",
+          data: { action: "change->stock-dependent#filterSubItems", stock_dependent_target: "item" } } %>
   </div>
 
   <div>
     <%= f.label :stock_sub_item_id, "Sub Item", class: "block text-xs font-bold text-slate-500 uppercase mb-1" %>
-    <%= f.collection_select :stock_sub_item_id, StockSubItem.all, :id, :name, 
+    <%= f.collection_select :stock_sub_item_id, 
+        (f.object.stock_sub_item ? StockSubItem.where(stock_item_id: f.object.stock_sub_item.stock_item_id) : []), 
+        :id, :name, 
         { prompt: "Select Sub Item" }, 
-        { class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700", required: true } %>
+        { class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700", 
+          required: true,
+          data: { stock_dependent_target: "subItem" } } %>
   </div>
 
   <div class="flex items-end gap-2">

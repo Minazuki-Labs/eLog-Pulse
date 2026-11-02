@@ -14,7 +14,7 @@ class StockOrder < ApplicationRecord
 
   enum :status, { pending: 0, rejected: 1, in_delivery: 2, completed: 3 }, validate: true
 
-  validates :company_name, presence: true
+  validates :company_name, presence: true, unless: -> { pending? }
   validates :teacher_phone_number, presence: true
   validates :teacher_email, presence: true
   validates :approver_1_id, presence: true
