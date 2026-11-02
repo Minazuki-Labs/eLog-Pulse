@@ -85,6 +85,13 @@ employee3 = User.create!(
   role: :employee
 )
 
+contractor = User.create!(
+  name: "Contractor",
+  username: "contractor",
+  password: "password123",
+  role: :contractor
+)
+
 EmployeeSchool.create!(school: school1, employee: employee1)
 EmployeeSchool.create!(school: school1, employee: employee2)
 EmployeeSchool.create!(school: school2, employee: employee2)
@@ -282,7 +289,8 @@ Ticket.create!(
   status: :in_progress,
   teacher_name: "Teacher Eve",
   teacher_email: "eve@test.edu",
-  teacher_phone_number: "0123456793"
+  teacher_phone_number: "0123456793",
+  assignee: contractor
 )
 
 Comment.create!(
