@@ -118,6 +118,10 @@ class StockOrdersController < ApplicationController
       :teacher_phone_number,
       :teacher_email,
       :approver_1_id,
+      :approver_2_id,
+      :manager_id,
+      :order_proof,
+      :status,
       stock_order_items_attributes: [ :id, :stock_sub_item_id, :quantity, :_destroy ]
     )
   end

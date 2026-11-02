@@ -22,6 +22,9 @@ class StockOrder < ApplicationRecord
   validates :stock_order_items, presence: true
 
   validates :order_proof, presence: true, if: -> { in_delivery? || completed? }
+  validate :prevent_self_approval_or_duplicate, on: [ :create, :update ]
+
+  before_save :auto_set_in_delivery_status
 
   scope :accessible_by, ->(user) {
     where(user_id: user.id)
@@ -29,4 +32,22 @@ class StockOrder < ApplicationRecord
       .or(where(approver_1_id: user.id))
       .or(where(approver_2_id: user.id))
   }
+
+  private
+
+  def prevent_self_approval_or_duplicate
+    if approver_2_id.present? && (approver_2_id == user_id || approver_2_id == approver_1_id)
+      errors.add(:approver_2_id, "cannot be the same as the requester or first approver")
+    end
+
+    if manager_id.present? && manager_id == approver_2_id
+      errors.add(:manager_id, "cannot be the same as the second approver")
+    end
+  end
+
+  def auto_set_in_delivery_status
+    if order_proof.attached? && pending?
+      self.status = :in_delivery
+    end
+  end
 end
