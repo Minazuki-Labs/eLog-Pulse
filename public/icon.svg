@@ -1,3 +1,53 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="256" fill="red"/>
-</svg>
+<svg id="logo-svg" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <!-- Outer Green to Yellow Gradient -->
+                                <linearGradient id="main-gradient" x1="50" y1="400" x2="450" y2="100" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#48bb78"/>
+                                    <stop offset="35%" stop-color="#84cc16"/>
+                                    <stop offset="70%" stop-color="#eab308"/>
+                                    <stop offset="100%" stop-color="#84cc16"/>
+                                </linearGradient>
+
+                                <!-- 3D Bevel Dark Green Shadow Gradient -->
+                                <linearGradient id="shadow-gradient" x1="100" y1="450" x2="450" y2="100" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#14532d"/>
+                                    <stop offset="50%" stop-color="#166534"/>
+                                    <stop offset="100%" stop-color="#064e3b"/>
+                                </linearGradient>
+
+                                <!-- Inner Hole Dark Depth Shadow -->
+                                <linearGradient id="inner-shadow" x1="200" y1="150" x2="400" y2="250" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#14532d"/>
+                                    <stop offset="100%" stop-color="#052e16"/>
+                                </linearGradient>
+
+                                <!-- Drop Shadow Filter for Realistic 3D Pop -->
+                                <filter id="drop-shadow" x="-10%" y="-10%" width="130%" height="130%">
+                                    <feDropShadow dx="4" dy="12" stdDeviation="10" flood-color="#000000" flood-opacity="0.55"/>
+                                </filter>
+                            </defs>
+
+                            <g filter="url(#drop-shadow)" transform="rotate(-12, 256, 256)">
+                                <!-- 3D Extrusion Shadow Layer (Bottom/Back) -->
+                                <g fill="url(#shadow-gradient)" transform="translate(4, 10)">
+                                    <!-- Main outer loop shape -->
+                                    <path d="M 430,135 &#10;                                             C 480,210 440,320 330,390 &#10;                                             C 210,460 100,430 70,360 &#10;                                             C 40,290 90,180 210,110 &#10;                                             C 330,40 400,80 430,135 Z&#10;                                             M 390,175 &#10;                                             C 370,130 310,110 230,155 &#10;                                             C 160,195 130,260 150,295 &#10;                                             C 170,330 220,335 290,295 &#10;                                             C 360,255 400,205 390,175 Z"/>
+                                </g>
+
+                                <!-- Front 3D Face (Main Body) -->
+                                <path d="M 425,130 &#10;                                         C 475,205 435,315 325,385 &#10;                                         C 205,455 95,425 65,355 &#10;                                         C 35,285 85,175 205,105 &#10;                                         C 325,35 395,75 425,130 Z" fill="url(#main-gradient)"/>
+
+                                <!-- Inner Hole Cutout & Bevel -->
+                                <!-- Inner Bevel Depth -->
+                                <path d="M 395,165 &#10;                                         C 375,120 315,100 235,145 &#10;                                         C 165,185 135,250 155,285 &#10;                                         C 175,320 225,325 295,285 &#10;                                         C 365,245 405,195 395,165 Z" fill="url(#inner-shadow)" transform="translate(-2, 3)"/>
+
+                                <!-- Cutout Mask (Translucent background window) -->
+                                <path d="M 390,170 &#10;                                         C 370,125 310,105 230,150 &#10;                                         C 160,190 130,255 150,290 &#10;                                         C 170,325 220,330 290,290 &#10;                                         C 360,250 400,200 390,170 Z" id="inner-hole" fill="none" class="hole-fill"/>
+
+                                <!-- Sleek Inner Accent Groove Cut -->
+                                <path d="M 125,335 &#10;                                         C 170,380 280,385 385,305 &#10;                                         L 405,290 &#10;                                         C 310,360 190,365 140,320 Z" fill="url(#shadow-gradient)"/>
+
+                                <!-- Highlight Ridge (Top Rim Reflection) -->
+                                <path d="M 210,110 &#10;                                         C 325,43 390,80 420,132 &#10;                                         C 410,120 350,75 240,125 Z" fill="#ffffff" opacity="0.35"/>
+                            </g>
+                        </svg>
