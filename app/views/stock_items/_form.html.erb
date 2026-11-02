@@ -14,7 +14,7 @@
     <%= f.text_field :name, class: "block w-full px-4 py-3.5 border-2 border-slate-100 bg-slate-50 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all" %>
   </div>
 
-  <div class="space-y-3" data-controller="email-fields">
+  <div class="space-y-3" data-controller="email-fields" data-email-fields-max-value="10">
     <div class="flex items-center justify-between">
       <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Sub-Items (Minimum 1)</label>
       <button type="button" data-action="click->email-fields#add" class="text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer">
