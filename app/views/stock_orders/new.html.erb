@@ -1,0 +1,16 @@
+<main class="flex-1 p-8 lg:p-12">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-10">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Create Stock Order</h1>
+        <p class="text-slate-400 mt-1 text-base">Submit a new equipment request for your assigned school.</p>
+      </div>
+
+      <%= link_to stock_orders_path, class: "text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors" do %>
+        ← Back to Orders
+      <% end %>
+    </div>
+
+    <%= render "form", stock_order: @stock_order, button_label: "Submit Stock Order" %>
+  </div>
+</main>

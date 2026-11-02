@@ -47,6 +47,12 @@ Rails.application.routes.draw do
 
   resources :equipment_categories, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
 
+  resources :stock_orders do
+    collection do
+      get :pending
+    end
+  end
+
   root to: "home#index"
 
   if Rails.env.development?

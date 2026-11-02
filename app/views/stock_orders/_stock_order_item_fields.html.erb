@@ -1,0 +1,29 @@
+<div class="nested-fields grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100 items-center" data-new-record="<%= f.object.new_record? %>">
+  <div>
+    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Stock Item</label>
+    <%= select_tag :stock_item_id, options_from_collection_for_select(StockItem.all, :id, :name), 
+        { prompt: "Select Item", class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700" } %>
+  </div>
+
+  <div>
+    <%= f.label :stock_sub_item_id, "Sub Item", class: "block text-xs font-bold text-slate-500 uppercase mb-1" %>
+    <%= f.collection_select :stock_sub_item_id, StockSubItem.all, :id, :name, 
+        { prompt: "Select Sub Item" }, 
+        { class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700", required: true } %>
+  </div>
+
+  <div class="flex items-end gap-2">
+    <div class="flex-1">
+      <%= f.label :quantity, class: "block text-xs font-bold text-slate-500 uppercase mb-1" %>
+      <%= f.number_field :quantity, min: 1, value: f.object.quantity || 1, 
+          class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700", required: true %>
+    </div>
+
+    <div class="pt-5">
+      <%= f.hidden_field :_destroy, data: { nested_form_target: "destroy" } %>
+      <button type="button" data-action="click->nested-form#remove" class="p-3 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl transition-all font-bold text-sm cursor-pointer">
+        ✕
+      </button>
+    </div>
+  </div>
+</div>
