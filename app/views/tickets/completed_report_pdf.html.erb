@@ -41,11 +41,10 @@
     <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
       <thead>
         <tr style="border-bottom: 1px solid #e2e8f0; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; background-color: #f8fafc;">
-          <th style="padding: 10px 12px; width: 10%;">Case ID</th>
-          <th style="padding: 10px 12px; width: 15%;">Date</th>
-          <th style="padding: 10px 12px; width: 12%;">Status</th>
-          <th style="padding: 10px 12px; width: 43%;">Device & Issue Details</th>
-          <th style="padding: 10px 12px; width: 20%;">Requested By / Location</th>
+          <th style="padding: 10px 12px; width: 12%;">Case ID</th>
+          <th style="padding: 10px 12px; width: 18%;">Date</th>
+          <th style="padding: 10px 12px; width: 48%;">Device & Issue Details</th>
+          <th style="padding: 10px 12px; width: 22%;">Requested By / Location</th>
         </tr>
       </thead>
       <tbody>
@@ -54,9 +53,6 @@
           <tr style="border-bottom: 1px solid #f1f5f9;">
             <td style="padding: 12px; font-weight: bold; color: #0f172a; vertical-align: top;">#<%= ticket.id %></td>
             <td style="padding: 12px; color: #475569; vertical-align: top; white-space: nowrap;"><%= ticket.created_at.strftime("%d %b %Y") %></td>
-            <td style="padding: 12px; vertical-align: top;">
-              <span style="display: inline-block; padding: 3px 6px; font-size: 9px; font-weight: bold; background-color: #d1fae5; color: #065f46; border-radius: 4px;">COMPLETED</span>
-            </td>
             <td style="padding: 12px; vertical-align: top; word-break: break-word;">
               <div style="font-weight: bold; color: #0f172a; text-transform: uppercase;"><%= ticket.equipment&.display_name || "Equipment ##{ticket.equipment_id}" %></div>
               <div style="color: #475569; margin-top: 4px;"><%= ticket.description %></div>
