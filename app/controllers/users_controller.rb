@@ -1,8 +1,8 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :ensure_staff!, only: [ :schools, :employees ]
-  before_action :ensure_admin!, only: [ :new_school, :create_school, :edit, :update, :toggle_role, :destroy, :edit_assignment, :update_assignment ]
-  before_action :set_user, only: [ :show, :edit, :update, :edit_assignment, :update_assignment, :toggle_role, :destroy ]
+  before_action :ensure_admin!, only: [ :new_school, :create_school, :edit, :update, :toggle_admin, :toggle_manager, :toggle_teacher, :destroy, :edit_assignment, :update_assignment ]
+  before_action :set_user, only: [ :show, :edit, :update, :edit_assignment, :update_assignment, :toggle_admin, :toggle_manager, :toggle_teacher, :destroy ]
 
   def show
     if @user.school?
@@ -131,7 +131,7 @@ class UsersController < ApplicationController
     redirect_to user_path(@employee), notice: "School assignments successfully updated."
   end
 
-  def toggle_role
+  def toggle_admin
     if @user.school?
       redirect_to employees_users_path, alert: "Cannot change role of a school."
       return
@@ -147,6 +147,36 @@ class UsersController < ApplicationController
       redirect_to user_path(@user), notice: "#{@user.name}'s role was updated to #{status_name}."
     else
       redirect_to user_path(@user), alert: "Failed to update admin status."
+    end
+  end
+
+  def toggle_manager
+    if @user.school?
+      redirect_to employees_users_path, alert: "Cannot change role of a school."
+      return
+    end
+
+    new_status = !@user.manager?
+    if @user.update(manager: new_status)
+      status_name = new_status ? "Manager" : "Non-Manager"
+      redirect_to user_path(@user), notice: "#{@user.name}'s manager status was updated to #{status_name}."
+    else
+      redirect_to user_path(@user), alert: "Failed to update manager status."
+    end
+  end
+
+  def toggle_teacher
+    if @user.school?
+      redirect_to employees_users_path, alert: "Cannot change role of a school."
+      return
+    end
+
+    new_status = !@user.teacher?
+    if @user.update(teacher: new_status)
+      status_name = new_status ? "Teacher" : "Non-Teacher"
+      redirect_to user_path(@user), notice: "#{@user.name}'s teacher status was updated to #{status_name}."
+    else
+      redirect_to user_path(@user), alert: "Failed to update teacher status."
     end
   end
 
