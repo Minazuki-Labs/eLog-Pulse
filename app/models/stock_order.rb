@@ -14,7 +14,9 @@ class StockOrder < ApplicationRecord
 
   enum :status, { pending: 0, rejected: 1, in_delivery: 2, completed: 3 }, validate: true
 
-  validates :company_name, presence: true, unless: -> { pending? }
+  validates :company_name, presence: true, unless: -> { pending? && approver_2_id.blank? && manager_id.blank? }
+  validates :school_id, presence: true
+  validates :user_id, presence: true
   validates :teacher_phone_number, presence: true
   validates :teacher_email, presence: true
   validates :approver_1_id, presence: true
@@ -43,12 +45,14 @@ class StockOrder < ApplicationRecord
 
   def can_modify_items?(user)
     return true if user.admin?
-    return false if manager_id.present?
 
-    if approver_2_id.present?
-      approver_2_id == user.id
+    current_order = errors.any? ? self.class.find(id) : self
+    return false if current_order.manager_id.present?
+
+    if current_order.approver_2_id.present?
+      current_order.approver_2_id == user.id
     else
-      approver_1_id == user.id
+      current_order.approver_1_id == user.id
     end
   end
 

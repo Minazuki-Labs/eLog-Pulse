@@ -1,4 +1,9 @@
-<div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200/40 border border-slate-100">
+<% in_delivery_map = StockOrder.accessible_by(current_user).where(status: :in_delivery).pluck(:school_id, :id).to_h %>
+
+<div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200/40 border border-slate-100" 
+     data-controller="school-delivery" 
+     data-school-delivery-delivery-orders-value="<%= in_delivery_map.to_json %>">
+  
   <%= form_with(model: stock_order, class: "space-y-8") do |f| %>
 
     <% if stock_order.errors.any? %>
@@ -20,7 +25,14 @@
           <%= f.label :school_id, "Order for School", class: "text-sm font-black text-slate-700 ml-1" %>
           <%= f.collection_select :school_id, @schools, :id, :name, 
               { prompt: "Select School" }, 
-              { class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700", required: true } %>
+              { 
+                class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700", 
+                required: true,
+                data: { 
+                  school_delivery_target: "schoolSelect",
+                  action: "change->school-delivery#checkDelivery" 
+                } 
+              } %>
         </div>
       </div>
     </div>

@@ -30,6 +30,10 @@ class StockOrdersController < ApplicationController
   def new
     @stock_order = StockOrder.new
     load_form_collections
+
+    @schools_in_delivery = StockOrder.accessible_by(current_user)
+                                     .where(status: :in_delivery)
+                                     .pluck(:school_id, :id.to_s)
   end
 
   def create
@@ -49,10 +53,15 @@ class StockOrdersController < ApplicationController
 
   def update
     if @stock_order.update(stock_order_params)
-      redirect_to @stock_order, notice: "Stock order was successfully updated."
+      respond_to do |format|
+        format.html { redirect_to @stock_order, notice: "Stock order was successfully updated." }
+        format.json { render json: { status: :ok, message: "Order updated successfully." } }
+      end
     else
-      load_form_collections
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { load_form_collections; render :show, status: :unprocessable_entity }
+        format.json { render json: @stock_order.errors, status: :unprocessable_entity }
+      end
     end
   end
 
