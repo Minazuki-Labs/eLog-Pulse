@@ -1,0 +1,29 @@
+<main class="flex-1 p-8 lg:p-12">
+  <div class="max-w-xl mx-auto bg-white p-8 lg:p-10 rounded-2xl border border-slate-200 shadow-sm">
+    <div class="mb-6">
+      <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-2">Edit Company</h1>
+      <p class="text-slate-400 text-sm">Update the company details below.</p>
+    </div>
+
+    <%= form_with model: @company, local: true, class: "space-y-5" do |f| %>
+      <% if @company.errors.any? %>
+        <div class="bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-medium border border-red-100">
+          <ul class="list-disc pl-4 space-y-1">
+            <% @company.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :name, "Company Name", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5" %>
+        <%= f.text_field :name, class: "block w-full px-4 py-3.5 border-2 #{ @company.errors[:name].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all" %>
+      </div>
+
+      <div class="pt-2">
+        <%= f.submit "Update Company", class: "w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-100 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+</main>

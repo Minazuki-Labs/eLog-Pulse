@@ -10,7 +10,7 @@ export default class extends Controller {
 
   add(event) {
     event.preventDefault()
-    const count = this.containerTarget.querySelectorAll('.email-group').length
+    const count = this.containerTarget.querySelectorAll('.email-group:not([style*="display: none"])').length
     
     if (count < this.maxValue) {
       const content = this.templateTarget.innerHTML.replace(/TEMPLATE_RECORD/g, new Date().getTime())
@@ -22,26 +22,35 @@ export default class extends Controller {
   remove(event) {
     event.preventDefault()
     const group = event.target.closest('.email-group')
-    const count = this.containerTarget.querySelectorAll('.email-group').length
+    const destroyInput = group.querySelector('.destroy-flag')
+    const count = this.containerTarget.querySelectorAll('.email-group:not([style*="display: none"])').length
 
-    // Keep at least 1 email input visible since min is 1
+    // Keep at least 1 input visible since min is 1
     if (count > 1) {
-      group.remove()
+      if (destroyInput) {
+        // If it's a persisted record, set _destroy to 1 and hide it so Rails processes the deletion
+        destroyInput.value = "1"
+        group.style.display = 'none'
+      } else {
+        // If it's a newly added dynamic record, safely remove it from the DOM
+        group.remove()
+      }
       this.updateButtons()
     }
   }
 
   updateButtons() {
-    const groups = this.containerTarget.querySelectorAll('.email-group')
+    const groups = this.containerTarget.querySelectorAll('.email-group:not([style*="display: none"])')
     const addBtn = this.element.querySelector('[data-action*="email-fields#add"]')
     
-    // Hide "Add Email" button if max reached, show otherwise
+    // Hide "Add" button if max reached, show otherwise
     if (addBtn) {
       addBtn.style.display = groups.length >= this.maxValue ? 'none' : 'block'
     }
 
-    // Toggle remove button visibility (hide if only 1 remains)
-    groups.forEach(group => {
+    // Toggle remove button visibility
+    const allGroups = this.containerTarget.querySelectorAll('.email-group')
+    allGroups.forEach(group => {
       const removeBtn = group.querySelector('.remove-btn')
       if (removeBtn) {
         removeBtn.style.display = groups.length > 1 ? 'inline-block' : 'none'

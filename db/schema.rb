@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_02_071638) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_03_114221) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -61,6 +61,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_071638) do
     t.bigint "user_id", null: false
     t.index ["ticket_id"], name: "index_comments_on_ticket_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "companies", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "employee_schools", force: :cascade do |t|
@@ -152,15 +158,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_071638) do
     t.bigint "manager_id"
     t.bigint "approver_1_id"
     t.bigint "approver_2_id"
-    t.string "company_name"
     t.text "purpose"
     t.integer "status", default: 0, null: false
     t.string "teacher_phone_number", null: false
     t.string "teacher_email", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "company_id"
     t.index ["approver_1_id"], name: "index_stock_orders_on_approver_1_id"
     t.index ["approver_2_id"], name: "index_stock_orders_on_approver_2_id"
+    t.index ["company_id"], name: "index_stock_orders_on_company_id"
     t.index ["manager_id"], name: "index_stock_orders_on_manager_id"
     t.index ["school_id"], name: "index_stock_orders_on_school_id"
     t.index ["user_id"], name: "index_stock_orders_on_user_id"
@@ -226,6 +233,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_071638) do
   add_foreign_key "school_emails", "users", column: "school_id"
   add_foreign_key "stock_order_items", "stock_orders"
   add_foreign_key "stock_order_items", "stock_sub_items"
+  add_foreign_key "stock_orders", "companies"
   add_foreign_key "stock_orders", "users"
   add_foreign_key "stock_orders", "users", column: "approver_1_id"
   add_foreign_key "stock_orders", "users", column: "approver_2_id"
