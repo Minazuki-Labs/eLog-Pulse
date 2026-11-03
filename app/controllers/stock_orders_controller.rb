@@ -79,7 +79,7 @@ class StockOrdersController < ApplicationController
   def apply_filters_and_group
     # Search query filtering
     if params[:query].present?
-      @stock_orders = @stock_orders.where("company_name LIKE ? OR notes LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%")
+      @stock_orders = @stock_orders.left_joins(:company).where("companies.name LIKE ? OR stock_orders.purpose LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%")
     end
 
     # Status filter
@@ -130,12 +130,13 @@ class StockOrdersController < ApplicationController
 
     @stock_items = StockItem.includes(:stock_sub_items).all
     @managers = User.where(manager: true)
+    @companies = Company.order(:name)
   end
 
   def stock_order_params
     params.require(:stock_order).permit(
       :school_id,
-      :company_name,
+      :company_id,
       :purpose,
       :teacher_phone_number,
       :teacher_email,

@@ -59,6 +59,8 @@ Rails.application.routes.draw do
     resources :stock_sub_items, only: [ :create, :destroy ]
   end
 
+  resources :companies, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
+
   root to: "home#index"
 
   if Rails.env.development?
