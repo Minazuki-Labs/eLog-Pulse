@@ -19,9 +19,27 @@
 
     <div class="flex items-center gap-2">
       <% if current_user.admin? %>
-        <!-- Toggle Admin Button -->
         <% if @user.staff? && current_user != @user %>
-          <%= button_to toggle_role_user_path(@user), method: :patch, 
+          <!-- Toggle Teacher Button -->
+          <%= button_to toggle_teacher_user_path(@user), method: :patch, 
+              class: "p-2 rounded-xl transition-all #{@user.respond_to?(:teacher?) && @user.teacher? ? 'text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50' : 'text-rose-400 hover:text-rose-600 hover:bg-rose-50'}",
+              title: @user.respond_to?(:teacher?) && @user.teacher? ? "Demote Teacher" : "Make Teacher" do %>
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+            </svg>
+          <% end %>
+
+          <!-- Toggle Manager Button -->
+          <%= button_to toggle_manager_user_path(@user), method: :patch, 
+              class: "p-2 rounded-xl transition-all #{@user.respond_to?(:manager?) && @user.manager? ? 'text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50' : 'text-rose-400 hover:text-rose-600 hover:bg-rose-50'}",
+              title: @user.respond_to?(:manager?) && @user.manager? ? "Demote Manager" : "Make Manager" do %>
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          <% end %>
+
+          <!-- Toggle Admin Button -->
+          <%= button_to toggle_admin_user_path(@user), method: :patch, 
               class: "p-2 rounded-xl transition-all #{@user.admin? ? 'text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50' : 'text-rose-400 hover:text-rose-600 hover:bg-rose-50'}",
               title: @user.admin? ? "Demote to Employee" : "Make Admin" do %>
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">

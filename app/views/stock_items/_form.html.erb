@@ -1,0 +1,55 @@
+<%= form_with model: stock_item, local: true, class: "space-y-5" do |f| %>
+  <% if stock_item.errors.any? %>
+    <div class="bg-red-50 text-red-600 p-4 rounded-2xl text-sm font-medium border border-red-100">
+      <ul class="list-disc pl-4 space-y-1">
+        <% stock_item.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "Stock Item Name", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5" %>
+    <%= f.text_field :name, class: "block w-full px-4 py-3.5 border-2 border-slate-100 bg-slate-50 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all" %>
+  </div>
+
+  <div class="space-y-3" data-controller="email-fields" data-email-fields-max-value="10">
+    <div class="flex items-center justify-between">
+      <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Sub-Items (Minimum 1)</label>
+      <button type="button" data-action="click->email-fields#add" class="text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer">
+        + Add Another Sub-Item
+      </button>
+    </div>
+
+    <div data-email-fields-target="container" class="space-y-2.5">
+      <%= f.fields_for :stock_sub_items do |builder| %>
+        <div class="email-group flex items-center gap-2">
+          <%= builder.hidden_field :id if builder.object.persisted? %>
+          <%= builder.text_field :name, placeholder: "e.g. 32GB RAM", class: "flex-1 block w-full px-4 py-3.5 border-2 border-slate-100 bg-slate-50 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all" %>
+          <% if builder.object.persisted? %>
+            <%= builder.hidden_field :_destroy, value: "0", class: "destroy-flag" %>
+          <% end %>
+          <button type="button" data-action="click->email-fields#remove" class="remove-btn px-3 py-3.5 text-slate-400 hover:text-red-600 font-bold text-sm transition-colors cursor-pointer" title="Remove Sub-Item">
+            ✕
+          </button>
+        </div>
+      <% end %>
+    </div>
+
+    <template data-email-fields-target="template">
+      <div class="email-group flex items-center gap-2">
+        <%= f.fields_for :stock_sub_items, StockSubItem.new, child_index: "TEMPLATE_RECORD" do |builder| %>
+          <%= builder.text_field :name, placeholder: "e.g. 32GB RAM", class: "flex-1 block w-full px-4 py-3.5 border-2 border-slate-100 bg-slate-50 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all" %>
+        <% end %>
+        <button type="button" data-action="click->email-fields#remove" class="remove-btn px-3 py-3.5 text-slate-400 hover:text-red-600 font-bold text-sm transition-colors cursor-pointer" title="Remove Sub-Item">
+          ✕
+        </button>
+      </div>
+    </template>
+  </div>
+
+  <div class="pt-2">
+    <%= f.submit button_label, class: "w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-100 cursor-pointer" %>
+  </div>
+<% end %>

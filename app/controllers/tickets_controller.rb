@@ -4,11 +4,13 @@ class TicketsController < ApplicationController
   def index
     @scope = params[:scope] || "open"
 
+    use_assigned_schools = current_user.admin? ? current_user.assigned_schools.any? : current_user.employee?
+
     base_tickets = if current_user.school?
       current_user.reported_tickets
     elsif current_user.contractor?
       current_user.assigned_tickets
-    elsif current_user.employee?
+    elsif use_assigned_schools
       Ticket.where(school_id: current_user.assigned_schools.select(:id))
     else
       current_user.admin? ? Ticket.all : Ticket.none
@@ -17,12 +19,10 @@ class TicketsController < ApplicationController
     session[:last_tickets_path] = request.fullpath
 
     # Load schools available for filtering based on user role
-    @schools = if current_user.admin?
-      User.where(role: :school)
-    elsif current_user.employee?
+    @schools = if use_assigned_schools
       current_user.assigned_schools
     else
-      []
+      User.school
     end
 
     # Filter schools by state if present
@@ -104,7 +104,7 @@ class TicketsController < ApplicationController
         scoped_tickets
       end
 
-      allowed_schools = if current_user.employee?
+      allowed_schools = if use_assigned_schools
         current_user.assigned_schools
       else
         User.school
@@ -242,12 +242,10 @@ class TicketsController < ApplicationController
   end
 
   def schools_by_state
-    allowed_schools = if current_user.admin?
-      User.where(role: :school)
-    elsif current_user.employee?
+    allowed_schools = if (current_user.employee?) || (current_user.admin? && current_user.assigned_schools.any?)
       current_user.assigned_schools
     else
-      User.none
+      User.school
     end
 
     schools = params[:state].present? ? allowed_schools.where(state: params[:state]) : allowed_schools

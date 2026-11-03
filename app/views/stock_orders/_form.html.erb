@@ -1,0 +1,108 @@
+<% in_delivery_map = StockOrder.accessible_by(current_user).where(status: :in_delivery).pluck(:school_id, :id).to_h %>
+
+<div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200/40 border border-slate-100" 
+     data-controller="school-delivery" 
+     data-school-delivery-delivery-orders-value="<%= in_delivery_map.to_json %>">
+  
+  <%= form_with(model: stock_order, class: "space-y-8") do |f| %>
+
+    <% if stock_order.errors.any? %>
+      <div class="bg-red-50 text-red-600 p-4 rounded-2xl mb-6 border border-red-100">
+        <p class="font-black mb-2">Please correct the following errors:</p>
+        <ul class="list-disc ml-5 space-y-1">
+          <% stock_order.errors.each do |error| %>
+            <li class="font-medium"><%= error.full_message %></li> 
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <!-- School Details -->
+    <div>
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6 ml-1">School Details</h3>
+      <div class="grid grid-cols-1 gap-8">
+        <div class="flex flex-col gap-2">
+          <%= f.label :school_id, "Order for School", class: "text-sm font-black text-slate-700 ml-1" %>
+          <%= f.collection_select :school_id, @schools, :id, :name, 
+              { prompt: "Select School" }, 
+              { 
+                class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700", 
+                required: true,
+                data: { 
+                  school_delivery_target: "schoolSelect",
+                  action: "change->school-delivery#checkDelivery" 
+                } 
+              } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Teacher / Contact Details -->
+    <div class="border-t border-slate-100 pt-8">
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6 ml-1">Teacher / Contact Details</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="flex flex-col gap-2">
+          <%= f.label :teacher_phone_number, "Phone Number", class: "text-sm font-black text-slate-700 ml-1" %>
+          <%= f.telephone_field :teacher_phone_number, 
+              placeholder: "Enter phone number",
+              class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700", required: true %>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <%= f.label :teacher_email, "Email Address", class: "text-sm font-black text-slate-700 ml-1" %>
+          <%= f.email_field :teacher_email, 
+              placeholder: "Enter email address",
+              class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700", required: true %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Items Section (Item -> Sub-Item -> Quantity) -->
+    <div class="border-t border-slate-100 pt-8" data-controller="nested-form">
+      <div class="flex items-center justify-between mb-6 ml-1 mr-1">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Stock Items & Quantities</h3>
+        <button type="button" data-action="nested-form#add" class="inline-flex items-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer">
+          + Add Item
+        </button>
+      </div>
+
+      <div data-nested-form-target="container" class="space-y-4">
+        <%= f.fields_for :stock_order_items do |item_form| %>
+          <%= render "stock_order_item_fields", f: item_form %>
+        <% end %>
+      </div>
+
+      <template data-nested-form-target="template">
+        <%= f.fields_for :stock_order_items, StockOrderItem.new, child_index: 'NEW_RECORD' do |item_form| %>
+          <%= render "stock_order_item_fields", f: item_form %>
+        <% end %>
+      </template>
+    </div>
+
+    <!-- Approval & Purpose Section -->
+    <div class="border-t border-slate-100 pt-8">
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6 ml-1">Approval & Purpose</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="flex flex-col gap-2 md:col-span-2">
+          <%= f.label :approver_1_id, "First Approval Manager", class: "text-sm font-black text-slate-700 ml-1" %>
+          <%= f.collection_select :approver_1_id, @managers, :id, :name, 
+              { prompt: "Select Manager for Approval" }, 
+              { class: "w-full rounded-2xl border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-4 text-slate-700", required: true } %>
+        </div>
+
+        <div class="flex flex-col gap-2 md:col-span-2">
+          <%= f.label :purpose, "Purpose / Notes (optional)", class: "text-sm font-black text-slate-700 ml-1" %>
+          <%= f.text_area :purpose, 
+              placeholder: "Enter purpose of stock order...",
+              class: "w-full rounded-[1.6rem] border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-6 text-slate-700 min-h-[120px] resize-none" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex justify-end pt-4 border-t border-slate-100">
+      <%= f.submit button_label, 
+          class: "bg-slate-900 hover:bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-base transition-all transform active:scale-95 shadow-xl shadow-blue-500/20 cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

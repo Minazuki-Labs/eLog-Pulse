@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_29_052143) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_02_071638) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "app_configs", force: :cascade do |t|
     t.string "key", null: false
@@ -101,6 +129,52 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_052143) do
     t.index ["school_id"], name: "index_school_emails_on_school_id"
   end
 
+  create_table "stock_items", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "stock_order_items", force: :cascade do |t|
+    t.bigint "stock_order_id", null: false
+    t.bigint "stock_sub_item_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["stock_order_id"], name: "index_stock_order_items_on_stock_order_id"
+    t.index ["stock_sub_item_id"], name: "index_stock_order_items_on_stock_sub_item_id"
+  end
+
+  create_table "stock_orders", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "school_id", null: false
+    t.bigint "manager_id"
+    t.bigint "approver_1_id"
+    t.bigint "approver_2_id"
+    t.string "company_name"
+    t.text "purpose"
+    t.integer "status", default: 0, null: false
+    t.string "teacher_phone_number", null: false
+    t.string "teacher_email", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approver_1_id"], name: "index_stock_orders_on_approver_1_id"
+    t.index ["approver_2_id"], name: "index_stock_orders_on_approver_2_id"
+    t.index ["manager_id"], name: "index_stock_orders_on_manager_id"
+    t.index ["school_id"], name: "index_stock_orders_on_school_id"
+    t.index ["user_id"], name: "index_stock_orders_on_user_id"
+  end
+
+  create_table "stock_sub_items", force: :cascade do |t|
+    t.bigint "stock_item_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["stock_item_id"], name: "index_stock_sub_items_on_stock_item_id"
+  end
+
   create_table "tickets", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -131,8 +205,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_052143) do
     t.integer "role", default: 1
     t.integer "state"
     t.datetime "updated_at", null: false
+    t.boolean "admin", default: false, null: false
+    t.boolean "teacher", default: false, null: false
+    t.boolean "manager", default: false, null: false
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "comments", "tickets"
   add_foreign_key "comments", "users"
   add_foreign_key "employee_schools", "users", column: "employee_id"
@@ -145,6 +224,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_052143) do
   add_foreign_key "location_templates", "users", column: "created_by_id"
   add_foreign_key "locations", "users", column: "school_id"
   add_foreign_key "school_emails", "users", column: "school_id"
+  add_foreign_key "stock_order_items", "stock_orders"
+  add_foreign_key "stock_order_items", "stock_sub_items"
+  add_foreign_key "stock_orders", "users"
+  add_foreign_key "stock_orders", "users", column: "approver_1_id"
+  add_foreign_key "stock_orders", "users", column: "approver_2_id"
+  add_foreign_key "stock_orders", "users", column: "manager_id"
+  add_foreign_key "stock_orders", "users", column: "school_id"
+  add_foreign_key "stock_sub_items", "stock_items"
   add_foreign_key "tickets", "equipment"
   add_foreign_key "tickets", "issue_types"
   add_foreign_key "tickets", "locations"

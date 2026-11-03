@@ -5,15 +5,17 @@ class HomeController < ApplicationController
     if current_user.school?
       @tickets = current_user.reported_tickets.not_completed.includes(:location, { equipment: :equipment_category }, :issue_type).order(created_at: :desc)
     else
+      use_assigned_schools = current_user.admin? ? current_user.assigned_schools.any? : current_user.employee?
+
       base_tickets = if current_user.contractor?
         current_user.assigned_tickets.where(status: :in_progress)
-      elsif current_user.employee?
+      elsif use_assigned_schools
         Ticket.where(school_id: current_user.assigned_schools.select(:id)).not_completed
       else
         Ticket.all.not_completed
       end
 
-      allowed_schools = if current_user.employee?
+      allowed_schools = if use_assigned_schools
         current_user.assigned_schools
       elsif current_user.contractor?
         User.joins(:reported_tickets).where(tickets: { id: base_tickets.select(:id) }).distinct

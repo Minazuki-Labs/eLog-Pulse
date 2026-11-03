@@ -11,7 +11,9 @@ Rails.application.routes.draw do
     member do
       get :edit_assignment
       patch :update_assignment
-      patch :toggle_role
+      patch :toggle_admin
+      patch :toggle_manager
+      patch :toggle_teacher
     end
 
     resources :locations, only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do
@@ -44,6 +46,18 @@ Rails.application.routes.draw do
   end
 
   resources :equipment_categories, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
+
+  resources :stock_orders do
+    collection do
+      get :pending
+      get :completed
+    end
+    resources :stock_order_items, only: [ :destroy ]
+  end
+
+  resources :stock_items do
+    resources :stock_sub_items, only: [ :create, :destroy ]
+  end
 
   root to: "home#index"
 

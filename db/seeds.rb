@@ -1,7 +1,11 @@
 # Run bin/rails db:seed
 
 puts "Cleaning database"
-[ Comment, Ticket, Equipment, IssueType, LocationTemplateItem, Location, LocationTemplate, EquipmentCategory, SchoolEmail, EmployeeSchool, User, AppConfig ].each(&:delete_all)
+[
+  Comment, Ticket, Equipment, IssueType, LocationTemplateItem, Location,
+  LocationTemplate, EquipmentCategory, SchoolEmail, EmployeeSchool,
+  StockOrderItem, StockOrder, StockSubItem, StockItem, User, AppConfig
+].each(&:delete_all)
 
 puts "Creating app configs"
 AppConfig.group_email = "support@test.edu"
@@ -11,7 +15,9 @@ admin = User.create!(
   name: "Admin",
   username: "admin",
   password: "password123",
-  role: :admin
+  role: :employee,
+  admin: true,
+  manager: true
 )
 
 school1 = User.create!(
@@ -68,21 +74,23 @@ employee1 = User.create!(
   name: "Employee 1",
   username: "employee1",
   password: "password123",
-  role: :employee
+  role: :employee,
+  manager: true
 )
 
 employee2 = User.create!(
   name: "Employee 2",
   username: "employee2",
   password: "password123",
-  role: :employee
+  role: :employee,
+  teacher: true
 )
 
 employee3 = User.create!(
   name: "Employee 3",
   username: "employee3",
   password: "password123",
-  role: :employee
+  role: :employee,
 )
 
 contractor = User.create!(
@@ -209,6 +217,29 @@ LocationTemplateItem.create!(location_template: template1, equipment_category: c
 LocationTemplateItem.create!(location_template: template2, equipment_category: cat_records["Computer"])
 LocationTemplateItem.create!(location_template: template2, equipment_category: cat_records["Mouse"])
 LocationTemplateItem.create!(location_template: template2, equipment_category: cat_records["Keyboard"])
+
+puts "Creating sample stock items and sub-items"
+printer_item = StockItem.create!(name: "Printer", description: "Office and Classroom printers")
+black_ink = StockSubItem.create!(stock_item: printer_item, name: "Black Ink Cartridge", description: "Standard black ink")
+color_ink = StockSubItem.create!(stock_item: printer_item, name: "Color Ink Cartridge", description: "CMYK color ink set")
+
+puts "Creating sample stock orders"
+
+StockOrder.create!(
+  user: employee1,
+  school: school1,
+  manager: employee1,
+  approver_1: admin,
+  approver_2: employee2,
+  company_name: "Edutech Supplies Sdn Bhd",
+  purpose: "Replacement cartridges for lab printer",
+  teacher_phone_number: "0123456789",
+  teacher_email: "teacher.alice@test.edu",
+  stock_order_items_attributes: [
+    { stock_sub_item: black_ink, quantity: 2 },
+    { stock_sub_item: color_ink, quantity: 1 }
+  ]
+)
 
 puts "Creating sample tickets"
 computer_category = EquipmentCategory.find_by!(name: "Computer")

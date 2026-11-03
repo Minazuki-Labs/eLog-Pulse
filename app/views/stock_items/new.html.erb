@@ -1,0 +1,10 @@
+<main class="flex-1 p-8 lg:p-12">
+  <div class="max-w-xl mx-auto bg-white p-8 lg:p-10 rounded-2xl border border-slate-200 shadow-sm">
+    <div class="mb-6">
+      <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight mb-2">Create New Stock Item</h1>
+      <p class="text-slate-400 text-sm">Fill out the details below to add a new stock item and its sub-items.</p>
+    </div>
+
+    <%= render "form", stock_item: @stock_item, button_label: "Create Stock Item" %>
+  </div>
+</main>

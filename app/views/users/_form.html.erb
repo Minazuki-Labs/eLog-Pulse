@@ -33,17 +33,96 @@
 
       <!-- User Type Selection Field  -->
       <% unless user.school? %>
-        <div>
-          <%= f.label :role, "Role", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1" %>
-          <%= f.select :role, [["Employee", "employee"], ["Contractor", "contractor"], ["Admin", "admin"]], {}, 
-              { 
-                class: "block w-full px-4 py-3.5 border-2 border-slate-100 bg-slate-50 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700",
-                data: { 
-                  role_warning_target: "select",
-                  current_role: user.role,
-                  action: "change->role-warning#confirmChange" 
-                } 
-              } %>
+        <div class="space-y-3">
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">
+            Staff Roles & Permissions
+          </label>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <label class="relative flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer bg-slate-50/50 border-slate-200/80 hover:border-slate-300 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/30 has-[:checked]:shadow-sm">
+              <div class="flex items-center gap-3">
+                <%= f.check_box :role, { 
+                  checked: user.contractor?, 
+                  data: { 
+                    role_warning_target: "contractorCheckbox",
+                    was_contractor: user.contractor?,
+                    action: "change->role-warning#confirmChange" 
+                  }, 
+                  class: "w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer" 
+                }, "contractor", "employee" %>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-sm font-semibold text-slate-800">Contractor</span>
+                  
+                  <div class="group relative flex items-center">
+                    <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block whitespace-nowrap px-3 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-xl shadow-xl z-20 pointer-events-none transition-all">
+                      Only can see school assign to them.
+                      <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </label>
+
+            <label class="relative flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer bg-slate-50/50 border-slate-200/80 hover:border-slate-300 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/30 has-[:checked]:shadow-sm">
+              <div class="flex items-center gap-3">
+                <%= f.check_box :manager, { class: "w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer" } %>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-sm font-semibold text-slate-800">Manager</span>
+                  
+                  <div class="group relative flex items-center">
+                    <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block whitespace-nowrap px-3 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-xl shadow-xl z-20 pointer-events-none transition-all">
+                      Can approve stock order.
+                      <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </label>
+
+            <label class="relative flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer bg-slate-50/50 border-slate-200/80 hover:border-slate-300 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/30 has-[:checked]:shadow-sm">
+              <div class="flex items-center gap-3">
+                <%= f.check_box :teacher, { class: "w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer" } %>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-sm font-semibold text-slate-800">Teacher</span>
+                  
+                  <div class="group relative flex items-center">
+                    <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block whitespace-nowrap px-3 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-xl shadow-xl z-20 pointer-events-none transition-all">
+                      Can create stock order.
+                      <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </label>
+
+            <label class="relative flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer bg-slate-50/50 border-slate-200/80 hover:border-slate-300 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/30 has-[:checked]:shadow-sm">
+              <div class="flex items-center gap-3">
+                <%= f.check_box :admin, { class: "w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer" } %>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-sm font-semibold text-slate-800">Admin</span>
+                  
+                  <div class="group relative flex items-center">
+                    <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block whitespace-nowrap px-3 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-xl shadow-xl z-20 pointer-events-none transition-all">
+                      Full system administration privileges.
+                      <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </label>
+          </div>
         </div>
       <% end %>
 
