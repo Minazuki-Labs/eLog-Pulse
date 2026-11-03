@@ -46,12 +46,22 @@
       </div>
 
       <div class="space-y-4 mb-8">
+        <% if stock_order.company_name.present? && !current_user.manager? %>
+          <div class='py-1'>
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+              Company Name
+            </h4>
+            <p class="text-sm font-bold text-slate-800 pl-6"><%= stock_order.company_name %></p>
+          </div>
+        <% end %>
+
         <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
           Ordered Items (<%= stock_order.stock_order_items.count %>)
         </h4>
         
-        <% is_approver = (stock_order.approver_1_id == current_user.id) || (stock_order.approver_2_id == current_user.id) %>
+        <% can_modify = stock_order.can_modify_items?(current_user) %>
 
         <div class="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/50">
           <table class="min-w-full divide-y divide-slate-100">
@@ -59,7 +69,7 @@
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">Item / Sub-Item</th>
                 <th class="px-6 py-3 text-right text-xs font-black text-slate-500 uppercase tracking-wider">Quantity</th>
-                <% if current_user.admin? || is_approver %>
+                <% if can_modify %>
                   <th class="px-6 py-3 text-right text-xs font-black text-slate-500 uppercase tracking-wider">Action</th>
                 <% end %>
               </tr>
@@ -75,7 +85,7 @@
                   <td class="px-6 py-4 text-sm font-black text-slate-900 text-right tabular-nums">
                     <%= item.quantity %>
                   </td>
-                  <% if current_user.admin? || is_approver %>
+                  <% if can_modify %>
                     <td class="px-6 py-4 text-right text-sm">
                       <%= link_to stock_order_stock_order_item_path(stock_order, item), 
                           data: { turbo_method: :delete, turbo_confirm: "Remove this item from the order?" }, 
@@ -119,100 +129,8 @@
         </div>
       <% end %>
 
-      <% if current_user.admin? || (current_user.manager? && stock_order.pending?) %>
-        <div class="pt-6 border-t border-slate-100" data-controller="approval-cascade">
-          
-          <% is_approver_1 = (stock_order.approver_1_id == current_user.id) %>
-          <% is_approver_2 = (stock_order.approver_2_id == current_user.id) %>
-          <% is_order_manager = (stock_order.manager_id == current_user.id) %>
-
-          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-            <%= is_order_manager && !current_user.admin? ? "Upload Order Proof" : "Manager Approvals & Assignment" %>
-          </h4>
-
-          <%= form_with model: stock_order, class: "bg-slate-50 p-6 rounded-2xl border border-slate-100 space-y-4" do |f| %>
-            <div class="space-y-4">
-              
-              <% if is_order_manager && !current_user.admin? %>
-                <div>
-                  <%= f.label :order_proof, "Order Proof Document", class: "block text-xs font-bold text-slate-700 mb-1" %>
-                  <%= f.file_field :order_proof, 
-                      class: "w-full rounded-xl border border-slate-200 bg-white p-2.5 text-sm text-slate-700 shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-900 file:text-white hover:file:bg-blue-600 file:cursor-pointer" 
-                  %>
-                  <% if stock_order.order_proof.attached? %>
-                    <p class="text-xs text-emerald-600 font-semibold mt-2">✓ Order proof currently attached</p>
-                  <% end %>
-                </div>
-
-              <% else %>
-                <div>
-                  <%= f.label :company_name, "Company Name", class: "block text-xs font-bold text-slate-700 mb-1" %>
-                  <%= f.text_field :company_name, 
-                      class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700 shadow-sm", 
-                      placeholder: "Enter company name..." 
-                  %>
-                </div>
-
-                <% if is_approver_1 %>
-                  <div>
-                    <%= f.label :approver_2_id, "Second Approval Manager", class: "block text-xs font-bold text-slate-700 mb-1" %>
-                    <%= f.collection_select :approver_2_id, 
-                        User.where(manager: true).where.not(id: [stock_order.user_id, stock_order.approver_1_id].compact), 
-                        :id, 
-                        :name, 
-                        { include_blank: "Select Second Approver..." }, 
-                        { class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700 shadow-sm" } 
-                    %>
-                  </div>
-
-                <% elsif is_approver_2 %>
-                  <div>
-                    <%= f.label :manager_id, "Order Manager (Assigned for Purchase)", class: "block text-xs font-bold text-slate-700 mb-1" %>
-                    <%= f.collection_select :manager_id, 
-                        User.where(manager: true).where.not(id: stock_order.approver_2_id), 
-                        :id, 
-                        :name, 
-                        { include_blank: "Select Order Manager..." }, 
-                        { class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700 shadow-sm" } 
-                    %>
-                  </div>
-
-                <% elsif current_user.admin? %>
-                  <% if stock_order.approver_2_id.blank? %>
-                    <div>
-                      <%= f.label :approver_2_id, "Second Approval Manager", class: "block text-xs font-bold text-slate-700 mb-1" %>
-                      <%= f.collection_select :approver_2_id, 
-                          User.where(manager: true).where.not(id: [stock_order.user_id, stock_order.approver_1_id].compact), 
-                          :id, 
-                          :name, 
-                          { include_blank: "Select Second Approver..." }, 
-                          { class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700 shadow-sm" } 
-                      %>
-                    </div>
-                  <% else %>
-                    <div>
-                      <%= f.label :manager_id, "Order Manager (Assigned for Purchase)", class: "block text-xs font-bold text-slate-700 mb-1" %>
-                      <%= f.collection_select :manager_id, 
-                          User.where(manager: true).where.not(id: stock_order.approver_2_id), 
-                          :id, 
-                          :name, 
-                          { include_blank: "Select Order Manager..." }, 
-                          { class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700 shadow-sm" } 
-                      %>
-                    </div>
-                  <% end %>
-                <% end %>
-              <% end %>
-            </div>
-
-            <div class="flex justify-end pt-2">
-              <%= f.submit is_order_manager && !current_user.admin? ? "Upload Proof" : "Save Management Details", 
-                  class: "bg-slate-900 hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md cursor-pointer" 
-              %>
-            </div>
-          <% end %>
-        </div>
+      <% if current_user.manager? && stock_order.pending? %>
+        <%= render "stock_orders/manager_form", stock_order: stock_order %>
       <% end %>
 
       <% if stock_order.in_delivery? && current_user == stock_order.user %>

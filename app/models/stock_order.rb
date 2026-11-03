@@ -37,6 +37,21 @@ class StockOrder < ApplicationRecord
     end
   }
 
+  def active_manager_id
+    manager_id.presence || approver_2_id.presence || approver_1_id
+  end
+
+  def can_modify_items?(user)
+    return true if user.admin?
+    return false if manager_id.present?
+
+    if approver_2_id.present?
+      approver_2_id == user.id
+    else
+      approver_1_id == user.id
+    end
+  end
+
   private
 
   def prevent_self_approval_or_duplicate
