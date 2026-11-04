@@ -29,14 +29,24 @@ class StockOrder < ApplicationRecord
 
   before_save :auto_set_in_delivery_status
 
+  after_create :send_creation_and_first_approval_emails
+  after_update :check_status_and_assignment_changes
+
   scope :accessible_by, ->(user) {
-    if user.admin?
+    if user.contractor? || user.manager?
+      where(
+        "stock_orders.user_id = ? OR " \
+        "(stock_orders.status = ? AND (" \
+          "stock_orders.contractor_id = ? OR " \
+          "(stock_orders.approver_1_id = ? AND stock_orders.approver_2_id IS NULL AND stock_orders.contractor_id IS NULL) OR " \
+          "(stock_orders.approver_2_id = ? AND stock_orders.contractor_id IS NULL)" \
+        "))",
+        user.id, StockOrder.statuses[:pending], user.id, user.id, user.id
+      )
+    elsif user.admin?
       all
     else
       where(user_id: user.id)
-        .or(where(contractor_id: user.id))
-        .or(where(approver_1_id: user.id))
-        .or(where(approver_2_id: user.id))
     end
   }
 
@@ -72,6 +82,32 @@ class StockOrder < ApplicationRecord
   def auto_set_in_delivery_status
     if order_proof.attached? && pending?
       self.status = :in_delivery
+    end
+  end
+
+  def send_creation_and_first_approval_emails
+    StockOrderMailer.order_created(self).deliver_later
+
+    if approver_1.present?
+      StockOrderMailer.approval_required(self, approver_1).deliver_later
+    end
+  end
+
+  def check_status_and_assignment_changes
+    if saved_change_to_approver_2_id? && approver_2.present?
+      StockOrderMailer.approval_required(self, approver_2).deliver_later
+    end
+
+    if saved_change_to_contractor_id? && contractor.present? && pending?
+      StockOrderMailer.approval_required(self, contractor).deliver_later
+    end
+
+    if saved_change_to_status? && in_delivery?
+      StockOrderMailer.order_in_delivery(self).deliver_later
+    end
+
+    if saved_change_to_status? && completed? && contractor.present?
+      StockOrderMailer.order_completed(self).deliver_later
     end
   end
 end

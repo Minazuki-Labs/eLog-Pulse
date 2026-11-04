@@ -31,6 +31,15 @@
             class: "block w-full px-4 py-3.5 border-2 #{ user.errors[:username].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700" %>
       </div>
 
+      <% unless user.school? %>
+        <div>
+          <%= f.label :email, "Email Address (Optional)", class: "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1" %>
+          <%= f.email_field :email, 
+              placeholder: "employee@example.com",
+              class: "block w-full px-4 py-3.5 border-2 #{ user.errors[:email].any? ? 'border-red-500 bg-red-50/50' : 'border-slate-100 bg-slate-50' } rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-700" %>
+        </div>
+      <% end %>
+
       <!-- User Type Selection Field  -->
       <% unless user.school? %>
         <div class="space-y-3">

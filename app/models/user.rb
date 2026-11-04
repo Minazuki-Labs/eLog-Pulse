@@ -37,6 +37,8 @@ class User < ApplicationRecord
   validates :username, presence: true, uniqueness: true
   validates :state, presence: true, if: :school?
   validates :school_emails, length: { in: 1..3 }, if: :school?
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
+  validate :email_must_be_nil_for_school
 
   scope :staff, -> { where(role: [ :employee, :contractor ]) }
 
@@ -52,6 +54,12 @@ class User < ApplicationRecord
       (parts[0][0] + parts[1][0]).upcase
     else
       display_name[0..1].upcase
+    end
+  end
+
+  def email_must_be_nil_for_school
+    if school? && email.present?
+      errors.add(:email, "cannot be assigned directly to a school user")
     end
   end
 end
