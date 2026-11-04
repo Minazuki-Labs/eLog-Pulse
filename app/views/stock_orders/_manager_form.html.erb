@@ -2,11 +2,11 @@
   
   <% is_approver_1 = (stock_order.approver_1_id == current_user.id) %>
   <% is_approver_2 = (stock_order.approver_2_id == current_user.id) %>
-  <% is_order_manager = (stock_order.manager_id == current_user.id) %>
+  <% is_order_contractor = (stock_order.contractor_id == current_user.id) %>
 
   <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-    <%= is_order_manager && !current_user.admin? ? "Upload Order Proof" : "Manager Approvals & Assignment" %>
+    <%= is_order_contractor && !current_user.admin? ? "Upload Order Proof" : "Manager Approvals & Assignment" %>
   </h4>
 
   <%= form_with model: stock_order, data: { turbo_frame: "_top" }, class: "bg-slate-50 p-6 rounded-2xl border border-slate-100 space-y-4" do |f| %>
@@ -24,7 +24,7 @@
 
     <div class="space-y-4">
       
-      <% if is_order_manager && !current_user.admin? %>
+      <% if is_order_contractor && !current_user.admin? %>
         <div>
           <%= f.label :order_proof, "Order Proof Document", class: "block text-xs font-bold text-slate-700 mb-1" %>
           <%= f.file_field :order_proof, 
@@ -67,19 +67,19 @@
 
         <% elsif is_approver_2 %>
           <div>
-            <%= f.label :manager_id, "Order Manager (Assigned for Purchase)", class: "block text-xs font-bold text-slate-700 mb-1" %>
-            <%= f.collection_select :manager_id, 
-                User.where(manager: true).where.not(id: stock_order.approver_2_id), 
+            <%= f.label :contractor_id, "Order Contractor (Assigned for Purchase)", class: "block text-xs font-bold text-slate-700 mb-1" %>
+            <%= f.collection_select :contractor_id, 
+                User.where(role: :contractor).where.not(id: stock_order.approver_2_id), 
                 :id, 
                 :name, 
-                { include_blank: "Select Order Manager..." }, 
+                { include_blank: "Select Order Contractor..." }, 
                 { 
                   class: "w-full rounded-xl border-none bg-white p-3 text-sm text-slate-700 shadow-sm disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed",
-                  disabled: stock_order.manager_id.present? && stock_order.errors.none?
+                  disabled: stock_order.contractor_id.present? && stock_order.errors.none?
                 } 
             %>
-            <% if stock_order.manager_id.present? && stock_order.errors.none? %>
-              <%= f.hidden_field :manager_id %>
+            <% if stock_order.contractor_id.present? && stock_order.errors.none? %>
+              <%= f.hidden_field :contractor_id %>
             <% end %>
           </div>
         <% end %>
@@ -87,7 +87,7 @@
     </div>
 
     <div class="flex justify-end pt-2">
-      <%= f.submit is_order_manager && !current_user.admin? ? "Upload Proof" : "Save Management Details", 
+      <%= f.submit is_order_contractor && !current_user.admin? ? "Upload Proof" : "Save Management Details", 
           class: "bg-slate-900 hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md cursor-pointer" 
       %>
     </div>

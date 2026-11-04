@@ -130,6 +130,7 @@ class StockOrdersController < ApplicationController
 
     @stock_items = StockItem.includes(:stock_sub_items).all
     @managers = User.where(manager: true)
+    @contractors = User.where(role: :contractor)
     @companies = Company.order(:name)
   end
 
@@ -142,7 +143,7 @@ class StockOrdersController < ApplicationController
       :teacher_email,
       :approver_1_id,
       :approver_2_id,
-      :manager_id,
+      :contractor_id,
       :order_proof,
       :status,
       stock_order_items_attributes: [ :id, :stock_sub_item_id, :quantity, :_destroy ]

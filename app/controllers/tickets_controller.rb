@@ -264,7 +264,12 @@ class TicketsController < ApplicationController
       @schools = [ @school ]
       @locations = @school.locations
     else
-      @schools = User.where(role: :school)
+      @schools = if current_user.employee? || (current_user.admin? && current_user.assigned_schools.any?)
+        current_user.assigned_schools
+      else
+        User.where(role: :school)
+      end
+
       school_id = params.dig(:ticket, :school_id) || @ticket.school_id
       @locations = school_id.present? ? Location.where(school_id: school_id) : []
     end

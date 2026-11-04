@@ -52,7 +52,7 @@ Rails.application.routes.draw do
       get :pending
       get :completed
     end
-    resources :stock_order_items, only: [ :destroy ]
+    resources :stock_order_items, only: [ :update, :destroy ]
   end
 
   resources :stock_items do
