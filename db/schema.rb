@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_03_114221) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_04_042255) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -99,24 +99,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_114221) do
     t.string "name"
     t.datetime "updated_at", null: false
     t.index ["equipment_category_id"], name: "index_issue_types_on_equipment_category_id"
-  end
-
-  create_table "location_template_items", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.bigint "equipment_category_id", null: false
-    t.bigint "location_template_id", null: false
-    t.datetime "updated_at", null: false
-    t.index ["equipment_category_id"], name: "index_location_template_items_on_equipment_category_id"
-    t.index ["location_template_id"], name: "index_location_template_items_on_location_template_id"
-  end
-
-  create_table "location_templates", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.bigint "created_by_id", null: false
-    t.text "description"
-    t.string "name"
-    t.datetime "updated_at", null: false
-    t.index ["created_by_id"], name: "index_location_templates_on_created_by_id"
   end
 
   create_table "locations", force: :cascade do |t|
@@ -226,9 +208,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_114221) do
   add_foreign_key "equipment", "equipment_categories"
   add_foreign_key "equipment", "locations"
   add_foreign_key "issue_types", "equipment_categories"
-  add_foreign_key "location_template_items", "equipment_categories"
-  add_foreign_key "location_template_items", "location_templates"
-  add_foreign_key "location_templates", "users", column: "created_by_id"
   add_foreign_key "locations", "users", column: "school_id"
   add_foreign_key "school_emails", "users", column: "school_id"
   add_foreign_key "stock_order_items", "stock_orders"

@@ -124,9 +124,22 @@ class UsersController < ApplicationController
 
   def update_assignment
     @employee = @user
-    school_ids = params[:school_ids] || []
+    submitted_school_ids = params[:school_ids] || []
 
-    @employee.assigned_school_ids = school_ids
+    filtered_schools_scope = User.school
+    if params[:query].present?
+      query = "%#{params[:query].strip}%"
+      filtered_schools_scope = filtered_schools_scope.where("name ILIKE :q OR username ILIKE :q", q: query)
+    end
+    if params[:state].present?
+      filtered_schools_scope = filtered_schools_scope.where(state: params[:state])
+    end
+    filtered_school_ids = filtered_schools_scope.pluck(:id)
+
+    existing_unfiltered_ids = @employee.assigned_school_ids
+    preserved_ids = existing_unfiltered_ids - filtered_school_ids
+
+    @employee.assigned_school_ids = preserved_ids + submitted_school_ids
 
     redirect_to user_path(@employee), notice: "School assignments successfully updated."
   end

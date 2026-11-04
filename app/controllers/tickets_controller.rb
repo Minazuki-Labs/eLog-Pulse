@@ -91,9 +91,9 @@ class TicketsController < ApplicationController
     end
 
     if current_user.school?
-      @tickets = scoped_tickets.includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(created_at: :desc)
+      @tickets = scoped_tickets.includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(updated_at: :desc)
     elsif @scope == "completed"
-      @tickets = scoped_tickets.where(status: :completed).includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(created_at: :desc)
+      @tickets = scoped_tickets.where(status: :completed).includes(:location, { equipment: :equipment_category }, :issue_type, :school).order(updated_at: :desc)
     else
       current_scoped_tickets = case @scope
       when "open"
@@ -116,7 +116,7 @@ class TicketsController < ApplicationController
         state_schools = allowed_schools.where(state: state_key)
 
         active_schools = state_schools.map do |school|
-          school_tickets = current_scoped_tickets.where(school_id: school.id).includes(:location, { equipment: :equipment_category }, :issue_type).order(created_at: :desc)
+          school_tickets = current_scoped_tickets.where(school_id: school.id).includes(:location, { equipment: :equipment_category }, :issue_type).order(updated_at: :desc)
           { school: school, tickets: school_tickets } if school_tickets.any?
         end.compact
 

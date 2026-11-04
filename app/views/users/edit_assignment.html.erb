@@ -72,6 +72,13 @@
     <!-- Toggle List Form -->
     <%= form_with url: update_assignment_user_path(@employee), method: :patch, local: true, html: { data: { controller: "select-all" } } do %>
       
+      <% visible_school_ids = @schools.map(&:id) %>
+      <% @employee.assigned_school_ids.each do |assigned_id| %>
+        <% unless visible_school_ids.include?(assigned_id) %>
+          <%= hidden_field_tag "school_ids[]", assigned_id %>
+        <% end %>
+      <% end %>
+
       <!-- Select All Bar -->
       <% if @schools.any? %>
         <div class="flex items-center justify-between px-5 py-3 mb-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
