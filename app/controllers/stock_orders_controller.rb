@@ -3,6 +3,7 @@ class StockOrdersController < ApplicationController
   before_action :set_stock_order, only: [ :show, :edit, :update, :destroy ]
 
   def index
+    @source = "index"
     @stock_orders = StockOrder.accessible_by(current_user)
                               .where(user_id: current_user.id)
                               .where.not(status: [ :rejected, :completed ])
@@ -11,6 +12,7 @@ class StockOrdersController < ApplicationController
   end
 
   def pending
+    @source = "pending"
     @stock_orders = StockOrder.accessible_by(current_user)
                               .where(status: :pending)
                               .where(
@@ -22,14 +24,30 @@ class StockOrdersController < ApplicationController
   end
 
   def completed
+    @source = "completed"
     @stock_orders = StockOrder.accessible_by(current_user)
                               .where(status: [ :rejected, :completed ])
                               .includes(:user, :school, :stock_sub_items)
+
+    if params[:start_date].blank? && params[:end_date].blank?
+      @stock_orders = @stock_orders.where("updated_at >= ?", 30.days.ago.beginning_of_day)
+    end
+
     apply_filters_and_group
     render :index
   end
 
   def show
+    @stock_order = StockOrder.accessible_by(current_user).find(params[:id])
+
+    @back_path = case params[:from]
+    when "pending"
+      pending_stock_orders_path
+    when "completed"
+      completed_stock_orders_path
+    else
+      stock_orders_path
+    end
   end
 
   def new
@@ -59,7 +77,7 @@ class StockOrdersController < ApplicationController
   def update
     if @stock_order.update(stock_order_params)
       respond_to do |format|
-        format.html { redirect_to stock_orders_path, notice: "Stock order was successfully updated." }
+        format.html { redirect_to stock_order_path(@stock_order, from: params[:from]), notice: "Stock order was successfully updated." }
         format.json { render json: { status: :ok, message: "Order updated successfully." } }
       end
     else

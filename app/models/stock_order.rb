@@ -38,12 +38,12 @@ class StockOrder < ApplicationRecord
     elsif user.contractor? || user.manager?
       where(
         "stock_orders.user_id = ? OR " \
-        "(stock_orders.status = ? AND (" \
+        "(stock_orders.status IN (?) AND (" \
           "stock_orders.contractor_id = ? OR " \
           "(stock_orders.approver_1_id = ? AND stock_orders.approver_2_id IS NULL AND stock_orders.contractor_id IS NULL) OR " \
           "(stock_orders.approver_2_id = ? AND stock_orders.contractor_id IS NULL)" \
         "))",
-        user.id, StockOrder.statuses[:pending], user.id, user.id, user.id
+        user.id, StockOrder.statuses.values_at(:pending, :rejected), user.id, user.id, user.id
       )
     else
       where(user_id: user.id)

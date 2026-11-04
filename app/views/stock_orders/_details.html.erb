@@ -6,6 +6,8 @@
           <div class="flex items-center">
             <% if current_user.admin? %>
               <%= form_with model: stock_order, class: "inline-block" do |f| %>
+                <%= hidden_field_tag :from, params[:from] %>
+
                 <div class="relative group cursor-pointer">
                   <span class="inline-flex items-center px-4 py-2.5 pr-10 rounded-full text-[11px] font-black uppercase tracking-widest <%= stock_status_color(stock_order.status) %> ring-1 ring-inset ring-black/5 transition-all group-hover:ring-black/20 shadow-sm">
                     <%= stock_order.status.humanize %>
@@ -89,6 +91,8 @@
                     <td class="px-6 py-4 text-sm font-black text-slate-900 text-right tabular-nums">
                       <% if can_modify %>
                         <%= form_with model: [stock_order, item], method: :patch, class: "inline-block" do |f| %>
+                          <%= hidden_field_tag :from, params[:from] %>
+
                           <%= f.number_field :quantity, 
                               min: 1, 
                               class: "w-20 text-right rounded-lg border-slate-200 text-sm font-bold p-1 focus:ring-blue-500 focus:border-blue-500", 
@@ -101,7 +105,7 @@
 
                     <% if can_modify %>
                       <td class="px-6 py-4 text-right text-sm">
-                        <%= link_to stock_order_stock_order_item_path(stock_order, item), 
+                        <%= link_to stock_order_stock_order_item_path(stock_order, item, from: params[:from]), 
                             data: { turbo_method: :delete, turbo_confirm: "Remove this item from the order?" }, 
                             class: "p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all inline-block",
                             title: "Remove Item" do %>

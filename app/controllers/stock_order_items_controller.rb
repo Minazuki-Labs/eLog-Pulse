@@ -26,9 +26,9 @@ class StockOrderItemsController < ApplicationController
 
     if current_user.admin? || current_user.manager?
       @stock_order_item.destroy
-      redirect_to @stock_order, notice: "Item removed from order."
+      redirect_to stock_order_path(@stock_order, from: params[:from]), notice: "Item removed from order."
     else
-      redirect_to @stock_order, alert: "Unauthorized action."
+      redirect_to stock_order_path(@stock_order, from: params[:from]), alert: "Unauthorized action."
     end
   end
 
