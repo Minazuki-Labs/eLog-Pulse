@@ -26,7 +26,7 @@ class User < ApplicationRecord
   has_many :comments
 
   has_many :stock_orders, dependent: :destroy
-  has_many :managed_stock_orders, class_name: "StockOrder", foreign_key: :manager_id, dependent: :nullify
+  has_many :contracted_stock_orders, class_name: "StockOrder", foreign_key: :contractor_id, dependent: :nullify
   has_many :approved_stock_orders_as_first, class_name: "StockOrder", foreign_key: :approver_1_id, dependent: :nullify
   has_many :approved_stock_orders_as_second, class_name: "StockOrder", foreign_key: :approver_2_id, dependent: :nullify
   has_many :school_stock_orders, class_name: "StockOrder", foreign_key: :school_id, dependent: :destroy

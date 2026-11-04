@@ -1,7 +1,7 @@
 class StockOrder < ApplicationRecord
-  belongs_to :user                                        # Person who ordered it
-  belongs_to :school, class_name: "User"                  # School the order is for
-  belongs_to :manager, class_name: "User", optional: true # Manager that ordered it
+  belongs_to :user                                            # Person who ordered it
+  belongs_to :school, class_name: "User"                      # School the order is for
+  belongs_to :contractor, class_name: "User", optional: true  # Contractor assigned to order
   belongs_to :company, optional: true
 
   belongs_to :approver_1, class_name: "User", optional: true
@@ -15,7 +15,7 @@ class StockOrder < ApplicationRecord
 
   enum :status, { pending: 0, rejected: 1, in_delivery: 2, completed: 3 }, validate: true
 
-  validates :company_id, presence: true, unless: -> { pending? && approver_2_id.blank? && manager_id.blank? }
+  validates :company_id, presence: true, unless: -> { pending? && approver_2_id.blank? && contractor_id.blank? }
   validates :school_id, presence: true
   validates :user_id, presence: true
   validates :teacher_phone_number, presence: true
@@ -34,21 +34,21 @@ class StockOrder < ApplicationRecord
       all
     else
       where(user_id: user.id)
-        .or(where(manager_id: user.id))
+        .or(where(contractor_id: user.id))
         .or(where(approver_1_id: user.id))
         .or(where(approver_2_id: user.id))
     end
   }
 
-  def active_manager_id
-    manager_id.presence || approver_2_id.presence || approver_1_id
+  def active_id
+    contractor_id.presence || approver_2_id.presence || approver_1_id
   end
 
   def can_modify_items?(user)
     return true if user.admin?
 
     current_order = errors.any? ? self.class.find(id) : self
-    return false if current_order.manager_id.present?
+    return false if current_order.contractor_id.present?
 
     if current_order.approver_2_id.present?
       current_order.approver_2_id == user.id
@@ -64,8 +64,8 @@ class StockOrder < ApplicationRecord
       errors.add(:approver_2_id, "cannot be the same as the requester or first approver")
     end
 
-    if manager_id.present? && manager_id == approver_2_id
-      errors.add(:manager_id, "cannot be the same as the second approver")
+    if contractor_id.present? && contractor_id == approver_2_id
+      errors.add(:contractor_id, "cannot be the same as the second approver")
     end
   end
 
