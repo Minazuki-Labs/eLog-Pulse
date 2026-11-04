@@ -2,9 +2,8 @@
 
 puts "Cleaning database"
 [
-  Comment, Ticket, Equipment, IssueType, LocationTemplateItem, Location,
-  LocationTemplate, EquipmentCategory, SchoolEmail, EmployeeSchool,
-  StockOrderItem, StockOrder, StockSubItem, StockItem, User, AppConfig
+  Comment, Ticket, Equipment, IssueType, Location, EquipmentCategory, SchoolEmail,
+  EmployeeSchool, StockOrderItem, StockOrder, StockSubItem, StockItem, User, AppConfig
 ].each(&:delete_all)
 
 puts "Creating app configs"
@@ -15,6 +14,7 @@ admin = User.create!(
   name: "Admin",
   username: "admin",
   password: "password123",
+  email: "admin@test.com",
   role: :employee,
   admin: true,
   manager: true
@@ -74,6 +74,7 @@ employee1 = User.create!(
   name: "Employee 1",
   username: "employee1",
   password: "password123",
+  email: "employee1@test.com",
   role: :employee,
   manager: true
 )
@@ -82,6 +83,7 @@ employee2 = User.create!(
   name: "Employee 2",
   username: "employee2",
   password: "password123",
+  email: "employee2@test.com",
   role: :employee,
   teacher: true
 )
@@ -90,6 +92,7 @@ employee3 = User.create!(
   name: "Employee 3",
   username: "employee3",
   password: "password123",
+  email: "employee3@test.com",
   role: :employee,
 )
 
@@ -97,6 +100,7 @@ contractor = User.create!(
   name: "Contractor",
   username: "contractor",
   password: "password123",
+  email: "contractor@test.com",
   role: :contractor
 )
 
@@ -196,42 +200,20 @@ Equipment.create!(location: lab3, equipment_category: cat_records["Projector"])
 
 Equipment.create!(location: office4, equipment_category: cat_records["Computer"])
 
-puts "Creating templates"
-template1 = LocationTemplate.create!(
-  name: "Classroom",
-  creator: admin
-)
-
-template2 = LocationTemplate.create!(
-  name: "Office",
-  description: "Teacher office",
-  creator: employee1
-)
-
-LocationTemplateItem.create!(location_template: template1, equipment_category: cat_records["Projector"])
-LocationTemplateItem.create!(location_template: template1, equipment_category: cat_records["Monitor"])
-LocationTemplateItem.create!(location_template: template1, equipment_category: cat_records["Mouse"])
-LocationTemplateItem.create!(location_template: template1, equipment_category: cat_records["Keyboard"])
-LocationTemplateItem.create!(location_template: template1, equipment_category: cat_records["Computer"])
-
-LocationTemplateItem.create!(location_template: template2, equipment_category: cat_records["Computer"])
-LocationTemplateItem.create!(location_template: template2, equipment_category: cat_records["Mouse"])
-LocationTemplateItem.create!(location_template: template2, equipment_category: cat_records["Keyboard"])
-
 puts "Creating sample stock items and sub-items"
 printer_item = StockItem.create!(name: "Printer", description: "Office and Classroom printers")
 black_ink = StockSubItem.create!(stock_item: printer_item, name: "Black Ink Cartridge", description: "Standard black ink")
 color_ink = StockSubItem.create!(stock_item: printer_item, name: "Color Ink Cartridge", description: "CMYK color ink set")
+
+puts "Creating company"
+Company.create!(name: "Edutech Supplies Sdn Bhd")
 
 puts "Creating sample stock orders"
 
 StockOrder.create!(
   user: employee1,
   school: school1,
-  manager: employee1,
   approver_1: admin,
-  approver_2: employee2,
-  company_name: "Edutech Supplies Sdn Bhd",
   purpose: "Replacement cartridges for lab printer",
   teacher_phone_number: "0123456789",
   teacher_email: "teacher.alice@test.edu",
