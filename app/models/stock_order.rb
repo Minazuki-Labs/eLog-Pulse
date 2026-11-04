@@ -33,13 +33,20 @@ class StockOrder < ApplicationRecord
   after_update :check_status_and_assignment_changes
 
   scope :accessible_by, ->(user) {
-    if user.admin?
+    if user.contractor? || user.manager?
+      where(
+        "stock_orders.user_id = ? OR " \
+        "(stock_orders.status = ? AND (" \
+          "stock_orders.contractor_id = ? OR " \
+          "(stock_orders.approver_1_id = ? AND stock_orders.approver_2_id IS NULL AND stock_orders.contractor_id IS NULL) OR " \
+          "(stock_orders.approver_2_id = ? AND stock_orders.contractor_id IS NULL)" \
+        "))",
+        user.id, StockOrder.statuses[:pending], user.id, user.id, user.id
+      )
+    elsif user.admin?
       all
     else
       where(user_id: user.id)
-        .or(where(contractor_id: user.id))
-        .or(where(approver_1_id: user.id))
-        .or(where(approver_2_id: user.id))
     end
   }
 

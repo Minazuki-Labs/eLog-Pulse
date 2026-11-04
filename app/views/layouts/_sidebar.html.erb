@@ -57,7 +57,9 @@
             <% if current_user.admin? || current_user.manager? || current_user.contractor? %>
               <%= sidebar_link "Pending Orders", pending_stock_orders_path, "clock" %>
             <% end %>
-            <%= sidebar_link "Completed Orders", completed_stock_orders_path, "check-circle" %>
+            <% if current_user.admin? || current_user.teacher? %>
+              <%= sidebar_link "Completed Orders", completed_stock_orders_path, "check-circle" %>
+            <% end %>
           </div>
         </div>
       </div>

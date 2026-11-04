@@ -54,7 +54,7 @@ class StockOrdersController < ApplicationController
   def update
     if @stock_order.update(stock_order_params)
       respond_to do |format|
-        format.html { redirect_to @stock_order, notice: "Stock order was successfully updated." }
+        format.html { redirect_to stock_orders_path, notice: "Stock order was successfully updated." }
         format.json { render json: { status: :ok, message: "Order updated successfully." } }
       end
     else
