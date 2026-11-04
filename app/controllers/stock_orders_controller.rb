@@ -4,6 +4,7 @@ class StockOrdersController < ApplicationController
 
   def index
     @stock_orders = StockOrder.accessible_by(current_user)
+                              .where(user_id: current_user.id)
                               .where.not(status: [ :rejected, :completed ])
                               .includes(:user, :school, :stock_sub_items)
     apply_filters_and_group
@@ -11,7 +12,11 @@ class StockOrdersController < ApplicationController
 
   def pending
     @stock_orders = StockOrder.accessible_by(current_user)
-                              .where(status: [ :pending, :in_delivery ])
+                              .where(status: :pending)
+                              .where(
+                                "stock_orders.contractor_id = ? OR stock_orders.approver_1_id = ? OR stock_orders.approver_2_id = ?",
+                                current_user.id, current_user.id, current_user.id
+                              )
                               .includes(:user, :school, :stock_sub_items)
     apply_filters_and_group
   end
