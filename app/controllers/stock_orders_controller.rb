@@ -1,6 +1,7 @@
 class StockOrdersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_stock_order, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_back_path, only: [ :show, :edit, :update ]
 
   def index
     @stock_orders = StockOrder.accessible_by(current_user)
@@ -25,6 +26,7 @@ class StockOrdersController < ApplicationController
   end
 
   def show
+    @stock_order = StockOrder.accessible_by(current_user).find(params[:id])
   end
 
   def new
@@ -54,7 +56,7 @@ class StockOrdersController < ApplicationController
   def update
     if @stock_order.update(stock_order_params)
       respond_to do |format|
-        format.html { redirect_to stock_orders_path, notice: "Stock order was successfully updated." }
+        format.html { redirect_to @back_path, notice: "Stock order was successfully updated." }
         format.json { render json: { status: :ok, message: "Order updated successfully." } }
       end
     else
@@ -67,7 +69,7 @@ class StockOrdersController < ApplicationController
 
   def destroy
     @stock_order.destroy
-    redirect_to stock_orders_path, notice: "Stock order was successfully deleted."
+    redirect_to session[:stock_order_return_to] || stock_orders_path, notice: "Stock order was successfully deleted."
   end
 
   private
@@ -132,6 +134,21 @@ class StockOrdersController < ApplicationController
     @managers = User.where(manager: true)
     @contractors = User.where(role: :contractor)
     @companies = Company.order(:name)
+  end
+
+  def set_back_path
+    if params[:from].present?
+      session[:stock_order_return_to] = case params[:from]
+      when "pending"
+        pending_stock_orders_path
+      when "completed"
+        completed_stock_orders_path
+      else
+        stock_orders_path
+      end
+    end
+
+    @back_path = session[:stock_order_return_to] || stock_orders_path
   end
 
   def stock_order_params
