@@ -84,7 +84,7 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                           <% filtered_orders.each do |order| %>
-                            <%= render partial: "stock_orders/stock_order_card", locals: { stock_order: order } %>
+                            <%= render partial: "stock_orders/stock_order_card", locals: { stock_order: order, source: @source } %>
                           <% end %>
                         </div>
                       </div>

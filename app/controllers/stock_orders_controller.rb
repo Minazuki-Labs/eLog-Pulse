@@ -4,23 +4,36 @@ class StockOrdersController < ApplicationController
   before_action :set_back_path, only: [ :show, :edit, :update ]
 
   def index
+    @source = "index"
     @stock_orders = StockOrder.accessible_by(current_user)
+                              .where(user_id: current_user.id)
                               .where.not(status: [ :rejected, :completed ])
                               .includes(:user, :school, :stock_sub_items)
     apply_filters_and_group
   end
 
   def pending
+    @source = "pending"
     @stock_orders = StockOrder.accessible_by(current_user)
-                              .where(status: [ :pending, :in_delivery ])
+                              .where(status: :pending)
+                              .where(
+                                "stock_orders.contractor_id = ? OR stock_orders.approver_1_id = ? OR stock_orders.approver_2_id = ?",
+                                current_user.id, current_user.id, current_user.id
+                              )
                               .includes(:user, :school, :stock_sub_items)
     apply_filters_and_group
   end
 
   def completed
+    @source = "completed"
     @stock_orders = StockOrder.accessible_by(current_user)
                               .where(status: [ :rejected, :completed ])
                               .includes(:user, :school, :stock_sub_items)
+
+    if params[:start_date].blank? && params[:end_date].blank?
+      @stock_orders = @stock_orders.where("updated_at >= ?", 30.days.ago.beginning_of_day)
+    end
+
     apply_filters_and_group
     render :index
   end

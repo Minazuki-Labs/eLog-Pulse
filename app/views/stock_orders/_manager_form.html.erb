@@ -10,6 +10,7 @@
   </h4>
 
   <%= form_with model: stock_order, data: { turbo_frame: "_top" }, class: "bg-slate-50 p-6 rounded-2xl border border-slate-100 space-y-4" do |f| %>
+    <%= hidden_field_tag :from, params[:from] %>
 
     <% if stock_order.errors.any? %>
       <div class="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 mb-4">
