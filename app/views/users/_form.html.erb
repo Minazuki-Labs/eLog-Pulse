@@ -1,5 +1,5 @@
 <div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200/40 border border-slate-100">
-  <%= form_with(model: user, url: user_path(user), data: { controller: "role-warning" }, method: :patch, class: "space-y-8") do |f| %>
+  <%= form_with(model: user, url: local_assigns[:url] || user_path(user), data: { controller: "role-warning" }, method: :patch, class: "space-y-8") do |f| %>
 
     <% if user.errors.any? %>
       <div class="bg-red-50 text-red-600 p-4 rounded-2xl mb-6 border border-red-100">
@@ -41,7 +41,7 @@
       <% end %>
 
       <!-- User Type Selection Field  -->
-      <% unless user.school? %>
+      <% if !user.school? && current_user.admin? %>
         <div class="space-y-3">
           <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">
             Staff Roles & Permissions
@@ -202,10 +202,12 @@
       </div>
     </div>
 
-    <div class="flex items-center justify-end gap-3 pt-4">
-      <%= link_to "Cancel", user_path(user), class: "px-5 py-3.5 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-2xl transition-all" %>
-      <%= f.submit button_label, 
-          class: "px-6 py-3.5 bg-blue-600 text-white text-sm font-bold rounded-2xl shadow-md shadow-blue-100 hover:bg-blue-700 transition-all cursor-pointer" %>
-    </div>
+    <% unless local_assigns[:button_label] == false %>
+      <div class="flex items-center justify-end gap-3 pt-4">
+        <%= link_to "Cancel", user_path(user), class: "px-5 py-3.5 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-2xl transition-all" %>
+        <%= f.submit button_label, 
+            class: "px-6 py-3.5 bg-blue-600 text-white text-sm font-bold rounded-2xl shadow-md shadow-blue-100 hover:bg-blue-700 transition-all cursor-pointer" %>
+      </div>
+    <% end %>
   <% end %>
 </div>

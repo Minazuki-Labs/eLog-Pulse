@@ -7,6 +7,8 @@ Rails.application.routes.draw do
     put "account" => "devise/registrations#update", as: "user_registration"
   end
 
+  resource :setting, only: [ :edit, :update ], controller: "settings"
+
   resources :users do
     member do
       get :edit_assignment
