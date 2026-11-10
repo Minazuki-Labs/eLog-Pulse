@@ -36,6 +36,10 @@ class Ticket < ApplicationRecord
     new_case_warning? || in_progress_warning?
   end
 
+  def editable_by_school?
+    completed? && updated_at >= 9.days.ago
+  end
+
   private
 
   def business_days_ago(business_days)
