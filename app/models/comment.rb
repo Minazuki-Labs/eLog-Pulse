@@ -5,7 +5,7 @@ class Comment < ApplicationRecord
   belongs_to :user
 
   validates :body, presence: true, length: { minimum: 1, maximum: 2000 }, unless: -> { system_log? }
-  validates :jobsheet, presence: true, unless: -> { system_log? }
+  validates :jobsheet, presence: true, unless: -> { system_log? || user&.school? }
 
   after_create_commit :send_comment_email, unless: -> { system_log? }
 

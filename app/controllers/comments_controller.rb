@@ -1,15 +1,17 @@
 class CommentsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_ticket
-  before_action :require_staff!
+  before_action :authorize_commenter!
 
   def create
     @ticket.updater = current_user
 
-    if params[:complete_case] == "1"
+    if params[:complete_case] == "1" && current_user.staff?
       @ticket.status = :completed
-    elsif @ticket.new_case?
+    elsif @ticket.new_case? && current_user.staff?
       @ticket.status = :in_progress
+    elsif @ticket.completed? && current_user.school?
+      @ticket.status = :new_case
     end
 
     @comment = @ticket.comments.build(comment_params)
@@ -38,9 +40,17 @@ class CommentsController < ApplicationController
     @ticket = Ticket.find(params[:ticket_id])
   end
 
-  def require_staff!
-    unless current_user.staff?
-      redirect_to @ticket, alert: "You are not authorized to post comments."
+  def authorize_commenter!
+    allowed = if current_user.staff?
+      !@ticket.completed?
+    elsif current_user.school?
+      current_user == @ticket.school && @ticket.editable_by_school?
+    else
+      false
+    end
+
+    unless allowed
+      redirect_to @ticket, alert: "You are not authorized to post comments on this ticket."
     end
   end
 
