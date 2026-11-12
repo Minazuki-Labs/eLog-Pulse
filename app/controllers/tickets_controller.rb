@@ -140,6 +140,12 @@ class TicketsController < ApplicationController
           disposition: "attachment"
         )
       end
+      format.csv do
+        csv_tickets = scoped_tickets.where(status: :completed)
+        send_data Ticket.to_csv(csv_tickets),
+                  filename: "tickets_report_#{Date.today}.csv",
+                  type: "text/csv; charset=utf-8"
+      end
     end
   end
 
