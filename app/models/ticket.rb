@@ -40,6 +40,34 @@ class Ticket < ApplicationRecord
     completed? && updated_at >= 9.days.ago
   end
 
+  def self.to_csv(tickets)
+    headers = [ "School", "Location", "Equipment", "Issue Type", "Description", "Created At", "Resolved At", "Assignee", "Last Comment", "Commented By", "Commented At" ]
+
+    CSV.generate(headers: true) do |csv|
+      csv << headers
+
+      tickets.includes(:school, :location, :issue_type, :assignee, equipment: :equipment_category, comments: :user).each do |ticket|
+        last_comment = ticket.comments
+                             .select(&:user_note?)
+                             .max_by(&:created_at)
+
+        csv << [
+          ticket.school&.name,
+          ticket.location&.name,
+          ticket.equipment&.display_name || "Equipment ##{ticket.equipment_id}",
+          ticket.issue_type&.name,
+          ticket.description,
+          ticket.created_at&.strftime("%Y-%m-%d %H:%M"),
+          ticket.resolved_at&.strftime("%Y-%m-%d %H:%M"),
+          ticket.assignee&.name || "Unassigned",
+          last_comment&.body,
+          last_comment&.user&.name,
+          last_comment&.created_at&.strftime("%Y-%m-%d %H:%M")
+        ]
+      end
+    end
+  end
+
   private
 
   def business_days_ago(business_days)

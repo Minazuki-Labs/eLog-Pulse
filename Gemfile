@@ -49,6 +49,9 @@ gem "heroicon"
 # PDF generation
 gem "grover"
 
+# CSV generation
+gem "csv"
+
 group :development, :test do
   # .env file support
   gem "dotenv-rails", require: "dotenv/load"
