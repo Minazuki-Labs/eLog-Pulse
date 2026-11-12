@@ -24,6 +24,8 @@ class Ticket < ApplicationRecord
 
   after_create :send_new_ticket_notification
 
+  before_save :set_resolved_at, if: -> { status_changed? }
+
   def new_case_warning?
     new_case? && created_at <= business_days_ago(3)
   end
@@ -146,5 +148,13 @@ class Ticket < ApplicationRecord
 
   def send_new_ticket_notification
     TicketMailer.new_ticket(self).deliver_later
+  end
+
+  def set_resolved_at
+    if completed?
+      self.resolved_at ||= Time.current
+    else
+      self.resolved_at = nil
+    end
   end
 end
