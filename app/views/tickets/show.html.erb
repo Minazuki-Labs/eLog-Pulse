@@ -37,7 +37,7 @@
       </div>
     </div>
 
-        <% if (current_user.staff? && !@ticket.completed?) || (current_user.school? && @ticket.completed? && @ticket.editable_by_school?) %>
+    <% if (current_user.staff? && !@ticket.completed?) || (current_user.school? && @ticket.completed? && @ticket.editable_by_school?) %>
       <div class="bg-white rounded-[2rem] p-4 shadow-xl shadow-slate-200/40 border border-slate-100">
         <%= form_with(model: [ @ticket, @comment || Comment.new ], class: "space-y-3 relative") do |f| %>
           <% if @comment && @comment.errors.any? %>
@@ -80,9 +80,28 @@
           <div class="relative">
             <%= f.text_area :body, 
                 placeholder: @ticket.completed? ? "Type a response to reopen this ticket..." : "Type a note or status update...", 
-                class: "w-full rounded-[1.4rem] border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-6 pb-16 text-slate-700 placeholder:text-slate-400 min-h-[120px] resize-none" 
+                class: "w-full rounded-[1.4rem] border-none bg-slate-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all p-6 pb-20 text-slate-700 placeholder:text-slate-400 min-h-[120px] resize-none" 
             %>
-            <div class="absolute bottom-4 right-4">
+            
+            <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <%= f.file_field :attachment, 
+                    id: "comment_attachment_input",
+                    class: "text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer",
+                    onchange: "document.getElementById('remove_attachment_btn').classList.toggle('hidden', this.files.length === 0)" 
+                %>
+
+                <button type="button" 
+                        id="remove_attachment_btn"
+                        onclick="const input = document.getElementById('comment_attachment_input'); input.value = ''; this.classList.add('hidden');"
+                        class="hidden text-xs font-bold text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                  <span>Remove</span>
+                </button>
+              </div>
+
               <%= f.submit "Post Comment", 
                   class: "bg-slate-900 hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all transform active:scale-95 flex items-center gap-2 shadow-lg shadow-blue-500/20" 
               %>
