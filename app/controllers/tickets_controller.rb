@@ -291,6 +291,6 @@ class TicketsController < ApplicationController
   end
 
   def store_last_index_path
-    session[:last_tickets_path] = request.fullpath
+    session[:last_tickets_path] = request.fullpath if request.format.html?
   end
 end
