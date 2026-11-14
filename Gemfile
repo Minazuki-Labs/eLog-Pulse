@@ -71,7 +71,7 @@ group :development, :test do
   # Mailer preview in browser
   gem "letter_opener_web"
 
-  gem "rspec-rails", "~> 8.0"
+  gem "rspec-rails", "~> 8.1"
 end
 
 group :development do
