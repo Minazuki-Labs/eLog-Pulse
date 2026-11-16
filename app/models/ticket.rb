@@ -43,7 +43,11 @@ class Ticket < ApplicationRecord
   end
 
   def self.to_csv(tickets)
-    headers = [ "Ticket ID", "School", "Location", "Equipment", "Issue Type", "Description", "Created At", "Resolved At", "Assignee", "Last Comment", "Commented By", "Commented At" ]
+    headers = [
+      "Ticket ID", "School", "Location", "Equipment", "Issue Type",
+      "Description", "Created At", "Resolved At", "Assignee",
+      "Last Comment", "Jobsheet", "Commented By", "Commented At"
+    ]
 
     CSV.generate(headers: true) do |csv|
       csv << headers
@@ -64,6 +68,7 @@ class Ticket < ApplicationRecord
           ticket.resolved_at&.strftime("%Y-%m-%d"),
           ticket.assignee&.name || "Unassigned",
           last_comment&.body,
+          last_comment&.jobsheet,
           last_comment&.user&.name,
           last_comment&.created_at&.strftime("%Y-%m-%d")
         ]
