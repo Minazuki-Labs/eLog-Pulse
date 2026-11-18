@@ -42,20 +42,8 @@ bin/dev
 
 ```
 
-## 🔐 Environment Variables
-For **Production** environments, the following variables must be set for the database to connect successfully:
-
-| Variable                        | Description                                                         |
-|---------------------------------|---------------------------------------------------------------------|
-| `E_LOG_PULSE_DATABASE_PASSWORD` | The password for the `e_log_pulse` PostgreSQL role.                 |
-| `RAILS_MAX_THREADS`             | *(Optional)* Controls the database connection pool (Defaults to 5). |
-
-## 🧪 Testing
-We use RSpec to ensure eLog-Pulse stays stable.
-
-```Bash
-bundle exec rspec
-```
+## 🔐 Deployment
+For details regrading deployment of the website into your own server, you may follow the step in the following [guide](https://github.com/Minazuki-Labs/eLog-Pulse/wiki).
 
 ## 🤝 Contributing
 1. Fork the Project.
