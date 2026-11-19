@@ -1,68 +1,68 @@
-<div class="relative flex gap-6">
+<div class="relative flex gap-3 sm:gap-6">
   <div class="relative z-10 flex-shrink-0">
     <% if comment.system_log? %>
-      <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 ring-4 ring-white border border-slate-200">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 ring-4 ring-white border border-slate-200">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       </div>
     <% else %>
-      <div class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white ring-4 ring-white">
-        <span class="text-xs font-bold">
+      <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-900 flex items-center justify-center text-white ring-4 ring-white">
+        <span class="text-[11px] sm:text-xs font-bold">
           <%= comment.user.initials %>
         </span>
       </div>
     <% end %>
   </div>
-  
-  <div class="flex-1">
-    <div class="flex items-center justify-between mb-2">
-      <div class="flex items-center gap-2 flex-wrap">
-        <span class="font-bold text-slate-900"><%= comment.user.name %></span>
+
+  <div class="flex-1 min-w-0">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 mb-2">
+      <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap min-w-0">
+        <span class="text-sm sm:text-base font-bold text-slate-900 break-words"><%= comment.user.name %></span>
         <span class="text-slate-300">•</span>
         <span class="text-xs font-medium text-slate-500">
           <%= time_ago_in_words(comment.created_at) %> ago
         </span>
         <% if comment.jobsheet.present? && !comment.system_log? %>
           <span class="text-slate-300">•</span>
-          <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+          <span class="text-[11px] sm:text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md break-all">
             Jobsheet: <%= comment.jobsheet %>
           </span>
         <% end %>
       </div>
       
-      <time class="text-[10px] font-mono font-medium text-slate-400 bg-slate-100/50 px-2 py-0.5 rounded">
+      <time class="text-[10px] font-mono font-medium text-slate-400 bg-slate-100/50 px-2 py-0.5 rounded self-start sm:self-auto shrink-0">
         <%= comment.created_at.strftime("%b %d, %Y • %H:%M") %>
       </time>
     </div>
 
     <% if comment.system_log? %>
-      <div class="pl-1">
-        <p class="text-sm text-slate-500 mb-2">updated the ticket parameters:</p>
+      <div class="pl-0.5 sm:pl-1">
+        <p class="text-xs sm:text-sm text-slate-500 mb-2">updated the ticket parameters:</p>
         <% if comment.tracked_changes.is_a?(Hash) && comment.tracked_changes["points"].present? %>
           <ul class="space-y-1.5 border-l-2 border-slate-200 pl-4 py-0.5">
             <% comment.tracked_changes["points"].each do |point| %>
-              <li class="text-sm text-slate-700 list-none relative before:content-[''] before:absolute before:-left-[21px] before:top-[7px] before:w-2 before:h-2 before:rounded-full before:bg-slate-300">
+              <li class="text-xs sm:text-sm text-slate-700 list-none relative before:content-[''] before:absolute before:-left-[21px] before:top-[7px] before:w-2 before:h-2 before:rounded-full before:bg-slate-300 break-words">
                 <%= point.html_safe %>
               </li>
             <% end %>
-          <% end %>
-        </ul>
+          </ul>
+        <% end %>
       </div>
     <% else %>
-      <div class="bg-slate-50 border border-slate-200/60 p-5 rounded-2xl rounded-tl-none shadow-sm space-y-2">
-        <div class="prose prose-sm text-slate-700 leading-relaxed max-w-none">
+      <div class="bg-slate-50 border border-slate-200/60 p-3.5 sm:p-5 rounded-2xl rounded-tl-none shadow-sm space-y-2.5">
+        <div class="prose prose-sm text-slate-700 leading-relaxed max-w-none break-words">
           <%= simple_format comment.body %>
         </div>
 
         <% if comment.attachment.attached? %>
-          <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between gap-3">
+          <div class="pt-2.5 border-t border-slate-200/60 flex flex-wrap items-center justify-between gap-2.5">
             <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500 min-w-0">
               <svg class="w-4 h-4 flex-shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
               </svg>
-              <span class="truncate max-w-[200px] sm:max-w-xs">
+              <span class="truncate max-w-[180px] sm:max-w-xs">
                 <%= comment.attachment.filename %>
               </span>
             </div>

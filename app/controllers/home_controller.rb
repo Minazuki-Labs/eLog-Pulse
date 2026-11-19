@@ -23,8 +23,10 @@ class HomeController < ApplicationController
         User.school
       end
 
-      @states_data = User.states.keys.map do |state_key|
-        state_schools = allowed_schools.where(state: state_key)
+      sorted_states = User.states.keys.sort_by { |state_key| state_key.titleize.downcase }
+
+      @states_data = sorted_states.map do |state_key|
+        state_schools = allowed_schools.where(state: state_key).order(Arel.sql("LOWER(users.name) ASC"))
 
         active_schools = state_schools.map do |school|
           school_tickets = base_tickets.where(school_id: school.id).includes(:location, { equipment: :equipment_category }, :issue_type).order(created_at: :desc)

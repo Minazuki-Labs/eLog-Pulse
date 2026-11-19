@@ -4,9 +4,10 @@ class StockItemsController < ApplicationController
   before_action :set_stock_item, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @stock_items = StockItem.includes(:stock_sub_items).all
+    @stock_items = StockItem.includes(:stock_sub_items).order(Arel.sql("LOWER(name) ASC"))
     if params[:query].present?
-      @stock_items = @stock_items.where("name LIKE ? OR description LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%")
+      q = "%#{params[:query].strip}%"
+      @stock_items = @stock_items.where("name ILIKE :q OR description LIKE :q", q: q)
     end
   end
 

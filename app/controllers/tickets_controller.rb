@@ -112,8 +112,10 @@ class TicketsController < ApplicationController
 
       allowed_schools = allowed_schools.where(id: params[:school_id]) if params[:school_id].present?
 
-      @states_data = User.states.keys.map do |state_key|
-        state_schools = allowed_schools.where(state: state_key)
+      sorted_states = User.states.keys.sort_by { |state_key| state_key.titleize.downcase }
+
+      @states_data = sorted_states.map do |state_key|
+        state_schools = allowed_schools.where(state: state_key).order(Arel.sql("LOWER(users.name) ASC"))
 
         active_schools = state_schools.map do |school|
           school_tickets = current_scoped_tickets.where(school_id: school.id).includes(:location, { equipment: :equipment_category }, :issue_type).order(updated_at: :desc)
@@ -124,18 +126,32 @@ class TicketsController < ApplicationController
       end.compact
     end
 
+    if @scope == "incomplete"
+      scoped_tickets = scoped_tickets.not_completed
+    end
+
+    @institution = params[:school_id].present? ? User.find_by(id: params[:school_id]) : nil
+
     respond_to do |format|
       format.html
       format.pdf do
+        is_incomplete = (@scope == "incomplete")
+        pdf_tickets = is_incomplete ? scoped_tickets.not_completed : scoped_tickets.where(status: :completed)
+        @tickets = pdf_tickets.includes(:location, :issue_type, :assignee, equipment: :equipment_category, comments: :user).order(created_at: :desc)
+
+        template_name = is_incomplete ? "tickets/incomplete_report_pdf" : "tickets/completed_report_pdf"
+        school_slug = @institution ? "#{@institution.name.to_s.parameterize}_" : ""
+        report_prefix = is_incomplete ? "#{school_slug}incomplete_tickets_report" : "completed_tickets_report"
+
         html_content = render_to_string(
-          template: "tickets/completed_report_pdf",
+          template: template_name,
           layout: false,
           formats: [ :html ]
         ).force_encoding("UTF-8")
 
         send_data(
           Grover.new(html_content).to_pdf,
-          filename: "completed_tickets_report_#{Date.today}.pdf",
+          filename: "#{report_prefix}_#{Date.today}.pdf",
           type: "application/pdf",
           disposition: "attachment"
         )
@@ -223,14 +239,15 @@ class TicketsController < ApplicationController
   end
 
   def locations
-    @locations = Location.where(school_id: params[:school_id])
+    @locations = Location.where(school_id: params[:school_id]).order(Arel.sql("LOWER(name) ASC"))
     render json: @locations.select(:id, :name)
   end
 
   def equipment
-    @equipment = Equipment.where(location_id: params[:location_id])
+    @equipment = Equipment.where(location_id: params[:location_id]).includes(:equipment_category)
+    sorted_equipment = @equipment.sort_by { |e| (e.display_name || "Equipment #{e.id}").to_s.downcase }
 
-    render json: @equipment.map { |e|
+    render json: sorted_equipment.map { |e|
       { id: e.id, name: e.display_name || "Equipment #{e.id}" }
     }
   end
@@ -240,7 +257,7 @@ class TicketsController < ApplicationController
 
     if equipment
       @issue_types = IssueType.where(equipment_category_id: equipment.equipment_category_id)
-                              .order(Arel.sql("CASE WHEN name = 'Other' THEN 1 ELSE 0 END, name ASC"))
+                              .order(Arel.sql("CASE WHEN LOWER(name) = 'other' THEN 1 ELSE 0 END, LOWER(name) ASC"))
       render json: @issue_types.select(:id, :name)
     else
       render json: []
@@ -248,13 +265,15 @@ class TicketsController < ApplicationController
   end
 
   def schools_by_state
-    allowed_schools = if (current_user.employee?) || (current_user.admin? && current_user.assigned_schools.any?)
+    use_assigned = current_user.admin? ? current_user.assigned_schools.any? : current_user.employee?
+    allowed_schools = if use_assigned
       current_user.assigned_schools
     else
       User.school
     end
 
     schools = params[:state].present? ? allowed_schools.where(state: params[:state]) : allowed_schools
+    schools = schools.order(Arel.sql("LOWER(users.name) ASC")) if schools.respond_to?(:order)
     render json: schools.select(:id, :name)
   end
 
@@ -268,23 +287,32 @@ class TicketsController < ApplicationController
     if current_user.school?
       @school = current_user
       @schools = [ @school ]
-      @locations = @school.locations
+      @locations = @school.locations.order(Arel.sql("LOWER(name) ASC"))
     else
-      @schools = if current_user.employee? || (current_user.admin? && current_user.assigned_schools.any?)
+      use_assigned = current_user.admin? ? current_user.assigned_schools.any? : current_user.employee?
+
+      @schools = if use_assigned
         current_user.assigned_schools
       else
-        User.where(role: :school)
+        User.school
       end
+      @schools = @schools.order(Arel.sql("LOWER(users.name) ASC")) if @schools.respond_to?(:order)
 
       school_id = params.dig(:ticket, :school_id) || @ticket.school_id
-      @locations = school_id.present? ? Location.where(school_id: school_id) : []
+      @locations = school_id.present? ? Location.where(school_id: school_id).order(Arel.sql("LOWER(name) ASC")) : []
     end
 
-    @equipment = @ticket.location_id ? Equipment.where(location_id: @ticket.location_id) : []
+    @equipment = if @ticket.location_id
+      Equipment.where(location_id: @ticket.location_id)
+               .includes(:equipment_category)
+               .sort_by { |e| (e.display_name || "Equipment #{e.id}").to_s.downcase }
+    else
+      []
+    end
 
     @issue_types = if @ticket.equipment&.equipment_category_id
       IssueType.where(equipment_category_id: @ticket.equipment.equipment_category_id)
-               .order(Arel.sql("CASE WHEN name = 'Other' THEN 1 ELSE 0 END, name ASC"))
+               .order(Arel.sql("CASE WHEN LOWER(name) = 'other' THEN 1 ELSE 0 END, LOWER(name) ASC"))
     else
       []
     end
