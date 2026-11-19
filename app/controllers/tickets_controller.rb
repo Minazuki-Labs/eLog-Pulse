@@ -124,18 +124,32 @@ class TicketsController < ApplicationController
       end.compact
     end
 
+    if @scope == "incomplete"
+      scoped_tickets = scoped_tickets.not_completed
+    end
+
+    @institution = params[:school_id].present? ? User.find_by(id: params[:school_id]) : nil
+
     respond_to do |format|
       format.html
       format.pdf do
+        is_incomplete = (@scope == "incomplete")
+        pdf_tickets = is_incomplete ? scoped_tickets.not_completed : scoped_tickets.where(status: :completed)
+        @tickets = pdf_tickets.includes(:location, :issue_type, :assignee, equipment: :equipment_category, comments: :user).order(created_at: :desc)
+
+        template_name = is_incomplete ? "tickets/incomplete_report_pdf" : "tickets/completed_report_pdf"
+        school_slug = @institution ? "#{@institution.name.to_s.parameterize}_" : ""
+        report_prefix = is_incomplete ? "#{school_slug}incomplete_tickets_report" : "completed_tickets_report"
+
         html_content = render_to_string(
-          template: "tickets/completed_report_pdf",
+          template: template_name,
           layout: false,
           formats: [ :html ]
         ).force_encoding("UTF-8")
 
         send_data(
           Grover.new(html_content).to_pdf,
-          filename: "completed_tickets_report_#{Date.today}.pdf",
+          filename: "#{report_prefix}_#{Date.today}.pdf",
           type: "application/pdf",
           disposition: "attachment"
         )
