@@ -45,14 +45,14 @@ class UsersController < ApplicationController
   end
 
   def schools
-    @schools = User.school.includes(:locations, :reported_tickets).order(:name)
+    @schools = User.school.includes(:locations, :reported_tickets).order(Arel.sql("LOWER(name) ASC"))
 
     if params[:query].present?
       query = "%#{params[:query].strip}%"
       @schools = @schools.where("name ILIKE :q OR username ILIKE :q", q: query)
     end
 
-    @schools = @schools.order(:name)
+    @schools = @schools.order(Arel.sql("LOWER(name) ASC"))
 
     render "users/schools"
   end
@@ -83,7 +83,10 @@ class UsersController < ApplicationController
       @employees = @employees.where(role: params[:role])
     end
 
-    @employees = @employees.order(Arel.sql("CASE role WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 3 THEN 3 ELSE 4 END"), :name)
+    @employees = @employees.order(
+      Arel.sql("CASE role WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 3 THEN 3 ELSE 4 END"),
+      Arel.sql("LOWER(name) ASC")
+    )
 
     render "users/employees"
   end

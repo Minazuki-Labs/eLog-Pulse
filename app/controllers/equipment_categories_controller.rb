@@ -3,9 +3,10 @@ class EquipmentCategoriesController < ApplicationController
   before_action :set_equipment_category, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @equipment_categories = EquipmentCategory.includes(:issue_types).order(created_at: :desc)
+    @equipment_categories = EquipmentCategory.includes(:issue_types).order(Arel.sql("LOWER(name) ASC"))
     if params[:query].present?
-      @equipment_categories = @equipment_categories.where("name ILIKE ?", "%#{params[:query]}%")
+      q = "%#{params[:query].strip}%"
+      @equipment_categories = @equipment_categories.where("name ILIKE ?", q)
     end
   end
 

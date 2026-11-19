@@ -35,6 +35,10 @@ export default class extends Controller {
       maxOptions: 100,
       plugins: ['dropdown_input'],
       searchField: ['text'],
+      sortField: {
+        field: 'text',
+        direction: 'asc'
+      },
       onInitialize: function() {
         this.wrapper.classList.add('w-full', 'rounded-2xl', 'border-none');
         this.control.classList.add('rounded-2xl', 'bg-slate-50', 'border-none', 'p-4');
@@ -83,7 +87,21 @@ export default class extends Controller {
       ts.unlock()
 
       if (data.length > 0) {
-        data.forEach(item => {
+        const isIssueType = this.hasIssueTypeTarget && target === this.issueTypeTarget
+        const sortedData = [...data].sort((a, b) => {
+          const textA = String(a.name || a.display_name || a.id)
+          const textB = String(b.name || b.display_name || b.id)
+
+          if (isIssueType) {
+            const aOther = textA.trim().toLowerCase() === "other"
+            const bOther = textB.trim().toLowerCase() === "other"
+            if (aOther !== bOther) return aOther ? 1 : -1
+          }
+
+          return textA.localeCompare(textB, undefined, { sensitivity: "base" })
+        })
+
+        sortedData.forEach(item => {
           ts.addOption({
             value: item.id,
             text: item.name || item.display_name || item.id

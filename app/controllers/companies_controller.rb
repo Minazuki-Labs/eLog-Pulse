@@ -4,9 +4,10 @@ class CompaniesController < ApplicationController
   before_action :require_admin!
 
   def index
-    @companies = Company.all
+    @companies = Company.order(Arel.sql("LOWER(name) ASC"))
     if params[:query].present?
-      @companies = @companies.where("name LIKE ?", "%#{params[:query]}%")
+      q = "%#{params[:query].strip}%"
+      @companies = @companies.where("name ILIKE :q", q: q)
     end
   end
 
