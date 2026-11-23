@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :stock_order do
-    association :user, factory: [:user, :employee]
-    association :school, factory: [:user, :school]
-    association :approver_1, factory: [:user, :employee]
+    association :user, factory: [ :user, :employee ]
+    association :school, factory: [ :user, :school ]
+    association :approver_1, factory: [ :user, :employee ]
     association :company
     teacher_phone_number { "0123456789" }
     teacher_email { "teacher@example.com" }

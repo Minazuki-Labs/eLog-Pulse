@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :ticket do
-    association :school, factory: [:user, :school]
+    association :school, factory: [ :user, :school ]
     teacher_name { "Teacher Ahmad" }
     teacher_phone_number { "0123456789" }
     teacher_email { "teacher@example.com" }
