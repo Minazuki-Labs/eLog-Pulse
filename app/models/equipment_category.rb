@@ -1,7 +1,6 @@
 class EquipmentCategory < ApplicationRecord
   has_many :equipment, dependent: :destroy
   has_many :issue_types, dependent: :destroy
-  has_many :location_template_items
 
   accepts_nested_attributes_for :issue_types, allow_destroy: true, reject_if: :all_blank
 
