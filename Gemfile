@@ -21,7 +21,7 @@ gem "jbuilder"
 # gem "bcrypt", "~> 3.1.7"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem "tzinfo-data", platforms: %i[ windows jruby ]
+gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem "solid_cache"
@@ -72,6 +72,9 @@ group :development, :test do
   gem "letter_opener_web"
 
   gem "rspec-rails", "~> 8.1"
+
+  # Test data factories
+  gem "factory_bot_rails"
 end
 
 group :development do
@@ -83,6 +86,9 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+
+  # One-liner tests for common Rails patterns
+  gem "shoulda-matchers", "~> 6.0"
 end
 
 gem "tailwindcss-rails", "~> 4.7"
