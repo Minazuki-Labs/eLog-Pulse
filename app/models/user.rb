@@ -10,7 +10,7 @@ class User < ApplicationRecord
   }
 
   has_many :school_emails, foreign_key: :school_id, inverse_of: :school, dependent: :destroy
-  accepts_nested_attributes_for :school_emails
+  accepts_nested_attributes_for :school_emails, allow_destroy: true, reject_if: :all_blank
 
   has_many :employee_schools, foreign_key: :school_id, dependent: :destroy
   has_many :assigned_employees, through: :employee_schools, source: :employee

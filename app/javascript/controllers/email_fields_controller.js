@@ -22,13 +22,13 @@ export default class extends Controller {
   remove(event) {
     event.preventDefault()
     const group = event.target.closest('.email-group')
+    const idInput = group.querySelector('input[name*="[id]"]')
     const destroyInput = group.querySelector('.destroy-flag')
     const count = this.containerTarget.querySelectorAll('.email-group:not([style*="display: none"])').length
 
     // Keep at least 1 input visible since min is 1
     if (count > 1) {
-      if (destroyInput) {
-        // If it's a persisted record, set _destroy to 1 and hide it so Rails processes the deletion
+      if (idInput && destroyInput) {
         destroyInput.value = "1"
         group.style.display = 'none'
       } else {
