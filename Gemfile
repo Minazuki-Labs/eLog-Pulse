@@ -72,6 +72,9 @@ group :development, :test do
   gem "letter_opener_web"
 
   gem "rspec-rails", "~> 8.1"
+
+  # Test data factories
+  gem "factory_bot_rails"
 end
 
 group :development do
@@ -83,6 +86,9 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+
+  # One-liner tests for common Rails patterns
+  gem "shoulda-matchers", "~> 6.0"
 end
 
 gem "tailwindcss-rails", "~> 4.7"
