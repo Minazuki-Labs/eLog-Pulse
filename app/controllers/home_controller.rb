@@ -23,15 +23,24 @@ class HomeController < ApplicationController
         User.school
       end
 
+      tickets_by_school_id = base_tickets
+        .where(school_id: allowed_schools.select(:id))
+        .includes(:location, { equipment: :equipment_category }, :issue_type)
+        .order(created_at: :desc)
+        .group_by(&:school_id)
+
       sorted_states = User.states.keys.sort_by { |state_key| state_key.titleize.downcase }
 
       @states_data = sorted_states.map do |state_key|
-        state_schools = allowed_schools.where(state: state_key).order(Arel.sql("LOWER(users.name) ASC"))
+        state_schools = allowed_schools
+          .where(state: state_key)
+          .select("users.*, LOWER(users.name) AS lower_name")
+          .order(Arel.sql("lower_name ASC"))
 
         active_schools = state_schools.map do |school|
-          school_tickets = base_tickets.where(school_id: school.id).includes(:location, { equipment: :equipment_category }, :issue_type).order(created_at: :desc)
+          school_tickets = tickets_by_school_id.fetch(school.id, [])
 
-          active_count = school_tickets.select { |t| t.new_case? || t.in_progress? }.count
+          active_count = school_tickets.count { |t| t.new_case? || t.in_progress? }
           { school: school, tickets: school_tickets } if active_count > 0
         end.compact
 
