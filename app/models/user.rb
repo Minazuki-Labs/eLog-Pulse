@@ -9,8 +9,8 @@ class User < ApplicationRecord
     terengganu: 12, kuala_lumpur: 13, labuan: 14, putrajaya: 15
   }
 
-  has_many :school_emails, foreign_key: :school_id, dependent: :destroy
-  accepts_nested_attributes_for :school_emails
+  has_many :school_emails, foreign_key: :school_id, inverse_of: :school, dependent: :destroy
+  accepts_nested_attributes_for :school_emails, allow_destroy: true, reject_if: :all_blank
 
   has_many :employee_schools, foreign_key: :school_id, dependent: :destroy
   has_many :assigned_employees, through: :employee_schools, source: :employee

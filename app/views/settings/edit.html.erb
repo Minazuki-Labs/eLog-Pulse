@@ -33,7 +33,7 @@
       </div>
     <% end %>
 
-    <%= render "users/form", user: target_user, url: setting_path, button_label: false %>
+    <%= render "users/form", f: f, user: target_user, url: setting_path, button_label: false %>
 
     <div class="flex items-center justify-end gap-3 pt-2">
       <%= link_to "Cancel", root_path, class: "px-5 py-3.5 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-2xl transition-all" %>
