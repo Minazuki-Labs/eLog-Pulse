@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :ensure_staff!, only: [ :schools, :employees ]
-  before_action :ensure_admin!, only: [ :new_school, :create_school, :edit, :update, :toggle_admin, :toggle_manager, :toggle_teacher, :destroy, :edit_assignment, :update_assignment ]
+  before_action :ensure_admin!, only: [ :new_school, :create_school, :new_employee, :create_employee, :edit, :update, :toggle_admin, :toggle_manager, :toggle_teacher, :destroy, :edit_assignment, :update_assignment ]
   before_action :set_user, only: [ :show, :edit, :update, :edit_assignment, :update_assignment, :toggle_admin, :toggle_manager, :toggle_teacher, :destroy ]
 
   def show
