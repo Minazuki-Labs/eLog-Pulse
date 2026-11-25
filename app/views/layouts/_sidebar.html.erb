@@ -79,7 +79,7 @@
       </div>
     <% end %>
 
-    <% if current_user.admin? %>
+    <% if current_user.admin? || current_user.contractor? %>
       <div class="pt-4 mt-4 border-t border-gray-100 space-y-1" data-controller="toggle" data-toggle-id-value="admin-tools">
         <button type="button" data-action="click->toggle#toggle" class="w-full flex items-center justify-between px-3 sm:px-5 py-2 text-[13px] font-black text-slate-900 uppercase tracking-[0.2em] mb-1 focus:outline-none cursor-pointer">
           <span>Admin Tools</span>
@@ -90,12 +90,16 @@
 
         <div data-toggle-target="content" class="grid grid-rows-[1fr] opacity-100 visible transition-all duration-300 ease-in-out overflow-hidden">
           <div class="overflow-hidden min-h-0 space-y-1 p-1.5 sm:p-2">
-            <%= sidebar_link "Equipment Directory", equipment_categories_path, "clipboard-document-list" %>
+            <% if current_user.admin? %>
+              <%= sidebar_link "Equipment Directory", equipment_categories_path, "clipboard-document-list" %>
+            <% end %>
             <%= sidebar_link "Stock Directory", stock_items_path, "archive-box" %>
-            <%= sidebar_link "School Directory", schools_users_path, "building-office" %>
-            <%= sidebar_link "Staff Management", employees_users_path, "users" %>
-            <%= sidebar_link "Company Directory", companies_path, "building-storefront" %>
-            <%= sidebar_link "Settings", edit_setting_path, "cog-6-tooth" %>
+            <% if current_user.admin? %>
+              <%= sidebar_link "School Directory", schools_users_path, "building-office" %>
+              <%= sidebar_link "Staff Management", employees_users_path, "users" %>
+              <%= sidebar_link "Company Directory", companies_path, "building-storefront" %>
+              <%= sidebar_link "Settings", edit_setting_path, "cog-6-tooth" %>
+            <% end %>
           </div>
         </div>
       </div>

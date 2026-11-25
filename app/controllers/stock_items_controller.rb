@@ -1,6 +1,6 @@
 class StockItemsController < ApplicationController
   before_action :authenticate_user!
-  before_action :ensure_admin!, except: [ :index, :show ]
+  before_action :ensure_admin_or_contractor!, except: [ :index, :show ]
   before_action :set_stock_item, only: [ :show, :edit, :update, :destroy ]
 
   def index
@@ -47,8 +47,8 @@ class StockItemsController < ApplicationController
 
   private
 
-  def ensure_admin!
-    redirect_to root_path, alert: "Unauthorized access." unless current_user.admin?
+  def ensure_admin_or_contractor!
+    redirect_to root_path, alert: "Unauthorized access." unless current_user.admin? || current_user.contractor?
   end
 
   def set_stock_item

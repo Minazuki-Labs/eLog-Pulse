@@ -10,7 +10,7 @@
       <% end %>
 
       <div class="flex items-center gap-2">
-        <% if current_user.admin? %>
+        <% if current_user.admin? || current_user.contractor? %>
           <%= link_to edit_stock_item_path(@stock_item), 
               class: "p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all", 
               title: "Edit Details" do %>
