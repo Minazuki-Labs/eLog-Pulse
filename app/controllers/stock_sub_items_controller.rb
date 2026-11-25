@@ -1,6 +1,6 @@
 class StockSubItemsController < ApplicationController
   before_action :authenticate_user!
-  before_action :ensure_admin!
+  before_action :ensure_admin_or_contractor!
 
   def create
     @stock_item = StockItem.find(params[:stock_item_id])
@@ -22,8 +22,8 @@ class StockSubItemsController < ApplicationController
 
   private
 
-  def ensure_admin!
-    redirect_to root_path, alert: "Unauthorized access." unless current_user.admin?
+  def ensure_admin_or_contractor!
+    redirect_to root_path, alert: "Unauthorized access." unless current_user.admin? || current_user.contractor?
   end
 
   def stock_sub_item_params
