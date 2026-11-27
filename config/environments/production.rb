@@ -20,6 +20,8 @@ Rails.application.configure do
   # Turn on "fragment caching" to speed up view rendering.
   config.action_controller.perform_caching = true
 
+  config.active_storage.service = :local
+
   # SMTP Mailer Configuration
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
