@@ -88,7 +88,7 @@ group :test do
   gem "selenium-webdriver"
 
   # One-liner tests for common Rails patterns
-  gem "shoulda-matchers", "~> 6.0"
+  gem "shoulda-matchers", "~> 8.0"
 end
 
 gem "tailwindcss-rails", "~> 4.7"
